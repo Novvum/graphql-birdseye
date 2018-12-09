@@ -1,9 +1,37 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import joint from "./jointjs";
+import {
+  GraphQLSchema,
+  buildClientSchema,
+  IntrospectionQuery,
+  GraphQLInputObjectType,
+  GraphQLEnumType,
+  GraphQLNamedType,
+  GraphQLScalarType,
+  GraphQLUnionType
+} from "graphql";
+import {
+  isFilteredEntity,
+  isBaseEntity,
+  getFieldLabel,
+  getNestedType
+} from "./utils";
+
 // var svgPanZoom = require("svg-pan-zoom");
 
-class GraphqlBirdseye extends React.Component {
+export interface GraphqlBirdseyeProps {
+  schema: GraphQLSchema | null;
+}
+export type FilteredGraphqlOutputType = Exclude<
+  GraphQLNamedType,
+  | GraphQLInputObjectType
+  | GraphQLEnumType
+  | GraphQLScalarType
+  | GraphQLUnionType
+>;
+
+class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
   graph: any;
   paper: any;
   ref: any;
@@ -13,6 +41,10 @@ class GraphqlBirdseye extends React.Component {
   }
 
   componentDidMount() {
+    const schema = this.props.schema;
+    if (!schema) {
+      return;
+    }
     const bounds = this.ref.getBoundingClientRect();
     this.paper = new joint.dia.Paper({
       el: ReactDOM.findDOMNode(this.ref),
@@ -20,55 +52,62 @@ class GraphqlBirdseye extends React.Component {
       width: bounds.width,
       height: bounds.height,
       drawGrid: true,
-      defaultRouter: { name: "metro" },
+      defaultRouter: { name: "manhattan", args: { endDirections: ["left"] } },
       defaultConnector: { name: "rounded" }
     });
-    const a1 = this.addNode({
-      id: "hello",
-      inPorts: ["as", "bs", "cs", "ds", "es", "fs"],
-      outPorts: ["a", "b", "c", "d", "e", "f"]
+    const typeMap = schema.getTypeMap();
+    const toRenderTypes: FilteredGraphqlOutputType[] = Object.keys(typeMap)
+      .filter(key => {
+        return !isFilteredEntity(typeMap[key]) && !isBaseEntity(typeMap[key]);
+      })
+      .map(k => typeMap[k] as FilteredGraphqlOutputType);
+    toRenderTypes.forEach(type => {
+      const fields = type.getFields();
+      this.addNode({
+        id: type.name,
+        attrs: {
+          ".label": {
+            text: type.name
+          }
+        },
+        inPorts: Object.keys(fields),
+        outPorts: Object.keys(fields).map(k => {
+          const field = fields[k];
+          const connectedType = getNestedType(field.type);
+          const id = `${field.name}_${connectedType.name}`;
+          const label = getFieldLabel(field.type);
+          return {
+            id,
+            label
+          };
+        })
+      });
     });
-    console.log(a1.id);
-    const a2 = this.addNode({
-      inPorts: ["ad"],
-      outPorts: ["a"]
+    toRenderTypes.forEach(type => {
+      const fields = type.getFields();
+      Object.keys(fields).map(k => {
+        const field = fields[k];
+        const connectedType = getNestedType(field.type);
+        const id = `${field.name}_${connectedType.name}`;
+        if (
+          toRenderTypes.findIndex(type => type.name === connectedType.name) > -1
+        ) {
+          var link = new joint.shapes.devs.Link();
+          link.source({
+            id: type.name,
+            port: id
+          });
+          link.target({
+            id: connectedType.name
+          });
+          link.addTo(this.graph);
+        }
+      });
     });
-    const a3 = this.addNode({
-      inPorts: ["ad"],
-      outPorts: ["d"]
-    });
-    const a4 = this.addNode({
-      inPorts: ["ad"],
-      outPorts: ["f"]
-    });
-    var link = new joint.shapes.devs.Link();
-    link.source({
-      id: a1.id,
-      port: "a"
-    });
-    link.target(a2);
-    link.addTo(this.graph);
-    var link2 = new joint.shapes.devs.Link();
-    link2.source({
-      id: a1.id,
-      port: "c"
-    });
-    link2.target(a3);
-    link2.addTo(this.graph);
-    var link3 = new joint.shapes.devs.Link();
-    link3.source(a2);
-    link3.target(a4);
-    link3.addTo(this.graph);
-    var link4 = new joint.shapes.devs.Link();
-    link4.source({
-      id: a1.id,
-      port: "b"
-    });
-    link4.target(a4);
-    link4.addTo(this.graph);
     joint.layout.DirectedGraph.layout(this.graph, {
       nodeSep: 100,
       edgeSep: 100,
+      rankSep: 300,
       rankDir: "LR"
     });
     // svgPanZoom("#v-2", {
@@ -101,4 +140,29 @@ class GraphqlBirdseye extends React.Component {
   };
 }
 
-export default GraphqlBirdseye;
+export interface SchemaProviderProps {
+  introspectionQuery?: IntrospectionQuery;
+  schema?: GraphQLSchema;
+}
+const schemaProvider = <P extends GraphqlBirdseyeProps>(
+  Component: React.ComponentType<P>
+) => {
+  return class SchemaProvider extends React.PureComponent<
+    P & SchemaProviderProps
+  > {
+    // displayName: `schemaProvider(${Component.displayName})`
+    render() {
+      const { introspectionQuery, schema: schemaProp, ...props } = this
+        .props as SchemaProviderProps;
+      let schema = null;
+      if (schemaProp) {
+        schema = schemaProp;
+      } else if (introspectionQuery) {
+        schema = buildClientSchema(introspectionQuery);
+      }
+      return <Component schema={schema} {...props} />;
+    }
+  };
+};
+
+export default schemaProvider(GraphqlBirdseye);

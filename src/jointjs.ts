@@ -139,11 +139,11 @@ joint.shapes.basic.Generic.define(
     },
     createPortItem: function(group: any, port: any) {
       return {
-        id: port,
+        id: typeof port === "object" ? port.id : port,
         group: group,
         attrs: {
           ".port-label": {
-            text: port
+            text: typeof port === "object" ? port.label : port
           },
           ".port-body": {
             width: group === "in" ? this.get("size").width : 0
