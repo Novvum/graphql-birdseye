@@ -1596,6 +1596,12 @@ babylon@^6.18.0:
   version "6.18.0"
   resolved "https://registry.npmjs.org/babylon/-/babylon-6.18.0.tgz#af2f3b88fa6f5c1e4c634d1a0f8eac4f55b395e3"
 
+backbone@1.3.3:
+  version "1.3.3"
+  resolved "https://registry.npmjs.org/backbone/-/backbone-1.3.3.tgz#4cc80ea7cb1631ac474889ce40f2f8bc683b2999"
+  dependencies:
+    underscore ">=1.8.3"
+
 balanced-match@^0.4.2:
   version "0.4.2"
   resolved "https://registry.npmjs.org/balanced-match/-/balanced-match-0.4.2.tgz#cb3f3e3c732dc0f01ee70b403f302e61d7709838"
@@ -2623,6 +2629,13 @@ d@1:
   resolved "http://registry.npmjs.org/d/-/d-1.0.0.tgz#754bb5bfe55451da69a58b94d45f4c5b0462d58f"
   dependencies:
     es5-ext "^0.10.9"
+
+dagre@0.8.2:
+  version "0.8.2"
+  resolved "https://registry.npmjs.org/dagre/-/dagre-0.8.2.tgz#755b79f4d5499d63cf74c3368fb08add93eceafe"
+  dependencies:
+    graphlib "^2.1.5"
+    lodash "^4.17.4"
 
 dashdash@^1.12.0:
   version "1.14.1"
@@ -3796,6 +3809,12 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   version "4.1.15"
   resolved "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.1.15.tgz#ffb703e1066e8a0eeaa4c8b80ba9253eeefbfb00"
 
+graphlib@2.1.5, graphlib@^2.1.5:
+  version "2.1.5"
+  resolved "https://registry.npmjs.org/graphlib/-/graphlib-2.1.5.tgz#6afe1afcc5148555ec799e499056795bd6938c87"
+  dependencies:
+    lodash "^4.11.1"
+
 growly@^1.3.0:
   version "1.3.0"
   resolved "https://registry.npmjs.org/growly/-/growly-1.3.0.tgz#f10748cbe76af964b7c96c93c6bcc28af120c081"
@@ -4858,6 +4877,20 @@ jest@22.4.2:
     import-local "^1.0.0"
     jest-cli "^22.4.2"
 
+jointjs@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.npmjs.org/jointjs/-/jointjs-2.2.1.tgz#eb4119638c0f88f023061da5eeea169d1fbd547d"
+  dependencies:
+    backbone "1.3.3"
+    dagre "0.8.2"
+    graphlib "2.1.5"
+    jquery "3.3.1"
+    lodash "4.17.11"
+
+jquery@3.3.1:
+  version "3.3.1"
+  resolved "https://registry.npmjs.org/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
+
 js-base64@^2.1.9:
   version "2.4.9"
   resolved "https://registry.npmjs.org/js-base64/-/js-base64-2.4.9.tgz#748911fb04f48a60c4771b375cac45a80df11c03"
@@ -5222,7 +5255,7 @@ lodash.uniq@^4.5.0:
   version "4.5.0"
   resolved "https://registry.npmjs.org/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
 
-"lodash@>=3.5 <5", lodash@^4.13.1, lodash@^4.17.10, lodash@^4.17.2, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.3.0:
+lodash@4.17.11, "lodash@>=3.5 <5", lodash@^4.11.1, lodash@^4.13.1, lodash@^4.17.10, lodash@^4.17.2, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.3.0:
   version "4.17.11"
   resolved "https://registry.npmjs.org/lodash/-/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
 
@@ -8178,6 +8211,10 @@ uglifyjs-webpack-plugin@^1.1.8:
     uglify-es "^3.3.4"
     webpack-sources "^1.1.0"
     worker-farm "^1.5.2"
+
+underscore@>=1.8.3:
+  version "1.9.1"
+  resolved "https://registry.npmjs.org/underscore/-/underscore-1.9.1.tgz#06dce34a0e68a7babc29b365b8e74b8925203961"
 
 unicode-canonical-property-names-ecmascript@^1.0.4:
   version "1.0.4"
