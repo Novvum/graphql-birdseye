@@ -1,5 +1,5 @@
 {
-  "name": "graphql-view-example",
+  "name": "graphql-birdseye-example",
   "homepage": "https://novvum.github.io/graphql-view",
   "version": "0.0.0",
   "license": "MIT",
@@ -9,7 +9,7 @@
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-scripts": "^1.1.4",
-    "graphql-view": "link:.."
+    "graphql-birdseye": "link:.."
   },
   "scripts": {
     "start": "react-scripts start",
