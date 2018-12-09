@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 
 import GraphqlBirdseye from "graphql-birdseye";
-
+import dummySchema from "./dummySchema";
 export default class App extends Component {
   render() {
     return (
       <div>
-        <GraphqlBirdseye text="Modern React component module" />
+        <GraphqlBirdseye introspectionQuery={dummySchema.data} />
       </div>
     );
   }
