@@ -119,20 +119,21 @@ joint.shapes.basic.Generic.define(
 
       var inPortItems = this.createPortItems("in", inPorts);
       var outPortItems = this.createPortItems("out", outPorts);
-      var portCount = Math.max(inPorts.length, outPorts.length);
-      this._setSize(portCount);
       this.prop(
         "ports/items",
         inPortItems.concat(outPortItems),
         joint.util.assign({ rewrite: true }, opt)
       );
+      var portCount = Math.max(inPorts.length, outPorts.length);
+      this._setSize(portCount);
     },
     _setSize: function(portCount: number) {
       const size = this.get("size");
+      const height = portCount * 40;
       if (!size.height || size.height === "auto") {
         this.set("size", {
           ...size,
-          height: portCount * 40
+          height
         });
       }
     },
