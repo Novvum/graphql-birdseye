@@ -24,7 +24,8 @@
     "deploy": "gh-pages -d example/build"
   },
   "dependencies": {
-    "jointjs": "^2.2.1"
+    "jointjs": "^2.2.1",
+    "svg-pan-zoom": "^3.6.0"
   },
   "peerDependencies": {
     "prop-types": "^15.5.4",
