@@ -2,9 +2,8 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import joint from "./jointjs";
 // var svgPanZoom = require("svg-pan-zoom");
-// import Shapes from '../jointjs-configuration/Shapes'
 
-class Graph extends React.Component {
+class GraphqlBirdseye extends React.Component {
   graph: any;
   paper: any;
   ref: any;
@@ -20,7 +19,6 @@ class Graph extends React.Component {
       model: this.graph,
       width: bounds.width,
       height: bounds.height,
-      gridSize: 10,
       drawGrid: true,
       defaultRouter: { name: "metro" },
       defaultConnector: { name: "rounded" }
@@ -73,10 +71,6 @@ class Graph extends React.Component {
       edgeSep: 100,
       rankDir: "LR"
     });
-    this.paper.drawGrid({
-      color: "black",
-      thickness: "0.5"
-    });
     // svgPanZoom("#v-2", {
     //   controlIconsEnabled: true
     // });
@@ -107,4 +101,4 @@ class Graph extends React.Component {
   };
 }
 
-export default Graph;
+export default GraphqlBirdseye;

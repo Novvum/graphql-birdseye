@@ -1,10 +1,10 @@
 {
-  "name": "graphql-view",
+  "name": "graphql-birdseye",
   "version": "1.0.0",
   "description": "graphql visualizer",
   "author": "novvum",
   "license": "MIT",
-  "repository": "novvum/graphql-view",
+  "repository": "novvum/graphql-birdseye",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "jsnext:main": "dist/index.es.js",

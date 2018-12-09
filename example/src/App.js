@@ -1,13 +1,13 @@
-import React, { Component } from 'react'
+import React, { Component } from "react";
 
-import ExampleComponent from 'graphql-view'
+import GraphqlBirdseye from "graphql-birdseye";
 
 export default class App extends Component {
-  render () {
+  render() {
     return (
       <div>
-        <ExampleComponent text='Modern React component module' />
+        <GraphqlBirdseye text="Modern React component module" />
       </div>
-    )
+    );
   }
 }
