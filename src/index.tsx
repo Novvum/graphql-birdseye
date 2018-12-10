@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import joint from "./jointjs";
+import joint, { addTools, bindToolEvents } from "./jointjs";
 import {
   GraphQLSchema,
   buildClientSchema,
@@ -37,7 +37,6 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
   ref: any;
   constructor(props: any) {
     super(props);
-    this.graph = new joint.dia.Graph();
   }
 
   componentDidMount() {
@@ -45,16 +44,24 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     if (!schema) {
       return;
     }
+
+    this.graph = new joint.dia.Graph();
     const bounds = this.ref.getBoundingClientRect();
     this.paper = new joint.dia.Paper({
       el: ReactDOM.findDOMNode(this.ref),
       model: this.graph,
       width: bounds.width,
       height: bounds.height,
-      drawGrid: true,
-      defaultRouter: { name: "manhattan", args: { endDirections: ["left"] } },
-      defaultConnector: { name: "rounded" }
+      gridSize: 1,
+      defaultConnector: { name: "smooth" },
+      interactive: {
+        linkMove: false
+      }
     });
+
+    // enable interactions
+    // bindInteractionEvents(adjustVertices, this.graph, this.paper);
+
     const typeMap = schema.getTypeMap();
     const toRenderTypes: FilteredGraphqlOutputType[] = Object.keys(typeMap)
       .filter(key => {
@@ -101,23 +108,24 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
             id: connectedType.name
           });
           link.addTo(this.graph);
+          addTools(this.paper, link);
         }
       });
     });
     joint.layout.DirectedGraph.layout(this.graph, {
-      nodeSep: 100,
-      edgeSep: 100,
+      nodeSep: 200,
       rankSep: 300,
       rankDir: "LR"
     });
-    // svgPanZoom("#v-2", {
-    //   controlIconsEnabled: true
-    // });
+    // tools are visible by default
+    this.paper.hideTools();
+
+    // enable tools
+    bindToolEvents(this.paper);
     this.paper.scaleContentToFit({
       padding: 100
     });
   }
-
   addNode(node: any) {
     var a1 = new joint.shapes.devs.Model(node);
     this.graph.addCells([a1]);
