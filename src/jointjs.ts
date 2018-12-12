@@ -125,20 +125,36 @@ joint.shapes.basic.Generic.define(
         inPortItems.concat(outPortItems),
         joint.util.assign({ rewrite: true }, opt)
       );
-      var portCount = Math.max(inPorts.length, outPorts.length);
-      this._setSize(portCount);
+      this._setSize();
     },
-    _setSize: function(portCount: number) {
+    _setSize: function() {
+      var portCount = Math.max(
+        this.get("inPorts").length,
+        this.get("outPorts").length
+      );
       const size = this.get("size");
-      const height = portCount * 40;
+      let height = size.height;
+      let width = size.width;
       if (!size.height || size.height === "auto") {
-        this.set("size", {
-          ...size,
-          height
-        });
+        height = portCount * 40;
       }
+      const maxInportLength = Math.max(
+        ...this.get("inPorts").map((port: string) => port.length)
+      );
+      const maxOutportLength = Math.max(
+        ...this.get("outPorts").map(
+          (port: { id: any; label: string }) => port.label.length
+        )
+      );
+      width = Math.max(width, (maxInportLength + maxOutportLength) * 10 + 20);
+      this.set("size", {
+        ...size,
+        height,
+        width
+      });
     },
     createPortItem: function(group: any, port: any) {
+      this._setSize();
       return {
         id: typeof port === "object" ? port.id : port,
         group: group,

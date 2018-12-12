@@ -41,7 +41,7 @@ export function isBaseEntity(entity: GraphQLNamedType): boolean {
   return (
     entity.name.startsWith("__") ||
     baseEntities.indexOf(entity.name) > -1 ||
-    ["GraphQLEnumType", "GraphQLInputObjectType"].includes(
+    ["GraphQLEnumType", "GraphQLInputObjectType", "GraphQLScalarType"].includes(
       entity.constructor.name
     )
   );
