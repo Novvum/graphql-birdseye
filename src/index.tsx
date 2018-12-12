@@ -18,7 +18,7 @@ import {
   getNestedType
 } from "./utils";
 
-// var svgPanZoom = require("svg-pan-zoom");
+var svgPanZoom = require("svg-pan-zoom");
 
 export interface GraphqlBirdseyeProps {
   schema: GraphQLSchema | null;
@@ -53,11 +53,13 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       width: bounds.width,
       height: bounds.height,
       gridSize: 1,
-      defaultConnector: { name: "smooth" },
+      // defaultRouter: { name: "metro" },
+      defaultConnector: { name: "rounded" },
       interactive: {
         linkMove: false
       }
     });
+    this.paper.setInteractivity(false);
 
     // enable interactions
     // bindInteractionEvents(adjustVertices, this.graph, this.paper);
@@ -114,7 +116,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     });
     joint.layout.DirectedGraph.layout(this.graph, {
       nodeSep: 200,
-      rankSep: 300,
+      rankSep: 400,
       rankDir: "LR"
     });
     // tools are visible by default
@@ -122,6 +124,10 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
 
     // enable tools
     bindToolEvents(this.paper);
+    svgPanZoom("#v-2", {
+      fit: true,
+      controlIconsEnabled: true
+    });
     this.paper.scaleContentToFit({
       padding: 100
     });
