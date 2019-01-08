@@ -82,7 +82,7 @@ joint.shapes.basic.Generic.define(
             ".port-body": {
               fill: "#fff",
               stroke: "#000",
-              magnet: false
+              magnet: true
             }
           },
           label: {
