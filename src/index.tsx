@@ -9,7 +9,8 @@ import {
   GraphQLEnumType,
   GraphQLNamedType,
   GraphQLScalarType,
-  GraphQLUnionType
+  GraphQLUnionType,
+  GraphQLObjectType
 } from "graphql";
 import {
   isFilteredEntity,
@@ -31,20 +32,24 @@ export type FilteredGraphqlOutputType = Exclude<
   | GraphQLUnionType
 >;
 
+export interface State {
+  activeType: string;
+}
 class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
   graph: any;
   paper: any;
   ref: any;
+  state: State = {
+    activeType: "Event"
+  };
   constructor(props: any) {
     super(props);
   }
 
   componentDidMount() {
-    const schema = this.props.schema;
-    if (!schema) {
+    if (!this.props.schema) {
       return;
     }
-
     this.graph = new joint.dia.Graph();
     const bounds = this.ref.getBoundingClientRect();
     this.paper = new joint.dia.Paper({
@@ -54,7 +59,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       height: bounds.height,
       gridSize: 1,
       // defaultRouter: { name: "metro" },
-      defaultConnector: { name: "rounded" },
+      defaultConnector: { name: "rounded", args: { radius: 100 } },
       interactive: {
         linkMove: false
       }
@@ -64,10 +69,69 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     // enable interactions
     // bindInteractionEvents(adjustVertices, this.graph, this.paper);
 
-    const typeMap = schema.getTypeMap();
+    this.addElementsToGraph(this.props);
+    // tools are visible by default
+    this.paper.hideTools();
+
+    // enable tools
+    bindToolEvents(this.paper);
+    svgPanZoom("#v-2", {
+      fit: true,
+      controlIconsEnabled: true,
+      maxZoom: 20
+    });
+    this.paper.scaleContentToFit({
+      padding: 100
+    });
+  }
+  private addElementsToGraph(
+    props: GraphqlBirdseyeProps = this.props,
+    state: State = this.state
+  ) {
+    if (!props.schema) {
+      return;
+    }
+    const { activeType } = state;
+    const typeMap = props.schema.getTypeMap();
+    const isRelatedType = (
+      source: GraphQLObjectType,
+      destination: GraphQLNamedType
+    ) => {
+      const sourceFields = source.getFields();
+      const matchingField =
+        Object.keys(sourceFields).find(key => {
+          const fieldType = getNestedType(sourceFields[key].type);
+          return fieldType.name === destination.name;
+        }) || false;
+      return matchingField;
+    };
     const toRenderTypes: FilteredGraphqlOutputType[] = Object.keys(typeMap)
       .filter(key => {
-        return !isFilteredEntity(typeMap[key]) && !isBaseEntity(typeMap[key]);
+        const type = typeMap[key];
+        if (isFilteredEntity(type) || isBaseEntity(type)) {
+          return false;
+        }
+        if (activeType === "root") {
+          if (type.name === "Query" || type.name === "Mutation") {
+            return true;
+          }
+          return (
+            (typeMap["Query"] &&
+              isRelatedType(typeMap["Query"] as GraphQLObjectType, type)) ||
+            (typeMap["Mutation"] &&
+              isRelatedType(typeMap["Mutation"] as GraphQLObjectType, type))
+          );
+        }
+        if (activeType === type.name) {
+          return true;
+        }
+        if (type.constructor.name === "GraphQLObjectType") {
+          return (
+            isRelatedType(type as GraphQLObjectType, typeMap[activeType]) ||
+            isRelatedType(typeMap[activeType] as GraphQLObjectType, type)
+          );
+        }
+        return false;
       })
       .map(k => typeMap[k] as FilteredGraphqlOutputType);
     toRenderTypes.forEach(type => {
@@ -118,20 +182,26 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       nodeSep: 200,
       rankSep: 400,
       rankDir: "LR"
-    });
-    // tools are visible by default
-    this.paper.hideTools();
-
-    // enable tools
-    bindToolEvents(this.paper);
-    svgPanZoom("#v-2", {
-      fit: true,
-      controlIconsEnabled: true
-    });
-    this.paper.scaleContentToFit({
-      padding: 100
+      // setPosition: function(element: any, glNode: any) {
+      //   element.set(
+      //     "position",
+      //     {
+      //       x: glNode.x - glNode.width / 2,
+      //       y: glNode.y - glNode.height / 2
+      //     },
+      //     { cacheOnly: true /* will not update links yet */ }
+      //   );
+      // }
+      // setVertices: function(link: any, points: any) {
+      //   var vertices = points.slice(1, points.length - 1);
+      //   // vertices.push({ ...vertices[0], x: vertices[0].x + 20 });
+      //   // trigger view update manually
+      //   link.unset("vertices", { silent: true });
+      //   link.set("vertices", vertices);
+      // }
     });
   }
+
   addNode(node: any) {
     var a1 = new joint.shapes.devs.Model(node);
     this.graph.addCells([a1]);
