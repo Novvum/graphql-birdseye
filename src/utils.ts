@@ -43,7 +43,8 @@ export function isBaseEntity(entity: GraphQLNamedType): boolean {
     baseEntities.indexOf(entity.name) > -1 ||
     ["GraphQLEnumType", "GraphQLInputObjectType", "GraphQLScalarType"].includes(
       entity.constructor.name
-    )
+    ) ||
+    entity.name === "Mutation"
   );
 }
 
