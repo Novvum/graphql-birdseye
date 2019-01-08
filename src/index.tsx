@@ -54,7 +54,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       return;
     }
     this.graph = new joint.dia.Graph();
-    const bounds = this.ref.getBoundingClientRect();
+    const bounds = this.getBounds();
     this.paper = new joint.dia.Paper({
       el: ReactDOM.findDOMNode(this.ref),
       model: this.graph,
@@ -79,20 +79,8 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
 
     // enable tools
     bindToolEvents(this.paper);
-    this.paper.on("link:pointerclick", (linkView: any) => {
-      const activeType = linkView.model.attributes.target.id;
-      this.setActiveType(activeType);
-    });
-    this.paper.on("element:pointerclick", (linkView: any) => {
-      const activeType = linkView.model.id;
-      this.setActiveType(activeType);
-    });
-    this.scaleContentToFit();
-  }
-  private scaleContentToFit() {
-    delete this.panAndZoom;
     this.panAndZoom = svgPanZoom("#v-2", {
-      fit: true,
+      fit: false,
       controlIconsEnabled: true,
       maxZoom: 20,
       panEnabled: false
@@ -103,10 +91,27 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     this.paper.on("cell:pointerup blank:pointerup", () => {
       this.panAndZoom.disablePan();
     });
+    this.paper.on("resize", () => {
+      this.panAndZoom.reset();
+    });
+    this.paper.on("link:pointerclick", (linkView: any) => {
+      const activeType = linkView.model.attributes.target.id;
+      this.setActiveType(activeType);
+    });
+    this.paper.on("element:pointerclick", (linkView: any) => {
+      const activeType = linkView.model.id;
+      this.setActiveType(activeType);
+    });
+    this.scaleContentToFit();
+  }
+  private getBounds() {
+    return this.ref.getBoundingClientRect();
+  }
+
+  private scaleContentToFit() {
     this.paper.scaleContentToFit({
       padding: 100
     });
-    this.panAndZoom.center();
   }
 
   private setActiveType(activeType: any) {
@@ -159,17 +164,19 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
   }
   private removeUnusedElements(toRenderTypes: FilteredGraphqlOutputType[]) {
     const currentElements = this.graph.getElements();
-    const toRemove = currentElements.filter(
-      (elem: any) => !toRenderTypes.find(type => type.name === elem.id)
-    );
+    const toRemove = currentElements;
+    console.log(toRenderTypes);
+    // .filter(
+    //   (elem: any) => !toRenderTypes.find(type => type.name === elem.id)
+    // );
     this.graph.removeCells(...toRemove);
   }
   private addNewElements(toRenderTypes: FilteredGraphqlOutputType[]) {
-    const currentElements = this.graph.getElements();
+    // const currentElements = this.graph.getElements();
     toRenderTypes
-      .filter(type => {
-        return !currentElements.find((elem: any) => elem.id === type.name);
-      })
+      // .filter(type => {
+      //   return !currentElements.find((elem: any) => elem.id === type.name);
+      // })
       .forEach(type => {
         const fields = type.getFields();
         this.addNode({
