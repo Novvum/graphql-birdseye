@@ -69,7 +69,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     // enable interactions
     // bindInteractionEvents(adjustVertices, this.graph, this.paper);
 
-    this.addElementsToGraph(this.props);
+    this.renderElements(this.props, this.state);
     // tools are visible by default
     this.paper.hideTools();
 
@@ -84,7 +84,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       padding: 100
     });
   }
-  private addElementsToGraph(
+  private renderElements(
     props: GraphqlBirdseyeProps = this.props,
     state: State = this.state
   ) {
@@ -178,6 +178,10 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
         }
       });
     });
+    const activeElement = this.graph
+      .getElements()
+      .find((elem: any) => elem.id === activeType);
+    console.log(activeElement);
     joint.layout.DirectedGraph.layout(this.graph, {
       nodeSep: 200,
       rankSep: 400,
