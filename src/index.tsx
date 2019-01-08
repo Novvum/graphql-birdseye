@@ -16,8 +16,10 @@ import {
   isFilteredEntity,
   isBaseEntity,
   getFieldLabel,
-  getNestedType
+  getNestedType,
+  isRelatedType
 } from "./utils";
+import { TypeMap } from "graphql/type/schema";
 
 var svgPanZoom = require("svg-pan-zoom");
 
@@ -38,9 +40,10 @@ export interface State {
 class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
   graph: any;
   paper: any;
+  panAndZoom: any;
   ref: any;
   state: State = {
-    activeType: "Event"
+    activeType: "root"
   };
   constructor(props: any) {
     super(props);
@@ -70,20 +73,51 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     // bindInteractionEvents(adjustVertices, this.graph, this.paper);
 
     this.renderElements(this.props, this.state);
+
     // tools are visible by default
     this.paper.hideTools();
 
     // enable tools
     bindToolEvents(this.paper);
-    svgPanZoom("#v-2", {
+    this.paper.on("link:pointerclick", (linkView: any) => {
+      const activeType = linkView.model.attributes.target.id;
+      this.setActiveType(activeType);
+    });
+    this.paper.on("element:pointerclick", (linkView: any) => {
+      const activeType = linkView.model.id;
+      this.setActiveType(activeType);
+    });
+    this.scaleContentToFit();
+  }
+  private scaleContentToFit() {
+    delete this.panAndZoom;
+    this.panAndZoom = svgPanZoom("#v-2", {
       fit: true,
       controlIconsEnabled: true,
-      maxZoom: 20
+      maxZoom: 20,
+      panEnabled: false
+    });
+    this.paper.on("blank:pointerdown", () => {
+      this.panAndZoom.enablePan();
+    });
+    this.paper.on("cell:pointerup blank:pointerup", () => {
+      this.panAndZoom.disablePan();
     });
     this.paper.scaleContentToFit({
       padding: 100
     });
+    this.panAndZoom.center();
   }
+
+  private setActiveType(activeType: any) {
+    this.setState(
+      {
+        activeType: activeType
+      },
+      () => this.renderElements()
+    );
+  }
+
   private renderElements(
     props: GraphqlBirdseyeProps = this.props,
     state: State = this.state
@@ -93,19 +127,97 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     }
     const { activeType } = state;
     const typeMap = props.schema.getTypeMap();
-    const isRelatedType = (
-      source: GraphQLObjectType,
-      destination: GraphQLNamedType
-    ) => {
-      const sourceFields = source.getFields();
-      const matchingField =
-        Object.keys(sourceFields).find(key => {
-          const fieldType = getNestedType(sourceFields[key].type);
-          return fieldType.name === destination.name;
-        }) || false;
-      return matchingField;
-    };
-    const toRenderTypes: FilteredGraphqlOutputType[] = Object.keys(typeMap)
+    const toRenderTypes: FilteredGraphqlOutputType[] = this.getToRenderTypes(
+      typeMap,
+      activeType
+    );
+    this.removeUnusedElements(toRenderTypes);
+    this.addNewElements(toRenderTypes);
+    joint.layout.DirectedGraph.layout(this.graph, {
+      nodeSep: 200,
+      rankSep: 400,
+      rankDir: "LR"
+      // setPosition: function(element: any, glNode: any) {
+      //   element.set(
+      //     "position",
+      //     {
+      //       x: glNode.x - glNode.width / 2,
+      //       y: glNode.y - glNode.height / 2
+      //     },
+      //     { cacheOnly: true /* will not update links yet */ }
+      //   );
+      // }
+      // setVertices: function(link: any, points: any) {
+      //   var vertices = points.slice(1, points.length - 1);
+      //   // vertices.push({ ...vertices[0], x: vertices[0].x + 20 });
+      //   // trigger view update manually
+      //   link.unset("vertices", { silent: true });
+      //   link.set("vertices", vertices);
+      // }
+    });
+    this.scaleContentToFit();
+  }
+  private removeUnusedElements(toRenderTypes: FilteredGraphqlOutputType[]) {
+    const currentElements = this.graph.getElements();
+    const toRemove = currentElements.filter(
+      (elem: any) => !toRenderTypes.find(type => type.name === elem.id)
+    );
+    this.graph.removeCells(...toRemove);
+  }
+  private addNewElements(toRenderTypes: FilteredGraphqlOutputType[]) {
+    const currentElements = this.graph.getElements();
+    toRenderTypes
+      .filter(type => {
+        return !currentElements.find((elem: any) => elem.id === type.name);
+      })
+      .forEach(type => {
+        const fields = type.getFields();
+        this.addNode({
+          id: type.name,
+          attrs: {
+            ".label": {
+              text: type.name
+            }
+          },
+          inPorts: Object.keys(fields),
+          outPorts: Object.keys(fields).map(k => {
+            const field = fields[k];
+            const connectedType = getNestedType(field.type);
+            const id = `${field.name}_${connectedType.name}`;
+            const label = getFieldLabel(field.type);
+            return {
+              id,
+              label
+            };
+          })
+        });
+      });
+    toRenderTypes.forEach(type => {
+      const fields = type.getFields();
+      Object.keys(fields).map(k => {
+        const field = fields[k];
+        const connectedType = getNestedType(field.type);
+        const id = `${field.name}_${connectedType.name}`;
+        if (
+          toRenderTypes.findIndex(type => type.name === connectedType.name) > -1
+        ) {
+          var link = new joint.shapes.devs.Link();
+          link.source({
+            id: type.name,
+            port: id
+          });
+          link.target({
+            id: connectedType.name
+          });
+          link.addTo(this.graph);
+          addTools(this.paper, link);
+        }
+      });
+    });
+  }
+
+  private getToRenderTypes(typeMap: TypeMap, activeType: string) {
+    return Object.keys(typeMap)
       .filter(key => {
         const type = typeMap[key];
         if (isFilteredEntity(type) || isBaseEntity(type)) {
@@ -134,76 +246,6 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
         return false;
       })
       .map(k => typeMap[k] as FilteredGraphqlOutputType);
-    toRenderTypes.forEach(type => {
-      const fields = type.getFields();
-      this.addNode({
-        id: type.name,
-        attrs: {
-          ".label": {
-            text: type.name
-          }
-        },
-        inPorts: Object.keys(fields),
-        outPorts: Object.keys(fields).map(k => {
-          const field = fields[k];
-          const connectedType = getNestedType(field.type);
-          const id = `${field.name}_${connectedType.name}`;
-          const label = getFieldLabel(field.type);
-          return {
-            id,
-            label
-          };
-        })
-      });
-    });
-    toRenderTypes.forEach(type => {
-      const fields = type.getFields();
-      Object.keys(fields).map(k => {
-        const field = fields[k];
-        const connectedType = getNestedType(field.type);
-        const id = `${field.name}_${connectedType.name}`;
-        if (
-          toRenderTypes.findIndex(type => type.name === connectedType.name) > -1
-        ) {
-          var link = new joint.shapes.devs.Link();
-          link.source({
-            id: type.name,
-            port: id
-          });
-          link.target({
-            id: connectedType.name
-          });
-          link.addTo(this.graph);
-          addTools(this.paper, link);
-        }
-      });
-    });
-    const activeElement = this.graph
-      .getElements()
-      .find((elem: any) => elem.id === activeType);
-    console.log(activeElement);
-    joint.layout.DirectedGraph.layout(this.graph, {
-      nodeSep: 200,
-      rankSep: 400,
-      rankDir: "LR"
-      // setPosition: function(element: any, glNode: any) {
-      //   element.set(
-      //     "position",
-      //     {
-      //       x: glNode.x - glNode.width / 2,
-      //       y: glNode.y - glNode.height / 2
-      //     },
-      //     { cacheOnly: true /* will not update links yet */ }
-      //   );
-      // }
-      // setVertices: function(link: any, points: any) {
-      //   var vertices = points.slice(1, points.length - 1);
-      //   // vertices.push({ ...vertices[0], x: vertices[0].x + 20 });
-      //   // trigger view update manually
-      //   link.unset("vertices", { silent: true });
-      //   link.set("vertices", vertices);
-      // }
-    });
   }
 
   addNode(node: any) {

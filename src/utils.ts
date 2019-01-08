@@ -3,7 +3,8 @@ import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLNamedType,
-  GraphQLType
+  GraphQLType,
+  GraphQLObjectType
 } from "graphql";
 
 var baseEntities = ["Boolean", "Int", "String", "Float", "ID"];
@@ -50,4 +51,17 @@ export function isBaseEntity(entity: GraphQLNamedType): boolean {
 
 export function isFilteredEntity(entity: any) {
   return filteredTypes.indexOf(entity.name) > -1;
+}
+
+export function isRelatedType(
+  source: GraphQLObjectType,
+  destination: GraphQLNamedType
+) {
+  const sourceFields = source.getFields();
+  const matchingField =
+    Object.keys(sourceFields).find(key => {
+      const fieldType = getNestedType(sourceFields[key].type);
+      return fieldType.name === destination.name;
+    }) || false;
+  return matchingField;
 }
