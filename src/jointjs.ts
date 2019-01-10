@@ -255,6 +255,7 @@ joint.dia.Link.define(
         stroke: "#38616b",
         fill: "transparent",
         strokeWidth: 2,
+        opacity: 1,
         // strokeLinejoin: "round",
         targetMarker: {
           type: "path",

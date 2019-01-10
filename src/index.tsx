@@ -17,7 +17,8 @@ import {
   isBaseEntity,
   getFieldLabel,
   getNestedType,
-  isRelatedType
+  isRelatedType,
+  setTimeoutAsync
 } from "./utils";
 import { TypeMap } from "graphql/type/schema";
 
@@ -49,7 +50,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     super(props);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     if (!this.props.schema) {
       return;
     }
@@ -72,7 +73,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     // enable interactions
     // bindInteractionEvents(adjustVertices, this.graph, this.paper);
 
-    this.renderElements(this.props, this.state);
+    await this.renderElements(this.props, this.state);
 
     // tools are visible by default
     this.paper.hideTools();
@@ -83,7 +84,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       const activeType = linkView.model.attributes.target.id;
       this.setActiveType(activeType);
     });
-    this.paper.on("element:pointerclick", (linkView: any) => {
+    this.paper.on("cell:pointerclick", (linkView: any) => {
       const activeType = linkView.model.id;
       this.setActiveType(activeType);
     });
@@ -102,7 +103,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       padding: 100
     });
     this.panZoom = svgPanZoom("#v-2", {
-      fit: false,
+      fit: true,
       center: true,
       controlIconsEnabled: true,
       maxZoom: 20,
@@ -129,7 +130,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     );
   }
 
-  private renderElements(
+  private async renderElements(
     props: GraphqlBirdseyeProps = this.props,
     state: State = this.state
   ) {
@@ -142,7 +143,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       typeMap,
       activeType
     );
-    this.removeUnusedElements(toRenderTypes);
+    await this.removeUnusedElements(toRenderTypes);
     this.addNewElements(toRenderTypes);
     joint.layout.DirectedGraph.layout(this.graph, {
       nodeSep: 200,
@@ -168,21 +169,36 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     });
     this.scaleContentToFit();
   }
-  private removeUnusedElements(toRenderTypes: FilteredGraphqlOutputType[]) {
+  private async removeUnusedElements(
+    toRenderTypes: FilteredGraphqlOutputType[]
+  ) {
     const currentElements = this.graph.getElements();
-    const toRemove = currentElements;
-    console.log(toRenderTypes);
-    // .filter(
-    //   (elem: any) => !toRenderTypes.find(type => type.name === elem.id)
-    // );
-    this.graph.removeCells(...toRemove);
+    const toRemove = currentElements.filter(
+      (elem: any) => !toRenderTypes.find(type => type.name === elem.id)
+    );
+    const TRANSITION_DURATION = 100;
+    toRemove.map(async (element: any) => {
+      const links = this.graph.getConnectedLinks(element);
+      links.map((link: any) => {
+        link.transition("attrs/line/opacity", 0, {
+          delay: 0,
+          duration: TRANSITION_DURATION,
+          timingFunction: joint.util.timing.linear,
+          valueFunction: joint.util.interpolate.number
+        });
+      });
+    });
+    await setTimeoutAsync(
+      () => this.graph.removeCells(...toRemove),
+      TRANSITION_DURATION
+    );
   }
   private addNewElements(toRenderTypes: FilteredGraphqlOutputType[]) {
-    // const currentElements = this.graph.getElements();
+    const currentElements = this.graph.getElements();
     toRenderTypes
-      // .filter(type => {
-      //   return !currentElements.find((elem: any) => elem.id === type.name);
-      // })
+      .filter(type => {
+        return !currentElements.find((elem: any) => elem.id === type.name);
+      })
       .forEach(type => {
         const fields = type.getFields();
         this.addNode({
