@@ -65,3 +65,13 @@ export function isRelatedType(
     }) || false;
   return matchingField;
 }
+
+export function setTimeoutAsync(...args: Array<any>) {
+  const [callback, ...rest] = args;
+  return new Promise(resolve =>
+    setTimeout(() => {
+      callback();
+      resolve();
+    }, ...rest)
+  );
+}
