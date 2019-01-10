@@ -40,7 +40,7 @@ export interface State {
 class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
   graph: any;
   paper: any;
-  panAndZoom: any;
+  panZoom: any;
   ref: any;
   state: State = {
     activeType: "root"
@@ -79,21 +79,6 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
 
     // enable tools
     bindToolEvents(this.paper);
-    this.panAndZoom = svgPanZoom("#v-2", {
-      fit: false,
-      controlIconsEnabled: true,
-      maxZoom: 20,
-      panEnabled: false
-    });
-    this.paper.on("blank:pointerdown", () => {
-      this.panAndZoom.enablePan();
-    });
-    this.paper.on("cell:pointerup blank:pointerup", () => {
-      this.panAndZoom.disablePan();
-    });
-    this.paper.on("resize", () => {
-      this.panAndZoom.reset();
-    });
     this.paper.on("link:pointerclick", (linkView: any) => {
       const activeType = linkView.model.attributes.target.id;
       this.setActiveType(activeType);
@@ -109,9 +94,30 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
   }
 
   private scaleContentToFit() {
+    if (this.panZoom) {
+      this.panZoom.destroy();
+      delete this.panZoom;
+    }
     this.paper.scaleContentToFit({
       padding: 100
     });
+    this.panZoom = svgPanZoom("#v-2", {
+      fit: false,
+      center: true,
+      controlIconsEnabled: true,
+      maxZoom: 20,
+      panEnabled: false
+    });
+    this.paper.on("blank:pointerdown", () => {
+      this.panZoom.enablePan();
+    });
+    this.paper.on("cell:pointerup blank:pointerup", () => {
+      this.panZoom.disablePan();
+    });
+    this.paper.on("resize", () => {
+      this.panZoom.reset();
+    });
+    // this.panAndZoom && this.panAndZoom.center();
   }
 
   private setActiveType(activeType: any) {
