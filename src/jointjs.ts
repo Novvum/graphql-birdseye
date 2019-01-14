@@ -412,10 +412,7 @@ export function adjustVertices(graph: any, cell: any) {
 
 export function addTools(paper: any, link: any) {
   var toolsView = new joint.dia.ToolsView({
-    tools: [
-      new joint.linkTools.SourceArrowhead(),
-      new joint.linkTools.TargetArrowhead()
-    ]
+    tools: [new joint.linkTools.TargetArrowhead()]
   });
   link.findView(paper).addTools(toolsView);
 }
@@ -435,17 +432,38 @@ export function bindInteractionEvents(
   paper.on("cell:pointerup", adjustGraphVertices);
 }
 
-export function bindToolEvents(paper: any) {
+export function bindToolEvents(paper: any, graph: any) {
   // show link tools
   paper.on("link:mouseover", function(linkView: any) {
+    const links = graph
+      .getLinks()
+      .filter((link: any) => link.cid !== linkView.model.cid);
+    animateLinkOpacity(links, { targetOpacity: 0.3 });
     linkView.showTools();
   });
 
   // hide link tools
   paper.on("link:mouseout", function(linkView: any) {
+    const links = graph.getLinks();
+    animateLinkOpacity(links, { targetOpacity: 1 });
     linkView.hideTools();
   });
   paper.on("blank:mouseover cell:mouseover", function() {
     paper.hideTools();
+  });
+}
+
+export function animateLinkOpacity(
+  links: any,
+  opts?: { transitionDuration?: number; targetOpacity?: number }
+) {
+  const { transitionDuration = 100, targetOpacity: opacity = 0 } = opts || {};
+  links.map((link: any) => {
+    link.transition("attrs/line/opacity", opacity, {
+      delay: 0,
+      duration: transitionDuration,
+      timingFunction: joint.util.timing.linear,
+      valueFunction: joint.util.interpolate.number
+    });
   });
 }
