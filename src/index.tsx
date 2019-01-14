@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import joint, { addTools, bindToolEvents } from "./jointjs";
+import joint, { addTools, bindToolEvents, animateLinkOpacity } from "./jointjs";
 import {
   GraphQLSchema,
   buildClientSchema,
@@ -62,8 +62,10 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       width: bounds.width,
       height: bounds.height,
       gridSize: 1,
-      // defaultRouter: { name: "metro" },
-      defaultConnector: { name: "rounded", args: { radius: 100 } },
+      defaultRouter: {
+        name: "metro"
+      },
+      defaultConnector: { name: "rounded", args: { radius: 1000 } },
       interactive: {
         linkMove: false
       }
@@ -79,7 +81,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     this.paper.hideTools();
 
     // enable tools
-    bindToolEvents(this.paper);
+    bindToolEvents(this.paper, this.graph);
     this.paper.on("link:pointerclick", (linkView: any) => {
       const activeType = linkView.model.attributes.target.id;
       this.setActiveType(activeType);
@@ -99,9 +101,9 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       this.panZoom.destroy();
       delete this.panZoom;
     }
-    this.paper.scaleContentToFit({
-      padding: 100
-    });
+    // this.paper.scaleContentToFit({
+    //   padding: 100
+    // });
     this.panZoom = svgPanZoom("#v-2", {
       fit: true,
       center: true,
@@ -109,6 +111,11 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       maxZoom: 20,
       panEnabled: false
     });
+    this.panZoom.fit();
+    this.panZoom.updateBBox(); // Update viewport bounding box
+    this.panZoom.fit(); // fit works as expected
+
+    // (this.paper.getContentBBox())
     this.paper.on("blank:pointerdown", () => {
       this.panZoom.enablePan();
     });
@@ -118,7 +125,6 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     this.paper.on("resize", () => {
       this.panZoom.reset();
     });
-    // this.panAndZoom && this.panAndZoom.center();
   }
 
   private setActiveType(activeType: any) {
@@ -144,7 +150,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       activeType
     );
     await this.removeUnusedElements(toRenderTypes);
-    this.addNewElements(toRenderTypes);
+    await this.addNewElements(toRenderTypes);
     joint.layout.DirectedGraph.layout(this.graph, {
       nodeSep: 200,
       rankSep: 400,
@@ -156,12 +162,12 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       //       x: glNode.x - glNode.width / 2,
       //       y: glNode.y - glNode.height / 2
       //     },
-      //     { cacheOnly: true /* will not update links yet */ }
+      //     { cacheOnly: false /* will not update links yet */ }
       //   );
       // }
       // setVertices: function(link: any, points: any) {
       //   var vertices = points.slice(1, points.length - 1);
-      //   // vertices.push({ ...vertices[0], x: vertices[0].x + 20 });
+      //   // vertices.push({ ...vertices[0], x: vertices[0].x + 5 });
       //   // trigger view update manually
       //   link.unset("vertices", { silent: true });
       //   link.set("vertices", vertices);
@@ -179,21 +185,18 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     const TRANSITION_DURATION = 100;
     toRemove.map(async (element: any) => {
       const links = this.graph.getConnectedLinks(element);
-      links.map((link: any) => {
-        link.transition("attrs/line/opacity", 0, {
-          delay: 0,
-          duration: TRANSITION_DURATION,
-          timingFunction: joint.util.timing.linear,
-          valueFunction: joint.util.interpolate.number
-        });
+      animateLinkOpacity(links, {
+        transitionDuration: TRANSITION_DURATION,
+        targetOpacity: 0
       });
     });
     await setTimeoutAsync(
       () => this.graph.removeCells(...toRemove),
-      TRANSITION_DURATION
+      TRANSITION_DURATION * (2 / 3)
     );
+    await setTimeoutAsync(() => null, TRANSITION_DURATION / 3);
   }
-  private addNewElements(toRenderTypes: FilteredGraphqlOutputType[]) {
+  private async addNewElements(toRenderTypes: FilteredGraphqlOutputType[]) {
     const currentElements = this.graph.getElements();
     toRenderTypes
       .filter(type => {
@@ -221,6 +224,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
           })
         });
       });
+    // await setTimeoutAsync(() => null, 100);
     toRenderTypes.forEach(type => {
       const fields = type.getFields();
       Object.keys(fields).map(k => {
