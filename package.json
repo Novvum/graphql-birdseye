@@ -16,7 +16,9 @@
     "test": "cross-env CI=1 react-scripts-ts test --env=jsdom",
     "test:watch": "react-scripts-ts test --env=jsdom",
     "build": "rollup -c",
-    "start": "rollup -c -w",
+    "start": "npm-run-all --parallel start:component start:demo",
+    "start:component": "rollup -c -w",
+    "start:demo": "yarn --cwd ./example start",
     "prepare": "yarn run build",
     "predeploy": "cd example && yarn install && yarn run build",
     "deploy": "gh-pages -d example/build"
@@ -47,7 +49,8 @@
     "rollup-plugin-postcss": "^1.6.2",
     "rollup-plugin-typescript2": "^0.17.0",
     "rollup-plugin-url": "^1.4.0",
-    "typescript": "^2.8.3"
+    "typescript": "^2.8.3",
+    "yarn-run-all": "^3.1.1"
   },
   "files": [
     "dist"

@@ -2964,7 +2964,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   version "4.1.15"
   resolved "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.1.15.tgz#ffb703e1066e8a0eeaa4c8b80ba9253eeefbfb00"
 
-"graphql-view@link:..":
+"graphql-birdseye@link:..":
   version "0.0.0"
   uid ""
 
