@@ -2985,6 +2985,18 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   version "4.1.15"
   resolved "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.1.15.tgz#ffb703e1066e8a0eeaa4c8b80ba9253eeefbfb00"
 
+graphlib@2.1.5:
+  version "2.1.5"
+  resolved "https://registry.npmjs.org/graphlib/-/graphlib-2.1.5.tgz#6afe1afcc5148555ec799e499056795bd6938c87"
+  dependencies:
+    lodash "^4.11.1"
+
+graphlib@^2.1.5:
+  version "2.1.7"
+  resolved "https://registry.npmjs.org/graphlib/-/graphlib-2.1.7.tgz#b6a69f9f44bd9de3963ce6804a2fc9e73d86aecc"
+  dependencies:
+    lodash "^4.17.5"
+
 "graphql-birdseye@link:..":
   version "0.0.0"
   uid ""
