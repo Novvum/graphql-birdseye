@@ -4,6 +4,10 @@ import router from "./router";
 
 router(joint);
 
+export const ROW_HEIGHT = 36;
+export const LINK_INACTIVE = 0.3;
+export const LINK_ACTIVE = 1;
+
 export function addTools(paper: any, link: any) {
   var toolsView = new joint.dia.ToolsView({
     tools: [new joint.linkTools.TargetArrowhead()]
@@ -29,29 +33,34 @@ export function bindInteractionEvents(
 export function bindToolEvents(paper: any, graph: any) {
   // show link tools
   paper.on("link:mouseover", function(linkView: any) {
-    const links = graph
-      .getLinks()
-      .filter((link: any) => link.cid === linkView.model.cid);
-    animateLinkOpacity(links, { targetOpacity: 1 });
+    const links = graph.getLinks().filter((link: any) => {
+      return link.cid !== linkView.model.cid;
+    });
+    animateLinkOpacity([linkView.model], { targetOpacity: LINK_ACTIVE });
+    animateLinkOpacity(links, { targetOpacity: LINK_INACTIVE });
     linkView.showTools();
   });
 
   // hide link tools
-  paper.on("link:mouseout", function(linkView: any) {
-    const links = graph.getLinks();
-    animateLinkOpacity(links, { targetOpacity: 0 });
-    linkView.hideTools();
-  });
+  // paper.on("link:mouseout", function(linkView: any) {
+  //   const links = graph.getLinks();
+  //   // animateLinkOpacity(links, { targetOpacity: 0 });
+  //   linkView.hideTools();
+  // });
 
   paper.on("cell:mouseover", function(cell: any) {
-    animateLinkOpacity(graph.getLinks(), { targetOpacity: 0 });
-    const links = graph.getConnectedLinks(cell.model);
-    animateLinkOpacity(links, { targetOpacity: 1 });
+    activateCellLinks(graph, cell);
   });
 
   paper.on("blank:mouseover cell:mouseover", function() {
     paper.hideTools();
   });
+}
+
+export function activateCellLinks(graph: any, cell: any) {
+  animateLinkOpacity(graph.getLinks(), { targetOpacity: LINK_INACTIVE });
+  const links = graph.getConnectedLinks(cell.model);
+  animateLinkOpacity(links, { targetOpacity: LINK_ACTIVE });
 }
 
 export function animateLinkOpacity(
@@ -69,7 +78,6 @@ export function animateLinkOpacity(
   });
 }
 
-export const ROW_HEIGHT = 36;
 joint.shapes.basic.Generic.define(
   "devs.Model",
   {

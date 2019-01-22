@@ -4,7 +4,8 @@ import joint, {
   addTools,
   bindToolEvents,
   animateLinkOpacity,
-  ROW_HEIGHT
+  ROW_HEIGHT,
+  LINK_INACTIVE
 } from "./jointjs/index";
 import {
   GraphQLSchema,
@@ -42,6 +43,7 @@ export type FilteredGraphqlOutputType = Exclude<
 
 export interface State {
   activeType: string;
+  loading: boolean;
 }
 class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
   graph: any;
@@ -49,7 +51,8 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
   panZoom: any;
   ref: any;
   state: State = {
-    activeType: "root"
+    activeType: "Query",
+    loading: false
   };
   constructor(props: any) {
     super(props);
@@ -85,7 +88,6 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     // bindInteractionEvents(adjustVertices, this.graph, this.paper);
 
     await this.renderElements(this.props, this.state);
-
     // tools are visible by default
     this.paper.hideTools();
 
@@ -101,6 +103,18 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     });
     this.scaleContentToFit();
   }
+  private stopLoading() {
+    this.setState({
+      loading: false
+    });
+  }
+
+  private startLoading() {
+    this.setState({
+      loading: true
+    });
+  }
+
   private getBounds() {
     return this.ref.getBoundingClientRect();
   }
@@ -137,12 +151,14 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
   }
 
   private setActiveType(activeType: any) {
-    this.setState(
-      {
-        activeType: activeType
-      },
-      () => this.renderElements()
-    );
+    if (this.graph.getCell(activeType).attributes.type === "devs.Model") {
+      this.setState(
+        {
+          activeType: activeType
+        },
+        () => this.renderElements()
+      );
+    }
   }
 
   private async renderElements(
@@ -152,6 +168,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     if (!props.schema) {
       return;
     }
+    this.startLoading();
     const { activeType } = state;
     const typeMap = props.schema.getTypeMap();
     const toRenderTypes: FilteredGraphqlOutputType[] = this.getToRenderTypes(
@@ -175,13 +192,12 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
         );
       },
       setVertices: (link: any, points: any) => {
-        var vertices = points.slice(1, points.length - 1);
-
         link.unset("vertices", { silent: true });
-        // link.set("vertices", vertices);
       }
     });
+    animateLinkOpacity(this.graph.getLinks(), { targetOpacity: LINK_INACTIVE });
     this.scaleContentToFit();
+    this.stopLoading();
   }
   private async removeUnusedElements(
     toRenderTypes: FilteredGraphqlOutputType[]
@@ -258,9 +274,6 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
           const dx = targetCenterPosition.x - sourcePortPosition.x;
           const dy = targetCenterPosition.y - sourcePortPosition.y;
           var link = new joint.shapes.devs.Link();
-          if (type.name === "Claim" && id.includes("rental")) {
-            console.log(id, dx, dy);
-          }
           link.source({
             id: type.name,
             port: id,
@@ -271,9 +284,9 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
           link.target({
             id: connectedType.name,
             anchor: {
-              name: `${dy > 0 ? "top" : "bottom"}`,
+              name: `top`, // `${dy > 0 ? "top" : "bottom"}`,
               args: {
-                dy: dy > 0 ? ROW_HEIGHT / 2 : 0
+                dy: ROW_HEIGHT / 2 // dy > 0 ? ROW_HEIGHT / 2 : 0
               }
             }
           });
@@ -325,12 +338,22 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     return (
       <div
         style={{
+          position: "relative",
           width: "100%",
           height: "90vh"
         }}
-        id="playground"
-        ref={this.setRef}
-      />
+      >
+        <div
+          id="playground"
+          ref={this.setRef}
+          style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}
+        />
+        {this.state.loading && (
+          <div style={{ position: "absolute", top: "50%", left: "50%" }}>
+            Loading...
+          </div>
+        )}
+      </div>
     );
   }
   setRef = (ref: any) => {
