@@ -1,6 +1,11 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import joint, { addTools, bindToolEvents, animateLinkOpacity } from "./jointjs";
+import joint, {
+  addTools,
+  bindToolEvents,
+  animateLinkOpacity,
+  ROW_HEIGHT
+} from "./jointjs/index";
 import {
   GraphQLSchema,
   buildClientSchema,
@@ -63,9 +68,13 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       height: bounds.height,
       gridSize: 1,
       defaultRouter: {
-        name: "metro"
+        name: "metro", // "normal" // "metro",
+        args: {
+          endDirection: ["top", "bottom"],
+          paddingBox: 10
+        }
       },
-      defaultConnector: { name: "rounded", args: { radius: 1000 } },
+      defaultConnector: { name: "rounded", args: { radius: 100 } },
       interactive: {
         linkMove: false
       }
@@ -154,24 +163,23 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     joint.layout.DirectedGraph.layout(this.graph, {
       nodeSep: 200,
       rankSep: 400,
-      rankDir: "LR"
-      // setPosition: function(element: any, glNode: any) {
-      //   element.set(
-      //     "position",
-      //     {
-      //       x: glNode.x - glNode.width / 2,
-      //       y: glNode.y - glNode.height / 2
-      //     },
-      //     { cacheOnly: false /* will not update links yet */ }
-      //   );
-      // }
-      // setVertices: function(link: any, points: any) {
-      //   var vertices = points.slice(1, points.length - 1);
-      //   // vertices.push({ ...vertices[0], x: vertices[0].x + 5 });
-      //   // trigger view update manually
-      //   link.unset("vertices", { silent: true });
-      //   link.set("vertices", vertices);
-      // }
+      rankDir: "LR",
+      setPosition: function(element: any, glNode: any) {
+        element.set(
+          "position",
+          {
+            x: glNode.x - glNode.width / 2,
+            y: glNode.y - glNode.height / 2
+          },
+          { cacheOnly: false /* will not update links yet */ }
+        );
+      },
+      setVertices: (link: any, points: any) => {
+        var vertices = points.slice(1, points.length - 1);
+
+        link.unset("vertices", { silent: true });
+        // link.set("vertices", vertices);
+      }
     });
     this.scaleContentToFit();
   }
@@ -224,7 +232,6 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
           })
         });
       });
-    // await setTimeoutAsync(() => null, 100);
     toRenderTypes.forEach(type => {
       const fields = type.getFields();
       Object.keys(fields).map(k => {
@@ -234,13 +241,41 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
         if (
           toRenderTypes.findIndex(type => type.name === connectedType.name) > -1
         ) {
+          const sourceCell = this.graph.getCell(type.name);
+          const existingLinks = this.graph.getConnectedLinks(sourceCell);
+          if (
+            existingLinks.find(
+              (link: any) => link.attributes.source.port === id
+            )
+          ) {
+            return;
+          }
+          const sourcePortPosition = sourceCell.getPortsPositions("out")[id];
+          const targetCenterPosition = this.graph
+            .getCell(connectedType.name)
+            .getBBox()
+            .center();
+          const dx = targetCenterPosition.x - sourcePortPosition.x;
+          const dy = targetCenterPosition.y - sourcePortPosition.y;
           var link = new joint.shapes.devs.Link();
+          if (type.name === "Claim" && id.includes("rental")) {
+            console.log(id, dx, dy);
+          }
           link.source({
             id: type.name,
-            port: id
+            port: id,
+            anchor: {
+              name: `${dx > 0 ? "right" : "left"}`
+            }
           });
           link.target({
-            id: connectedType.name
+            id: connectedType.name,
+            anchor: {
+              name: `${dy > 0 ? "top" : "bottom"}`,
+              args: {
+                dy: dy > 0 ? ROW_HEIGHT / 2 : 0
+              }
+            }
           });
           link.addTo(this.graph);
           addTools(this.paper, link);
@@ -317,7 +352,7 @@ const schemaProvider = <P extends GraphqlBirdseyeProps>(
     render() {
       const { introspectionQuery, schema: schemaProp, ...props } = this
         .props as SchemaProviderProps;
-      let schema = null;
+      let schema: any = null;
       if (schemaProp) {
         schema = schemaProp;
       } else if (introspectionQuery) {

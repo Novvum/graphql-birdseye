@@ -1,6 +1,75 @@
 import joint from "jointjs/index";
 var _ = require("lodash");
+import router from "./router";
 
+router(joint);
+
+export function addTools(paper: any, link: any) {
+  var toolsView = new joint.dia.ToolsView({
+    tools: [new joint.linkTools.TargetArrowhead()]
+  });
+  link.findView(paper).addTools(toolsView);
+}
+
+export function bindInteractionEvents(
+  adjustVertices: any,
+  graph: any,
+  paper: any
+) {
+  // bind `graph` to the `adjustVertices` function
+  var adjustGraphVertices = _.partial(adjustVertices, graph);
+
+  // adjust vertices when a cell is removed or its source/target was changed
+  graph.on("add remove change:source change:target", adjustGraphVertices);
+
+  // adjust vertices when the user stops interacting with an element
+  paper.on("cell:pointerup", adjustGraphVertices);
+}
+
+export function bindToolEvents(paper: any, graph: any) {
+  // show link tools
+  paper.on("link:mouseover", function(linkView: any) {
+    const links = graph
+      .getLinks()
+      .filter((link: any) => link.cid === linkView.model.cid);
+    animateLinkOpacity(links, { targetOpacity: 1 });
+    linkView.showTools();
+  });
+
+  // hide link tools
+  paper.on("link:mouseout", function(linkView: any) {
+    const links = graph.getLinks();
+    animateLinkOpacity(links, { targetOpacity: 0 });
+    linkView.hideTools();
+  });
+
+  paper.on("cell:mouseover", function(cell: any) {
+    animateLinkOpacity(graph.getLinks(), { targetOpacity: 0 });
+    const links = graph.getConnectedLinks(cell.model);
+    animateLinkOpacity(links, { targetOpacity: 1 });
+  });
+
+  paper.on("blank:mouseover cell:mouseover", function() {
+    paper.hideTools();
+  });
+}
+
+export function animateLinkOpacity(
+  links: any,
+  opts?: { transitionDuration?: number; targetOpacity?: number }
+) {
+  const { transitionDuration = 100, targetOpacity: opacity = 0 } = opts || {};
+  links.map((link: any) => {
+    link.transition("attrs/line/opacity", opacity, {
+      delay: 0,
+      duration: transitionDuration,
+      timingFunction: joint.util.timing.linear,
+      valueFunction: joint.util.interpolate.number
+    });
+  });
+}
+
+export const ROW_HEIGHT = 36;
 joint.shapes.basic.Generic.define(
   "devs.Model",
   {
@@ -24,18 +93,18 @@ joint.shapes.basic.Generic.define(
       },
       ".header": {
         "ref-width": "100%",
-        height: 36.5,
+        height: ROW_HEIGHT,
         fill: "#548f9e",
         stroke: "#548f9e"
       },
       ".body": {
         "ref-width": "100%",
         "ref-height": "100%",
-        y: 36.5,
+        y: ROW_HEIGHT,
         stroke: "#548f9e"
       },
       ".joint-port": {
-        y: 36.5
+        y: ROW_HEIGHT
       }
     },
     ports: {
@@ -44,7 +113,7 @@ joint.shapes.basic.Generic.define(
           position: {
             name: "left",
             args: {
-              dy: 36.5
+              dy: ROW_HEIGHT
             }
           },
           attrs: {
@@ -53,9 +122,7 @@ joint.shapes.basic.Generic.define(
             },
             ".port-body": {
               fill: "#fff",
-              stroke: "#548f9e",
-              height: 40,
-              y: -20,
+              stroke: "#000",
               magnet: false
             }
           },
@@ -72,7 +139,7 @@ joint.shapes.basic.Generic.define(
           position: {
             name: "right",
             args: {
-              dy: 36.5
+              dy: ROW_HEIGHT
             }
           },
           attrs: {
@@ -80,8 +147,10 @@ joint.shapes.basic.Generic.define(
               fill: "#000"
             },
             ".port-body": {
-              fill: "#fff",
-              stroke: "#000",
+              fill: "transparent",
+              stroke: "#548f9e",
+              height: 40,
+              y: -20,
               magnet: true
             }
           },
@@ -163,7 +232,8 @@ joint.shapes.basic.Generic.define(
             text: typeof port === "object" ? port.label : port
           },
           ".port-body": {
-            width: group === "in" ? this.get("size").width : 0
+            width: group === "out" ? this.get("size").width : 0,
+            x: -this.get("size").width
           }
         }
       };
@@ -255,7 +325,7 @@ joint.dia.Link.define(
         stroke: "#38616b",
         fill: "transparent",
         strokeWidth: 2,
-        opacity: 1,
+        opacity: 0,
         // strokeLinejoin: "round",
         targetMarker: {
           type: "path",
@@ -408,62 +478,4 @@ export function adjustVertices(graph: any, cell: any) {
       });
     }
   }
-}
-
-export function addTools(paper: any, link: any) {
-  var toolsView = new joint.dia.ToolsView({
-    tools: [new joint.linkTools.TargetArrowhead()]
-  });
-  link.findView(paper).addTools(toolsView);
-}
-
-export function bindInteractionEvents(
-  adjustVertices: any,
-  graph: any,
-  paper: any
-) {
-  // bind `graph` to the `adjustVertices` function
-  var adjustGraphVertices = _.partial(adjustVertices, graph);
-
-  // adjust vertices when a cell is removed or its source/target was changed
-  graph.on("add remove change:source change:target", adjustGraphVertices);
-
-  // adjust vertices when the user stops interacting with an element
-  paper.on("cell:pointerup", adjustGraphVertices);
-}
-
-export function bindToolEvents(paper: any, graph: any) {
-  // show link tools
-  paper.on("link:mouseover", function(linkView: any) {
-    const links = graph
-      .getLinks()
-      .filter((link: any) => link.cid !== linkView.model.cid);
-    animateLinkOpacity(links, { targetOpacity: 0.3 });
-    linkView.showTools();
-  });
-
-  // hide link tools
-  paper.on("link:mouseout", function(linkView: any) {
-    const links = graph.getLinks();
-    animateLinkOpacity(links, { targetOpacity: 1 });
-    linkView.hideTools();
-  });
-  paper.on("blank:mouseover cell:mouseover", function() {
-    paper.hideTools();
-  });
-}
-
-export function animateLinkOpacity(
-  links: any,
-  opts?: { transitionDuration?: number; targetOpacity?: number }
-) {
-  const { transitionDuration = 100, targetOpacity: opacity = 0 } = opts || {};
-  links.map((link: any) => {
-    link.transition("attrs/line/opacity", opacity, {
-      delay: 0,
-      duration: transitionDuration,
-      timingFunction: joint.util.timing.linear,
-      valueFunction: joint.util.interpolate.number
-    });
-  });
 }
