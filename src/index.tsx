@@ -3,9 +3,7 @@ import * as ReactDOM from "react-dom";
 import joint, {
   addTools,
   bindToolEvents,
-  animateLinkOpacity,
-  ROW_HEIGHT,
-  LINK_INACTIVE
+  animateLinkOpacity
 } from "./jointjs/index";
 import {
   GraphQLSchema,
@@ -27,6 +25,7 @@ import {
   setTimeoutAsync
 } from "./utils";
 import { TypeMap } from "graphql/type/schema";
+import theme from "./theme";
 
 var svgPanZoom = require("svg-pan-zoom");
 
@@ -69,6 +68,9 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       model: this.graph,
       width: bounds.width,
       height: bounds.height,
+      background: {
+        color: theme.colors.background
+      },
       gridSize: 1,
       defaultRouter: {
         name: "metro", // "normal" // "metro",
@@ -195,7 +197,9 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
         link.unset("vertices", { silent: true });
       }
     });
-    animateLinkOpacity(this.graph.getLinks(), { targetOpacity: LINK_INACTIVE });
+    animateLinkOpacity(this.graph.getLinks(), {
+      targetColor: theme.colors.link.inactive
+    });
     this.scaleContentToFit();
     this.stopLoading();
   }
@@ -211,7 +215,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       const links = this.graph.getConnectedLinks(element);
       animateLinkOpacity(links, {
         transitionDuration: TRANSITION_DURATION,
-        targetOpacity: 0
+        targetColor: theme.colors.white
       });
     });
     await setTimeoutAsync(
@@ -286,7 +290,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
             anchor: {
               name: `top`, // `${dy > 0 ? "top" : "bottom"}`,
               args: {
-                dy: ROW_HEIGHT / 2 // dy > 0 ? ROW_HEIGHT / 2 : 0
+                dy: theme.row.height / 2 // dy > 0 ? ROW_HEIGHT / 2 : 0
               }
             }
           });

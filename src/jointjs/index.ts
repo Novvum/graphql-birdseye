@@ -1,10 +1,10 @@
 import joint from "jointjs/index";
 var _ = require("lodash");
 import router from "./router";
+import theme from "../theme";
 
 router(joint);
 
-export const ROW_HEIGHT = 36;
 export const LINK_INACTIVE = 0.3;
 export const LINK_ACTIVE = 1;
 
@@ -33,11 +33,11 @@ export function bindInteractionEvents(
 export function bindToolEvents(paper: any, graph: any) {
   // show link tools
   paper.on("link:mouseover", function(linkView: any) {
-    const links = graph.getLinks().filter((link: any) => {
-      return link.cid !== linkView.model.cid;
+    const links = graph.getLinks();
+    animateLinkOpacity(links, { targetColor: theme.colors.link.inactive });
+    animateLinkOpacity([linkView.model], {
+      targetColor: theme.colors.link.active
     });
-    animateLinkOpacity([linkView.model], { targetOpacity: LINK_ACTIVE });
-    animateLinkOpacity(links, { targetOpacity: LINK_INACTIVE });
     linkView.showTools();
   });
 
@@ -58,22 +58,27 @@ export function bindToolEvents(paper: any, graph: any) {
 }
 
 export function activateCellLinks(graph: any, cell: any) {
-  animateLinkOpacity(graph.getLinks(), { targetOpacity: LINK_INACTIVE });
+  animateLinkOpacity(graph.getLinks(), {
+    targetColor: theme.colors.link.inactive
+  });
   const links = graph.getConnectedLinks(cell.model);
-  animateLinkOpacity(links, { targetOpacity: LINK_ACTIVE });
+  animateLinkOpacity(links, { targetColor: theme.colors.link.active });
 }
 
 export function animateLinkOpacity(
   links: any,
-  opts?: { transitionDuration?: number; targetOpacity?: number }
+  opts?: { transitionDuration?: number; targetColor?: string }
 ) {
-  const { transitionDuration = 100, targetOpacity: opacity = 0 } = opts || {};
+  const {
+    transitionDuration = 100,
+    targetColor: color = theme.colors.primary
+  } = opts || {};
   links.map((link: any) => {
-    link.transition("attrs/line/opacity", opacity, {
+    link.transition("attrs/line/stroke", color, {
       delay: 0,
       duration: transitionDuration,
       timingFunction: joint.util.timing.linear,
-      valueFunction: joint.util.interpolate.number
+      valueFunction: joint.util.interpolate.hexColor
     });
   });
 }
@@ -92,27 +97,22 @@ joint.shapes.basic.Generic.define(
         magnet: false
       },
       ".label": {
-        text: "Model",
+        ...theme.header.label,
         "ref-x": 0.5,
-        "ref-y": 10,
-        "font-size": 18,
-        "text-anchor": "middle",
-        fill: "white"
+        "ref-y": 10
       },
       ".header": {
-        "ref-width": "100%",
-        height: ROW_HEIGHT,
-        fill: "#548f9e",
-        stroke: "#548f9e"
+        ...theme.header.container,
+        "ref-width": "100%"
       },
       ".body": {
+        ...theme.body,
         "ref-width": "100%",
         "ref-height": "100%",
-        y: ROW_HEIGHT,
-        stroke: "#548f9e"
+        y: theme.header.container.height
       },
       ".joint-port": {
-        y: ROW_HEIGHT
+        y: theme.row.height
       }
     },
     ports: {
@@ -121,13 +121,11 @@ joint.shapes.basic.Generic.define(
           position: {
             name: "left",
             args: {
-              dy: ROW_HEIGHT
+              dy: theme.row.height
             }
           },
           attrs: {
-            ".port-label": {
-              fill: "#000"
-            },
+            ".port-label": theme.row.label,
             ".port-body": {
               fill: "#fff",
               stroke: "#000",
@@ -147,7 +145,7 @@ joint.shapes.basic.Generic.define(
           position: {
             name: "right",
             args: {
-              dy: ROW_HEIGHT
+              dy: theme.row.height
             }
           },
           attrs: {
@@ -155,10 +153,8 @@ joint.shapes.basic.Generic.define(
               fill: "#000"
             },
             ".port-body": {
-              fill: "transparent",
-              stroke: "#548f9e",
-              height: 40,
-              y: -20,
+              ...theme.row.body,
+              y: -theme.row.body.height / 2,
               magnet: true
             }
           },
@@ -329,16 +325,8 @@ joint.dia.Link.define(
   {
     attrs: {
       line: {
-        connection: true,
-        stroke: "#38616b",
-        fill: "transparent",
-        strokeWidth: 2,
-        opacity: 0,
-        // strokeLinejoin: "round",
-        targetMarker: {
-          type: "path",
-          d: "M 10 -5 0 0 10 5 z"
-        }
+        ...theme.line,
+        connection: true
       },
       wrapper: {
         connection: true,
