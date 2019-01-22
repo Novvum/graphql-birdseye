@@ -1,364 +1,373 @@
 import joint from "jointjs/index";
-var _ = require("lodash");
-import router from "./router";
 import theme from "../theme";
+import injectCustomRouter from "./router";
+import injectCustomShapes from "./shapes";
+import {
+  setTimeoutAsync,
+  isFilteredEntity,
+  isBaseEntity,
+  isRelatedType,
+  getNestedType,
+  getFieldLabel
+} from "../utils";
+import {
+  GraphQLNamedType,
+  GraphQLInputObjectType,
+  GraphQLEnumType,
+  GraphQLScalarType,
+  GraphQLUnionType,
+  GraphQLObjectType
+} from "graphql";
+import { TypeMap } from "graphql/type/schema";
+var _ = require("lodash");
+var svgPanZoom = require("svg-pan-zoom");
 
-router(joint);
+export type FilteredGraphqlOutputType = Exclude<
+  GraphQLNamedType,
+  | GraphQLInputObjectType
+  | GraphQLEnumType
+  | GraphQLScalarType
+  | GraphQLUnionType
+>;
 
-export const LINK_INACTIVE = 0.3;
-export const LINK_ACTIVE = 1;
-
-export function addTools(paper: any, link: any) {
-  var toolsView = new joint.dia.ToolsView({
-    tools: [new joint.linkTools.TargetArrowhead()]
-  });
-  link.findView(paper).addTools(toolsView);
-}
-
-export function bindInteractionEvents(
-  adjustVertices: any,
-  graph: any,
-  paper: any
-) {
-  // bind `graph` to the `adjustVertices` function
-  var adjustGraphVertices = _.partial(adjustVertices, graph);
-
-  // adjust vertices when a cell is removed or its source/target was changed
-  graph.on("add remove change:source change:target", adjustGraphVertices);
-
-  // adjust vertices when the user stops interacting with an element
-  paper.on("cell:pointerup", adjustGraphVertices);
-}
-
-export function bindToolEvents(paper: any, graph: any) {
-  // show link tools
-  paper.on("link:mouseover", function(linkView: any) {
-    const links = graph.getLinks();
-    animateLinkOpacity(links, { targetColor: theme.colors.line.inactive });
-    animateLinkOpacity([linkView.model], {
-      targetColor: theme.colors.line.active
-    });
-    linkView.showTools();
-  });
-
-  // hide link tools
-  // paper.on("link:mouseout", function(linkView: any) {
-  //   const links = graph.getLinks();
-  //   // animateLinkOpacity(links, { targetOpacity: 0 });
-  //   linkView.hideTools();
-  // });
-
-  paper.on("cell:mouseover", function(cell: any) {
-    activateCellLinks(graph, cell);
-  });
-
-  paper.on("blank:mouseover cell:mouseover", function() {
-    paper.hideTools();
-  });
-}
-
-export function activateCellLinks(graph: any, cell: any) {
-  animateLinkOpacity(graph.getLinks(), {
-    targetColor: theme.colors.line.inactive
-  });
-  const links = graph.getConnectedLinks(cell.model);
-  animateLinkOpacity(links, { targetColor: theme.colors.line.active });
-}
-
-export function animateLinkOpacity(
-  links: any,
-  opts?: { transitionDuration?: number; targetColor?: string }
-) {
-  const {
-    transitionDuration = 100,
-    targetColor: color = theme.colors.primary
-  } = opts || {};
-  links.map((link: any) => {
-    link.transition("attrs/line/stroke", color, {
-      delay: 0,
-      duration: transitionDuration,
-      timingFunction: joint.util.timing.linear,
-      valueFunction: joint.util.interpolate.hexColor
-    });
-  });
-}
-
-joint.shapes.basic.Generic.define(
-  "devs.Model",
-  {
-    inPorts: [],
-    outPorts: [],
-    size: {
-      width: 300,
-      height: "auto"
-    },
-    attrs: {
-      ".": {
-        magnet: false
+class JointJS {
+  joint: any;
+  theme: any;
+  graph: any;
+  paper: any;
+  panZoom: any;
+  typeMap: TypeMap;
+  activeType: string = "root";
+  constructor(joint, theme) {
+    injectCustomShapes(joint, theme);
+    injectCustomRouter(joint);
+    this.joint = joint;
+    this.theme = theme;
+  }
+  async init(el: any, bounds: any, typeMap: TypeMap) {
+    this.typeMap = typeMap;
+    this.graph = new joint.dia.Graph();
+    this.paper = new joint.dia.Paper({
+      el,
+      model: this.graph,
+      width: bounds.width,
+      height: bounds.height,
+      background: {
+        color: this.theme.colors.background
       },
-      ".label": {
-        ...theme.header.label,
-        "ref-x": 0.5,
-        "ref-y": 10
-      },
-      ".header": {
-        ...theme.header.container,
-        "ref-width": "100%"
-      },
-      ".body": {
-        ...theme.body,
-        "ref-width": "100%",
-        "ref-height": "100%",
-        y: theme.header.container.height
-      },
-      ".joint-port": {
-        y: theme.row.height
-      }
-    },
-    ports: {
-      groups: {
-        in: {
-          position: {
-            name: "left",
-            args: {
-              dy: theme.row.height
-            }
-          },
-          attrs: {
-            ".port-label": theme.row.label,
-            ".port-body": {
-              fill: "#fff",
-              stroke: "#000",
-              magnet: false
-            }
-          },
-          label: {
-            position: {
-              name: "right",
-              args: {
-                y: 0
-              }
-            }
-          }
-        },
-        out: {
-          position: {
-            name: "right",
-            args: {
-              dy: theme.row.height
-            }
-          },
-          attrs: {
-            ".port-label": {
-              fill: "#000"
-            },
-            ".port-body": {
-              ...theme.row.body,
-              y: -theme.row.body.height / 2,
-              magnet: true
-            }
-          },
-          label: {
-            position: {
-              name: "left",
-              args: {
-                y: 0
-              }
-            }
-          }
+      gridSize: 1,
+      defaultRouter: {
+        name: "metro",
+        args: {
+          endDirection: ["top", "bottom"],
+          paddingBox: 10
         }
+      },
+      defaultConnector: { name: "rounded", args: { radius: 100 } },
+      interactive: {
+        linkMove: false
       }
+    });
+    this.paper.setInteractivity(false);
+    // enable interactions
+    // bindInteractionEvents(adjustVertices, this.graph, this.paper);
+    await this.renderElements();
+    // tools are visible by default
+    this.paper.hideTools();
+    // enable tools
+    this.bindToolEvents();
+    this.paper.on("link:pointerclick", (linkView: any) => {
+      const activeType = linkView.model.attributes.target.id;
+      this.setActiveType(activeType);
+    });
+    this.paper.on("cell:pointerclick", (linkView: any) => {
+      const activeType = linkView.model.id;
+      this.setActiveType(activeType);
+    });
+    this.resizeToFit();
+  }
+  async setTypeMap(newTypeMap) {
+    this.typeMap = newTypeMap;
+    await this.renderElements(newTypeMap);
+  }
+  private setActiveType(activeType: any) {
+    if (this.graph.getCell(activeType).attributes.type === "devs.Model") {
+      this.activeType = activeType;
+      this.renderElements();
     }
-  },
-  {
-    markup:
-      '<g class="rotatable"><rect class="header"/><rect class="body"/><text class="label"/></g>',
-    portMarkup: '<rect class="port-body"/>',
-    portLabelMarkup: '<text class="port-label"/>',
+  }
+  private resizeToFit() {
+    if (this.panZoom) {
+      this.panZoom.destroy();
+      delete this.panZoom;
+    }
+    // this.paper.scaleContentToFit({
+    //   padding: 100
+    // });
+    this.panZoom = svgPanZoom("#v-2", {
+      fit: true,
+      center: true,
+      controlIconsEnabled: true,
+      maxZoom: 20,
+      panEnabled: false
+    });
+    this.panZoom.fit();
+    this.panZoom.updateBBox(); // Update viewport bounding box
+    this.panZoom.fit(); // fit works as expected
 
-    initialize: function() {
-      joint.shapes.basic.Generic.prototype.initialize.apply(this, arguments);
-
-      this.on("change:inPorts change:outPorts", this.updatePortItems, this);
-      this.updatePortItems();
-    },
-
-    updatePortItems: function(_model: any, _changed: any, opt: any) {
-      // Make sure all ports are unique.
-      var inPorts = joint.util.uniq(this.get("inPorts"));
-      var outPorts = joint.util.difference(
-        joint.util.uniq(this.get("outPorts")),
-        inPorts
-      );
-
-      var inPortItems = this.createPortItems("in", inPorts);
-      var outPortItems = this.createPortItems("out", outPorts);
-      this.prop(
-        "ports/items",
-        inPortItems.concat(outPortItems),
-        joint.util.assign({ rewrite: true }, opt)
-      );
-      this._setSize();
-    },
-    _setSize: function() {
-      var portCount = Math.max(
-        this.get("inPorts").length,
-        this.get("outPorts").length
-      );
-      const size = this.get("size");
-      let height = size.height;
-      let width = size.width;
-      if (!size.height || size.height === "auto") {
-        height = portCount * 40;
+    // (this.paper.getContentBBox())
+    this.paper.on("blank:pointerdown", () => {
+      this.panZoom.enablePan();
+    });
+    this.paper.on("cell:pointerup blank:pointerup", () => {
+      this.panZoom.disablePan();
+    });
+    this.paper.on("resize", () => {
+      this.panZoom.reset();
+    });
+  }
+  async renderElements(typeMap = this.typeMap, activeType = this.activeType) {
+    const toRenderTypes: FilteredGraphqlOutputType[] = this.getToRenderTypes(
+      typeMap,
+      activeType
+    );
+    await this.removeUnusedElements(toRenderTypes);
+    await this.addNewElements(toRenderTypes);
+    joint.layout.DirectedGraph.layout(this.graph, {
+      nodeSep: 200,
+      rankSep: 400,
+      rankDir: "LR",
+      setPosition: (element: any, glNode: any) => {
+        element.set(
+          "position",
+          {
+            x: glNode.x - glNode.width / 2,
+            y: glNode.y - glNode.height / 2
+          },
+          { cacheOnly: false /* will not update links yet */ }
+        );
+      },
+      setVertices: (link: any, points: any) => {
+        link.unset("vertices", { silent: true });
       }
-      const maxInportLength = Math.max(
-        ...this.get("inPorts").map((port: string) => port.length)
-      );
-      const maxOutportLength = Math.max(
-        ...this.get("outPorts").map(
-          (port: { id: any; label: string }) => port.label.length
-        )
-      );
-      width = Math.max(width, (maxInportLength + maxOutportLength) * 10 + 20);
-      this.set("size", {
-        ...size,
-        height,
-        width
+    });
+    this.transitionLinkColor(this.graph.getLinks(), {
+      targetColor: this.theme.colors.line.inactive
+    });
+    this.resizeToFit();
+  }
+  private getToRenderTypes(
+    typeMap: TypeMap = this.typeMap,
+    activeType: string = this.activeType
+  ) {
+    return Object.keys(typeMap)
+      .filter(key => {
+        const type = typeMap[key];
+        if (isFilteredEntity(type) || isBaseEntity(type)) {
+          return false;
+        }
+        if (activeType === "root") {
+          if (type.name === "Query" || type.name === "Mutation") {
+            return true;
+          }
+          return (
+            (typeMap["Query"] &&
+              isRelatedType(typeMap["Query"] as GraphQLObjectType, type)) ||
+            (typeMap["Mutation"] &&
+              isRelatedType(typeMap["Mutation"] as GraphQLObjectType, type))
+          );
+        }
+        if (activeType === type.name) {
+          return true;
+        }
+        if (type.constructor.name === "GraphQLObjectType") {
+          return (
+            isRelatedType(type as GraphQLObjectType, typeMap[activeType]) ||
+            isRelatedType(typeMap[activeType] as GraphQLObjectType, type)
+          );
+        }
+        return false;
+      })
+      .map(k => typeMap[k] as FilteredGraphqlOutputType);
+  }
+  private async removeUnusedElements(
+    toRenderTypes: FilteredGraphqlOutputType[]
+  ) {
+    const currentElements = this.graph.getElements();
+    const toRemove = currentElements.filter(
+      (elem: any) => !toRenderTypes.find(type => type.name === elem.id)
+    );
+    const TRANSITION_DURATION = 100;
+    toRemove.map(async (element: any) => {
+      const links = this.graph.getConnectedLinks(element);
+      this.transitionLinkColor(links, {
+        transitionDuration: TRANSITION_DURATION,
+        targetColor: this.theme.colors.white
       });
-    },
-    createPortItem: function(group: any, port: any) {
-      this._setSize();
-      return {
-        id: typeof port === "object" ? port.id : port,
-        group: group,
-        attrs: {
-          ".port-label": {
-            text: typeof port === "object" ? port.label : port
+    });
+    await setTimeoutAsync(
+      () => this.graph.removeCells(...toRemove),
+      TRANSITION_DURATION * (2 / 3)
+    );
+    await setTimeoutAsync(() => null, TRANSITION_DURATION / 3);
+  }
+  private async addNewElements(toRenderTypes: FilteredGraphqlOutputType[]) {
+    const currentElements = this.graph.getElements();
+    toRenderTypes
+      .filter(type => {
+        return !currentElements.find((elem: any) => elem.id === type.name);
+      })
+      .forEach(type => {
+        const fields = type.getFields();
+        this.addNode({
+          id: type.name,
+          attrs: {
+            ".label": {
+              text: type.name
+            }
           },
-          ".port-body": {
-            width: group === "out" ? this.get("size").width : 0,
-            x: -this.get("size").width
+          inPorts: Object.keys(fields),
+          outPorts: Object.keys(fields).map(k => {
+            const field = fields[k];
+            const connectedType = getNestedType(field.type);
+            const id = `${field.name}_${connectedType.name}`;
+            const label = getFieldLabel(field.type);
+            return {
+              id,
+              label
+            };
+          })
+        });
+      });
+    toRenderTypes.forEach(type => {
+      const fields = type.getFields();
+      Object.keys(fields).map(k => {
+        const field = fields[k];
+        const connectedType = getNestedType(field.type);
+        const id = `${field.name}_${connectedType.name}`;
+        if (
+          toRenderTypes.findIndex(type => type.name === connectedType.name) > -1
+        ) {
+          const sourceCell = this.graph.getCell(type.name);
+          const existingLinks = this.graph.getConnectedLinks(sourceCell);
+          if (
+            existingLinks.find(
+              (link: any) => link.attributes.source.port === id
+            )
+          ) {
+            return;
           }
+          const sourcePortPosition = sourceCell.getPortsPositions("out")[id];
+          const targetCenterPosition = this.graph
+            .getCell(connectedType.name)
+            .getBBox()
+            .center();
+          const dx = targetCenterPosition.x - sourcePortPosition.x;
+          const dy = targetCenterPosition.y - sourcePortPosition.y;
+          var link = new joint.shapes.devs.Link();
+          link.source({
+            id: type.name,
+            port: id,
+            anchor: {
+              name: `${dx > 0 ? "right" : "left"}`
+            }
+          });
+          link.target({
+            id: connectedType.name,
+            anchor: {
+              name: `top`, // `${dy > 0 ? "top" : "bottom"}`,
+              args: {
+                dy: this.theme.row.height / 2 // dy > 0 ? ROW_HEIGHT / 2 : 0
+              }
+            }
+          });
+          link.addTo(this.graph);
+          this.addTools(link);
         }
-      };
-    },
-
-    createPortItems: function(group: any, ports: any) {
-      return joint.util
-        .toArray(ports)
-        .map(this.createPortItem.bind(this, group));
-    },
-
-    _addGroupPort: function(port: any, group: any, opt: any) {
-      var ports = this.get(group);
-      return this.set(
-        group,
-        Array.isArray(ports) ? ports.concat(port) : [port],
-        opt
-      );
-    },
-
-    addOutPort: function(port: any, opt: any) {
-      return this._addGroupPort(port, "outPorts", opt);
-    },
-
-    addInPort: function(port: any, opt: any) {
-      return this._addGroupPort(port, "inPorts", opt);
-    },
-
-    _removeGroupPort: function(port: any, group: any, opt: any) {
-      return this.set(group, joint.util.without(this.get(group), port), opt);
-    },
-
-    removeOutPort: function(port: any, opt: any) {
-      return this._removeGroupPort(port, "outPorts", opt);
-    },
-
-    removeInPort: function(port: any, opt: any) {
-      return this._removeGroupPort(port, "inPorts", opt);
-    },
-
-    _changeGroup: function(group: any, properties: any, opt: any) {
-      return this.prop(
-        "ports/groups/" + group,
-        joint.util.isObject(properties) ? properties : {},
-        opt
-      );
-    },
-
-    changeInGroup: function(properties: any, opt: any) {
-      return this._changeGroup("in", properties, opt);
-    },
-
-    changeOutGroup: function(properties: any, opt: any) {
-      return this._changeGroup("out", properties, opt);
-    }
+      });
+    });
   }
-);
-
-joint.shapes.devs.Model.define("devs.Atomic", {
-  size: {
-    width: 80,
-    height: 80
-  },
-  attrs: {
-    ".label": {
-      text: "Atomic"
-    }
+  private addNode(node: any) {
+    var a1 = new joint.shapes.devs.Model(node);
+    this.graph.addCells([a1]);
+    return a1;
   }
-});
-
-joint.shapes.devs.Model.define("devs.Coupled", {
-  size: {
-    width: 200,
-    height: 300
-  },
-  attrs: {
-    ".label": {
-      text: "Coupled"
-    }
+  private addTools(link: any) {
+    var toolsView = new joint.dia.ToolsView({
+      tools: [new joint.linkTools.TargetArrowhead()]
+    });
+    link.findView(this.paper).addTools(toolsView);
   }
-});
+  private bindInteractionEvents(adjustVertices: any) {
+    // bind `graph` to the `adjustVertices` function
+    var adjustGraphVertices = _.partial(adjustVertices, this.graph);
 
-joint.dia.Link.define(
-  "devs.Link",
-  {
-    attrs: {
-      line: {
-        ...theme.line,
-        connection: true
-      },
-      wrapper: {
-        connection: true,
-        strokeWidth: 2,
-        strokeLinejoin: "round"
-      }
-    }
-  },
-  {
-    markup: [
-      {
-        tagName: "path",
-        selector: "wrapper",
-        attributes: {
-          fill: "none",
-          cursor: "pointer",
-          stroke: "transparent"
-        }
-      },
-      {
-        tagName: "path",
-        selector: "line",
-        attributes: {
-          fill: "none",
-          "pointer-events": "none"
-        }
-      }
-    ]
+    // adjust vertices when a cell is removed or its source/target was changed
+    this.graph.on(
+      "add remove change:source change:target",
+      adjustGraphVertices
+    );
+
+    // adjust vertices when the user stops interacting with an element
+    this.paper.on("cell:pointerup", adjustGraphVertices);
   }
-);
+  private bindToolEvents() {
+    // show link tools
+    this.paper.on("link:mouseover", (linkView: any) => {
+      const links = this.graph.getLinks();
+      this.transitionLinkColor(links, {
+        targetColor: this.theme.colors.line.inactive
+      });
+      this.transitionLinkColor([linkView.model], {
+        targetColor: this.theme.colors.line.active
+      });
+      linkView.showTools();
+    });
 
-export default joint;
+    // hide link tools
+    // paper.on("link:mouseout", function(linkView: any) {
+    //   const links = graph.getLinks();
+    //   // animateLinkOpacity(links, { targetOpacity: 0 });
+    //   linkView.hideTools();
+    // });
+
+    this.paper.on("cell:mouseover", (cell: any) => {
+      this.activateCellLinks(cell);
+    });
+
+    this.paper.on("blank:mouseover cell:mouseover", () => {
+      this.paper.hideTools();
+    });
+  }
+  private activateCellLinks(cell: any) {
+    this.transitionLinkColor(this.graph.getLinks(), {
+      targetColor: this.theme.colors.line.inactive
+    });
+    const links = this.graph.getConnectedLinks(cell.model);
+    this.transitionLinkColor(links, {
+      targetColor: this.theme.colors.line.active
+    });
+  }
+  private transitionLinkColor(
+    links: any,
+    opts?: { transitionDuration?: number; targetColor?: string }
+  ) {
+    const {
+      transitionDuration = 100,
+      targetColor: color = this.theme.colors.primary
+    } = opts || {};
+    links.map((link: any) => {
+      link.transition("attrs/line/stroke", color, {
+        delay: 0,
+        duration: transitionDuration,
+        timingFunction: joint.util.timing.linear,
+        valueFunction: joint.util.interpolate.hexColor
+      });
+    });
+  }
+}
+
+export default new JointJS(joint, theme);
 
 export function adjustVertices(graph: any, cell: any) {
   // if `cell` is a view, find its model
