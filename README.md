@@ -1,8 +1,13 @@
-# graphql-view
+<p align="center"><img src="https://i.imgur.com/JBBZ9Yn.png" width="269"></p>
+
+
+# graphql-birdseye
 
 > graphql visualizer
 
 [![NPM](https://img.shields.io/npm/v/graphql-view.svg)](https://www.npmjs.com/package/graphql-view) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+
+GraphQL Visualizer for better development workflows. Still a **WIP**!
 
 ## Install
 
@@ -29,3 +34,7 @@ class Example extends React.Component {
 ## License
 
 MIT © [novvum](https://github.com/novvum)
+
+
+---
+<p align="center">Made by <a href="https://www.novvum.io">Novvum</a> ❤️</p>
