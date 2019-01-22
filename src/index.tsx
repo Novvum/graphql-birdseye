@@ -29,6 +29,8 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       return;
     }
     const bounds = this.getBounds();
+    jointjs.on("loading:start", this.startLoading);
+    jointjs.on("loading:stop", this.stopLoading);
     await jointjs.init(
       ReactDOM.findDOMNode(this.ref),
       bounds,
@@ -36,17 +38,17 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
     );
   }
 
-  private stopLoading() {
+  private stopLoading = () => {
     this.setState({
       loading: false
     });
-  }
+  };
 
-  private startLoading() {
+  private startLoading = () => {
     this.setState({
       loading: true
     });
-  }
+  };
 
   private getBounds() {
     return this.ref.getBoundingClientRect();

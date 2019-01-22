@@ -30,6 +30,8 @@ export type FilteredGraphqlOutputType = Exclude<
   | GraphQLUnionType
 >;
 
+export type EventType = "loading:start" | "loading:stop";
+
 class JointJS {
   joint: any;
   theme: any;
@@ -38,6 +40,7 @@ class JointJS {
   panZoom: any;
   typeMap: TypeMap;
   activeType: string = "root";
+  eventMap: { [key in EventType]?: () => any } = {};
   constructor(joint, theme) {
     injectCustomShapes(joint, theme);
     injectCustomRouter(joint);
@@ -86,6 +89,24 @@ class JointJS {
     });
     this.resizeToFit();
   }
+  /**
+   * Events
+   */
+  on(key: EventType, callback: () => any) {
+    this.eventMap[key] = callback;
+  }
+  startLoading() {
+    const onStart = this.eventMap["loading:start"];
+    if (onStart) {
+      onStart();
+    }
+  }
+  stopLoading() {
+    const onStop = this.eventMap["loading:stop"];
+    if (onStop) {
+      onStop();
+    }
+  }
   async setTypeMap(newTypeMap) {
     this.typeMap = newTypeMap;
     await this.renderElements(newTypeMap);
@@ -131,6 +152,7 @@ class JointJS {
       typeMap,
       activeType
     );
+    this.startLoading();
     await this.removeUnusedElements(toRenderTypes);
     await this.addNewElements(toRenderTypes);
     joint.layout.DirectedGraph.layout(this.graph, {
@@ -155,6 +177,7 @@ class JointJS {
       targetColor: this.theme.colors.line.inactive
     });
     this.resizeToFit();
+    this.stopLoading();
   }
   private getToRenderTypes(
     typeMap: TypeMap = this.typeMap,
