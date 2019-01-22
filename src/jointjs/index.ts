@@ -34,9 +34,9 @@ export function bindToolEvents(paper: any, graph: any) {
   // show link tools
   paper.on("link:mouseover", function(linkView: any) {
     const links = graph.getLinks();
-    animateLinkOpacity(links, { targetColor: theme.colors.link.inactive });
+    animateLinkOpacity(links, { targetColor: theme.colors.line.inactive });
     animateLinkOpacity([linkView.model], {
-      targetColor: theme.colors.link.active
+      targetColor: theme.colors.line.active
     });
     linkView.showTools();
   });
@@ -59,10 +59,10 @@ export function bindToolEvents(paper: any, graph: any) {
 
 export function activateCellLinks(graph: any, cell: any) {
   animateLinkOpacity(graph.getLinks(), {
-    targetColor: theme.colors.link.inactive
+    targetColor: theme.colors.line.inactive
   });
   const links = graph.getConnectedLinks(cell.model);
-  animateLinkOpacity(links, { targetColor: theme.colors.link.active });
+  animateLinkOpacity(links, { targetColor: theme.colors.line.active });
 }
 
 export function animateLinkOpacity(

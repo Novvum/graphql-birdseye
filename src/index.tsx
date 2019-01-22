@@ -198,7 +198,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       }
     });
     animateLinkOpacity(this.graph.getLinks(), {
-      targetColor: theme.colors.link.inactive
+      targetColor: theme.colors.line.inactive
     });
     this.scaleContentToFit();
     this.stopLoading();

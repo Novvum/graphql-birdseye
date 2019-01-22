@@ -2,14 +2,13 @@ const colors = {
   primary: "#548f9e",
   background: "#ffffff",
   white: "#ffffff",
-  link: {
+  line: {
     active: "#38616b",
     inactive: "#E8E8E8"
   }
 };
 
-export default {
-  colors,
+const nodeStyles = {
   header: {
     label: {
       "font-size": 18,
@@ -35,9 +34,13 @@ export default {
       stroke: colors.primary,
       height: 40
     }
-  },
+  }
+};
+export default {
+  colors,
+  ...nodeStyles,
   line: {
-    stroke: colors.link.inactive,
+    stroke: colors.line.inactive,
     fill: "transparent",
     strokeWidth: 2,
     strokeLinejoin: "round",
