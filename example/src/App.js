@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 import GraphqlBirdseye from "graphql-birdseye";
-import { bigSchema /** smallSchema */ as dummySchema } from "./dummySchema";
+import { smallSchema /** bigSchema */ as dummySchema } from "./dummySchema";
 export default class App extends Component {
   render() {
     return (
