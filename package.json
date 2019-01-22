@@ -56,6 +56,7 @@
     "rollup-plugin-postcss": "^1.6.2",
     "rollup-plugin-typescript2": "^0.17.0",
     "rollup-plugin-url": "^1.4.0",
+    "rollup-plugin-visualizer": "^0.9.2",
     "typescript": "^2.8.3",
     "yarn-run-all": "^3.1.1"
   },
