@@ -1,9 +1,8 @@
 "use strict";
-var _ = require("lodash");
 
 export default function(joint) {
   var g = joint.g;
-  joint.routers.manhattan = (function(g, _, joint, util) {
+  joint.routers.manhattan = (function(g, asd, joint, util) {
     var config = {
       // size of the step to find a route (the grid of the manhattan pathfinder)
       step: 10,
@@ -874,7 +873,7 @@ export default function(joint) {
     return function(vertices, opt, linkView) {
       return router(vertices, util.assign({}, config, opt), linkView);
     };
-  })(g, _, joint, joint.util);
+  })(g, null, joint, joint.util);
 
   joint.routers.metro = (function(util) {
     var config = {

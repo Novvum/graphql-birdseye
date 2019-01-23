@@ -7,7 +7,6 @@ declare module "*.css" {
   export default content;
 }
 
-declare module "jointjs/index";
 declare module "react-svg-pan-zoom";
 interface SvgrComponent
   extends React.StatelessComponent<React.SVGAttributes<SVGElement>> {}
