@@ -5,7 +5,7 @@ import {
   GraphQLNamedType,
   GraphQLType,
   GraphQLObjectType
-} from "graphql";
+} from "graphql/type/definition";
 
 var baseEntities = ["Boolean", "Int", "String", "Float", "ID"];
 var filteredTypes = ["DateTime"];

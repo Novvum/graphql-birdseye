@@ -1,6 +1,7 @@
 import typescript from "rollup-plugin-typescript2";
 import commonjs from "rollup-plugin-commonjs";
 import external from "rollup-plugin-peer-deps-external";
+import minify from "rollup-plugin-babel-minify";
 import visualizer from "rollup-plugin-visualizer";
 // import postcss from 'rollup-plugin-postcss-modules'
 import postcss from "rollup-plugin-postcss";
@@ -39,6 +40,7 @@ export default {
       clean: true
     }),
     commonjs(),
+    minify(),
     visualizer({
       filename: "./dist/statistics.html",
       title: "GraphQL Birdseye"

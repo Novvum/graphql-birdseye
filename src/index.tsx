@@ -1,7 +1,9 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import jointjs from "./jointjs/index";
-import { GraphQLSchema, buildClientSchema, IntrospectionQuery } from "graphql";
+import { IntrospectionQuery } from "graphql/utilities/introspectionQuery";
+import { buildClientSchema } from "graphql/utilities/buildClientSchema";
+import { GraphQLSchema } from "graphql/type/schema";
 
 export interface GraphqlBirdseyeProps {
   schema: GraphQLSchema | null;
@@ -85,12 +87,10 @@ export interface SchemaProviderProps {
   introspectionQuery?: IntrospectionQuery;
   schema?: GraphQLSchema;
 }
-const schemaProvider = <P extends GraphqlBirdseyeProps>(
-  Component: React.ComponentType<P>
+const schemaProvider = (
+  Component: React.ComponentType<GraphqlBirdseyeProps>
 ) => {
-  return class SchemaProvider extends React.PureComponent<
-    P & SchemaProviderProps
-  > {
+  return class SchemaProvider extends React.PureComponent<SchemaProviderProps> {
     // displayName: `schemaProvider(${Component.displayName})`
     render() {
       const { introspectionQuery, schema: schemaProp, ...props } = this
