@@ -1,4 +1,3 @@
-import joint from "jointjs/index";
 import theme from "../theme";
 import injectCustomRouter from "./router";
 import injectCustomShapes from "./shapes";
@@ -19,6 +18,7 @@ import {
   GraphQLObjectType
 } from "graphql";
 import { TypeMap } from "graphql/type/schema";
+var joint = require("jointjs");
 var _ = require("lodash");
 var svgPanZoom = require("svg-pan-zoom");
 
