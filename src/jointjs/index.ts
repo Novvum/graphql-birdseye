@@ -1,4 +1,3 @@
-import theme from "../theme";
 import injectCustomRouter from "./router";
 import injectCustomShapes from "./shapes";
 import {
@@ -18,6 +17,7 @@ import {
   GraphQLObjectType
 } from "graphql/type/definition";
 import { TypeMap } from "graphql/type/schema";
+import defaultTheme, { Theme } from "../defaultTheme";
 var joint = require("jointjs");
 var svgPanZoom = require("svg-pan-zoom");
 
@@ -31,7 +31,7 @@ export type FilteredGraphqlOutputType = Exclude<
 
 export type EventType = "loading:start" | "loading:stop";
 
-class JointJS {
+export default class JointJS {
   joint: any;
   theme: any;
   graph: any;
@@ -40,7 +40,8 @@ class JointJS {
   typeMap: TypeMap;
   activeType: string = "root";
   eventMap: { [key in EventType]?: () => any } = {};
-  constructor(joint, theme) {
+  constructor(opts: { theme?: Theme }) {
+    const { theme = defaultTheme } = opts;
     injectCustomShapes(joint, theme);
     injectCustomRouter(joint);
     this.joint = joint;
@@ -512,5 +513,3 @@ class JointJS {
     });
   }
 }
-
-export default new JointJS(joint, theme);

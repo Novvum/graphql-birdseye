@@ -1,12 +1,14 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import jointjs from "./jointjs/index";
+import { Theme } from "./defaultTheme";
+import JointJS from "./jointjs/index";
 import { IntrospectionQuery } from "graphql/utilities/introspectionQuery";
 import { buildClientSchema } from "graphql/utilities/buildClientSchema";
 import { GraphQLSchema } from "graphql/type/schema";
 
 export interface GraphqlBirdseyeProps {
   schema: GraphQLSchema | null;
+  theme?: Theme;
 }
 
 export interface State {
@@ -14,16 +16,15 @@ export interface State {
   loading: boolean;
 }
 class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
-  graph: any;
-  paper: any;
-  panZoom: any;
   ref: any;
+  jointjs: any;
   state: State = {
     activeType: "Query",
     loading: false
   };
-  constructor(props: any) {
+  constructor(props: GraphqlBirdseyeProps) {
     super(props);
+    this.jointjs = new JointJS({ theme: props.theme });
   }
 
   async componentDidMount() {
@@ -31,9 +32,9 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       return;
     }
     const bounds = this.getBounds();
-    jointjs.on("loading:start", this.startLoading);
-    jointjs.on("loading:stop", this.stopLoading);
-    await jointjs.init(
+    this.jointjs.on("loading:start", this.startLoading);
+    this.jointjs.on("loading:stop", this.stopLoading);
+    await this.jointjs.init(
       ReactDOM.findDOMNode(this.ref),
       bounds,
       this.props.schema.getTypeMap()
@@ -90,7 +91,9 @@ export interface SchemaProviderProps {
 const schemaProvider = (
   Component: React.ComponentType<GraphqlBirdseyeProps>
 ) => {
-  return class SchemaProvider extends React.PureComponent<SchemaProviderProps> {
+  return class SchemaProvider extends React.PureComponent<
+    GraphqlBirdseyeProps & SchemaProviderProps
+  > {
     // displayName: `schemaProvider(${Component.displayName})`
     render() {
       const { introspectionQuery, schema: schemaProp, ...props } = this
