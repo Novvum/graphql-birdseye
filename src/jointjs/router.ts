@@ -9,7 +9,7 @@ export default function(joint) {
 
       // the number of route finding loops that cause the router to abort
       // returns fallback route instead
-      maximumLoops: 90000,
+      maximumLoops: 50000,
 
       // the number of decimal places to round floating point coordinates
       precision: 10,
@@ -20,7 +20,7 @@ export default function(joint) {
       // should the router use perpendicular linkView option?
       // does not connect anchor of element but rather a point close-by that is orthogonal
       // this looks much better
-      perpendicular: true,
+      perpendicular: false,
 
       // should the source and/or target not be considered as obstacles?
       excludeEnds: [], // 'source', 'target'
@@ -29,7 +29,7 @@ export default function(joint) {
       excludeTypes: ["basic.Text"],
 
       // possible starting directions from an element
-      startDirections: ["top", "right", "bottom", "left"],
+      startDirections: ["top", "right", "left"],
 
       // possible ending directions to an element
       endDirections: ["top", "right", "bottom", "left"],
@@ -149,25 +149,25 @@ export default function(joint) {
       // Exclude any embedded elements from the source and the target element.
       var excludedAncestors: any = [];
 
-      var source = graph.getCell(link.get("source").id);
-      if (source) {
-        excludedAncestors = util.union(
-          excludedAncestors,
-          source.getAncestors().map(function(cell) {
-            return cell.id;
-          })
-        );
-      }
+      // var source = graph.getCell(link.get("source").id);
+      // if (source) {
+      //   excludedAncestors = util.union(
+      //     excludedAncestors,
+      //     source.getAncestors().map(function(cell) {
+      //       return cell.id;
+      //     })
+      //   );
+      // }
 
-      var target = graph.getCell(link.get("target").id);
-      if (target) {
-        excludedAncestors = util.union(
-          excludedAncestors,
-          target.getAncestors().map(function(cell) {
-            return cell.id;
-          })
-        );
-      }
+      // var target = graph.getCell(link.get("target").id);
+      // if (target) {
+      //   excludedAncestors = util.union(
+      //     excludedAncestors,
+      //     target.getAncestors().map(function(cell) {
+      //       return cell.id;
+      //     })
+      //   );
+      // }
 
       // Builds a map of all elements for quicker obstacle queries (i.e. is a point contained
       // in any obstacle?) (a simplified grid search).

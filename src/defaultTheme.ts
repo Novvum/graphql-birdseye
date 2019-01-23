@@ -40,7 +40,7 @@ export default {
   colors,
   ...nodeStyles,
   line: {
-    stroke: colors.line.inactive,
+    stroke: colors.line.active,
     fill: "transparent",
     strokeWidth: 2,
     strokeLinejoin: "round",
