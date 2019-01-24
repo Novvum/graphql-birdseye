@@ -541,7 +541,6 @@ export default class JointJS {
               });
               animate && link.prop("attrs/line/opacity", 0);
               link.addTo(this.graph);
-              this.addTools(link);
             }
           })
         );
@@ -557,13 +556,14 @@ export default class JointJS {
           valueFunction: joint.util.interpolate.number
         });
       });
-    animate &&
-      this.graph.getLinks().map(async link => {
+    this.graph.getLinks().map(async link => {
+      animate &&
         this.transitionLinkOpacity(link, {
           targetOpacity: 1,
           transitionDuration: TRANSITION_DURATION
         });
-      });
+      this.addTools(link);
+    });
   }
   private transitionLinkOpacity(
     link: any,
