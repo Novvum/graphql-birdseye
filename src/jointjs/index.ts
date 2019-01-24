@@ -618,6 +618,9 @@ export default class JointJS {
     // });
 
     this.paper.on("cell:mouseover", (cell: any, evt: any) => {
+      if (!cell.model.isElement()) {
+        return null;
+      }
       let activeLink = this.getHoveredPortLink(cell, evt);
       if (!activeLink) {
         return this.highlightLinks({ cell: cell.model });
@@ -632,6 +635,9 @@ export default class JointJS {
     });
   }
   private getHoveredPortLink(cell: any, evt: any) {
+    if (!cell.model.isElement()) {
+      return null;
+    }
     const relBBox = this.joint.util.getElementBBox(cell.$el);
     const cellBBox = cell.model.getBBox();
     const getRelHeight = height => (height * relBBox.height) / cellBBox.height;
