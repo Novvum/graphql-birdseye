@@ -364,56 +364,57 @@ export default class JointJS {
     await Promise.all(
       toRenderTypes.map(async type => {
         const fields = type.getFields();
-        await Promise.all(
-          Object.keys(fields).map(async k => {
-            const field = fields[k];
-            const connectedType = getNestedType(field.type);
-            const id = `${field.name}_${connectedType.name}`;
-            if (
-              toRenderTypes.findIndex(
-                type => type.name === connectedType.name
-              ) > -1
-            ) {
-              const sourceCell = this.graph.getCell(type.name);
-              const existingLinks = this.graph.getConnectedLinks(sourceCell);
-              if (
-                existingLinks.find(
-                  (link: any) => link.attributes.source.port === id
-                )
-              ) {
-                return;
+        const fieldArr = Object.keys(fields);
+        const targetMap = fieldArr.reduce((accumulator, k) => {
+          const field = fields[k];
+          const connectedType = getNestedType(field.type);
+          if (
+            toRenderTypes.findIndex(type => type.name === connectedType.name) >
+            -1
+          ) {
+            accumulator[connectedType.name] = [
+              ...(accumulator[connectedType.name] || []),
+              field
+            ];
+          }
+          return accumulator;
+        }, {});
+        Object.keys(targetMap).map(targetId => {
+          const sourceCell = this.graph.getCell(type.name);
+          const existingLinks = this.graph.getConnectedLinks(sourceCell);
+          if (
+            existingLinks.find(
+              (link: any) =>
+                link.attributes.source.id === type.name &&
+                link.attributes.target.id === targetId
+            )
+          ) {
+            return;
+          }
+          var link = new joint.shapes.devs.Link();
+          link.source({
+            id: type.name,
+            anchor: {
+              name: `top`,
+              args: {
+                dy: 5
               }
-              const sourcePortPosition = sourceCell.getPortsPositions("out")[
-                id
-              ];
-              const targetCenterPosition = this.graph
-                .getCell(connectedType.name)
-                .getBBox()
-                .center();
-              const dx = targetCenterPosition.x - sourcePortPosition.x;
-              var link = new joint.shapes.devs.Link();
-              link.source({
-                id: type.name,
-                port: id,
-                anchor: {
-                  name: `${dx > 0 ? "right" : "left"}`
-                }
-              });
-              link.target({
-                id: connectedType.name,
-                anchor: {
-                  name: `top`, // `${dy > 0 ? "top" : "bottom"}`,
-                  args: {
-                    dy: this.theme.row.height / 2 // dy > 0 ? ROW_HEIGHT / 2 : 0
-                  }
-                }
-              });
-              animate && link.prop("attrs/line/opacity", 0);
-              link.addTo(this.graph);
-              this.addTools(link);
             }
-          })
-        );
+          });
+          link.target({
+            id: targetId,
+            anchor: {
+              name: `top`, // `${dy > 0 ? "top" : "bottom"}`,
+              args: {
+                dy: this.theme.row.height - 5, // dy > 0 ? ROW_HEIGHT / 2 : 0
+                dx: 10
+              }
+            }
+          });
+          animate && link.prop("attrs/line/opacity", 0);
+          link.addTo(this.graph);
+          this.addTools(link);
+        });
       })
     );
     animate && (await setTimeoutAsync(() => null, TRANSITION_DURATION));
@@ -433,58 +434,6 @@ export default class JointJS {
           transitionDuration: TRANSITION_DURATION
         });
       });
-    toRenderTypes.forEach(type => {
-      const fields = type.getFields();
-      const fieldArr = Object.keys(fields);
-      const targetMap = fieldArr.reduce((accumulator, k) => {
-        const field = fields[k];
-        const connectedType = getNestedType(field.type);
-        if (
-          toRenderTypes.findIndex(type => type.name === connectedType.name) > -1
-        ) {
-          accumulator[connectedType.name] = [
-            ...(accumulator[connectedType.name] || []),
-            field
-          ];
-        }
-        return accumulator;
-      }, {});
-      Object.keys(targetMap).map(targetId => {
-        const sourceCell = this.graph.getCell(type.name);
-        const existingLinks = this.graph.getConnectedLinks(sourceCell);
-        if (
-          existingLinks.find(
-            (link: any) =>
-              link.attributes.source.id === type.name &&
-              link.attributes.target.id === targetId
-          )
-        ) {
-          return;
-        }
-        var link = new joint.shapes.devs.Link();
-        link.source({
-          id: type.name,
-          anchor: {
-            name: `top`,
-            args: {
-              dy: 5
-            }
-          }
-        });
-        link.target({
-          id: targetId,
-          anchor: {
-            name: `top`, // `${dy > 0 ? "top" : "bottom"}`,
-            args: {
-              dy: this.theme.row.height - 5, // dy > 0 ? ROW_HEIGHT / 2 : 0
-              dx: 10
-            }
-          }
-        });
-        link.addTo(this.graph);
-        this.addTools(link);
-      });
-    });
   }
   private transitionLinkOpacity(
     link: any,
