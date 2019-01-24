@@ -657,6 +657,38 @@
   version "4.1.0"
   resolved "https://registry.npmjs.org/@comandeer/babel-plugin-banner/-/babel-plugin-banner-4.1.0.tgz#5f9f22f3ba5a4e87d0c972c402f039c6eeffc079"
 
+"@f/animate@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.npmjs.org/@f/animate/-/animate-1.0.1.tgz#a031398adadf9a0bd3a56398cec931f877d88485"
+  dependencies:
+    "@f/elapsed-time" "^1.0.0"
+    "@f/raf" "^1.0.0"
+    "@f/tween" "^1.0.0"
+
+"@f/elapsed-time@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/@f/elapsed-time/-/elapsed-time-1.0.0.tgz#6a079a6104a87278bf5b4080444ef02d1b595449"
+  dependencies:
+    "@f/timestamp" "^1.0.0"
+
+"@f/map-obj@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.npmjs.org/@f/map-obj/-/map-obj-1.2.2.tgz#d9a9f8bd76caa2ae11b633dda24d9c6cccc1e60d"
+
+"@f/raf@^1.0.0":
+  version "1.0.3"
+  resolved "https://registry.npmjs.org/@f/raf/-/raf-1.0.3.tgz#32ddca37de345b20c8c3843018cc51b8f897914d"
+
+"@f/timestamp@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/@f/timestamp/-/timestamp-1.0.0.tgz#32a9166e2516e5ccb9b0fcfdc89223819710e88c"
+
+"@f/tween@^1.0.0":
+  version "1.0.1"
+  resolved "https://registry.npmjs.org/@f/tween/-/tween-1.0.1.tgz#18aef79c4975e54415adf326e4b5e0d053d207f0"
+  dependencies:
+    "@f/map-obj" "^1.2.2"
+
 "@svgr/core@^2.4.1":
   version "2.4.1"
   resolved "https://registry.npmjs.org/@svgr/core/-/core-2.4.1.tgz#03a407c28c4a1d84305ae95021e8eabfda8fa731"

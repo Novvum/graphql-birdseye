@@ -25,6 +25,7 @@
     "deploy": "gh-pages -d example/build"
   },
   "dependencies": {
+    "@f/animate": "^1.0.1",
     "@types/graphql": "^14.0.3",
     "@types/lodash": "^4.14.118",
     "jointjs": "^2.2.1",
