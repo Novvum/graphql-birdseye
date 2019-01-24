@@ -35,7 +35,7 @@ export type EventType = "loading:start" | "loading:stop";
 
 export default class JointJS {
   joint: any;
-  theme: any;
+  theme: Theme;
   graph: any;
   paper: any;
   shadowPaper: any;
@@ -610,18 +610,30 @@ export default class JointJS {
       linkView.showTools();
     });
 
-    // hide link tools
-    // paper.on("link:mouseout", function(linkView: any) {
-    //   const links = graph.getLinks();
-    //   // animateLinkOpacity(links, { targetOpacity: 0 });
-    //   linkView.hideTools();
-    // });
-
     this.paper.on("cell:mouseover", (cell: any, evt: any) => {
       if (!cell.model.isElement()) {
         return null;
       }
-      let activeLink = this.getHoveredPortLink(cell, evt);
+      let activePort = this.getHoveredPort(cell, evt);
+      cell.model.getPorts().map(port => {
+        cell.model.portProp(
+          port.id,
+          "attrs/.port-body-highlighter/fill",
+          "transparent"
+        );
+      });
+      if (!activePort) {
+        return this.highlightLinks({ cell: cell.model });
+      }
+      if (activePort) {
+        cell.model.portProp(
+          activePort.id,
+          "attrs/.port-body-highlighter/fill",
+          this.theme.colors.background
+        );
+      }
+
+      const activeLink = activePort && activePort.link;
       if (!activeLink) {
         return this.highlightLinks({ cell: cell.model });
       }
@@ -634,14 +646,16 @@ export default class JointJS {
       this.paper.hideTools();
     });
   }
-  private getHoveredPortLink(cell: any, evt: any) {
+  private getHoveredPort(cell: any, evt: any) {
     if (!cell.model.isElement()) {
       return null;
     }
     const relBBox = this.joint.util.getElementBBox(cell.$el);
     const cellBBox = cell.model.getBBox();
     const getRelHeight = height => (height * relBBox.height) / cellBBox.height;
-    const headerOffset = getRelHeight(this.theme.header.container.height);
+    const headerOffset = getRelHeight(
+      this.theme.header.height + this.theme.gap - this.theme.row.height / 2
+    );
     const relRowHeight = getRelHeight(this.theme.row.height);
     const relCursorPosition = {
       x: evt.clientX - relBBox.x,
@@ -659,11 +673,14 @@ export default class JointJS {
       return false;
     });
     return port
-      ? this.graph
-          .getCells()
-          .find(
-            cell => cell.isLink() && cell.attributes.source.port === port.id
-          )
+      ? {
+          ...port,
+          link: this.graph
+            .getCells()
+            .find(
+              cell => cell.isLink() && cell.attributes.source.port === port.id
+            )
+        }
       : null;
   }
 

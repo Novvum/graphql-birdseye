@@ -1,4 +1,6 @@
-export default (joint, theme) => {
+import { Theme } from "../defaultTheme";
+
+export default (joint, theme: Theme) => {
   joint.shapes.basic.Generic.define(
     "devs.Model",
     {
@@ -13,6 +15,12 @@ export default (joint, theme) => {
           magnet: false,
           opacity: 1
         },
+        ".container": {
+          ...theme.container,
+          "ref-width": "100%",
+          "ref-height": theme.header.height + theme.gap * 2 + 5,
+          "ref-height-2": "100%"
+        },
         ".label": {
           ...theme.header.label,
           "ref-x": 0.5,
@@ -22,11 +30,11 @@ export default (joint, theme) => {
           ...theme.header.container,
           "ref-width": "100%"
         },
-        ".body": {
-          ...theme.body,
-          "ref-width": "100%",
-          "ref-height": "100%",
-          y: theme.header.container.height
+        ".divider": {
+          "ref-width": "1",
+          "ref-width-2": "100%",
+          y: theme.header.height,
+          ...theme.divider
         },
         ".joint-port": {
           y: theme.row.height
@@ -34,18 +42,47 @@ export default (joint, theme) => {
       },
       ports: {
         groups: {
+          out: {
+            position: {
+              name: "right",
+              args: {
+                dy: theme.header.height + theme.gap
+              }
+            },
+            attrs: {
+              ".port-label": {
+                ...theme.row.fieldTypeLabel
+              },
+              ".port-body": {
+                ...theme.row.body,
+                y: -theme.row.height / 2,
+                magnet: true
+              },
+              ".port-body-highlighter": {
+                rx: 5,
+                fill: "transparent",
+                cursor: "pointer"
+              }
+            },
+            label: {
+              position: {
+                name: "left",
+                args: {
+                  y: 0
+                }
+              }
+            }
+          },
           in: {
             position: {
               name: "left",
               args: {
-                dy: theme.row.height
+                dy: theme.header.height + theme.gap
               }
             },
             attrs: {
-              ".port-label": theme.row.label,
+              ".port-label": theme.row.fieldNameLabel,
               ".port-body": {
-                fill: "#fff",
-                stroke: "#000",
                 magnet: false
               }
             },
@@ -57,40 +94,15 @@ export default (joint, theme) => {
                 }
               }
             }
-          },
-          out: {
-            position: {
-              name: "right",
-              args: {
-                dy: theme.row.height
-              }
-            },
-            attrs: {
-              ".port-label": {
-                fill: "#000"
-              },
-              ".port-body": {
-                ...theme.row.body,
-                y: -theme.row.body.height / 2,
-                magnet: true
-              }
-            },
-            label: {
-              position: {
-                name: "left",
-                args: {
-                  y: 0
-                }
-              }
-            }
           }
         }
       }
     },
     {
       markup:
-        '<g class="rotatable"><rect class="header"/><rect class="body"/><text class="label"/></g>',
-      portMarkup: '<rect class="port-body"/>',
+        '<g class="rotatable"><rect class="container"/><rect class="header"/><text class="label"/><rect class="divider" /></g>',
+      portMarkup:
+        '<g class="port-body-container"><rect class="port-body"/><rect class="port-body-highlighter" /></g>',
       portLabelMarkup: '<text class="port-label"/>',
       initialize: function() {
         joint.shapes.basic.Generic.prototype.initialize.apply(this, arguments);
@@ -108,7 +120,7 @@ export default (joint, theme) => {
         var outPortItems = this.createPortItems("out", outPorts);
         this.prop(
           "ports/items",
-          inPortItems.concat(outPortItems),
+          outPortItems.concat(inPortItems),
           joint.util.assign({ rewrite: true }, opt)
         );
         this._setSize();
@@ -122,7 +134,8 @@ export default (joint, theme) => {
         let height = size.height;
         let width = size.width;
         if (!size.height || size.height === "auto") {
-          height = portCount * 40;
+          height =
+            portCount * theme.row.height + theme.header.height + theme.gap;
         }
         const maxInportLength = Math.max(
           ...this.get("inPorts").map((port: string) => port.length)
@@ -133,6 +146,7 @@ export default (joint, theme) => {
           )
         );
         width = Math.max(width, (maxInportLength + maxOutportLength) * 10 + 20);
+        this.set("attrs/.container/height", height);
         this.set("size", {
           ...size,
           height,
@@ -151,6 +165,12 @@ export default (joint, theme) => {
             ".port-body": {
               width: group === "out" ? this.get("size").width : 0,
               x: -this.get("size").width
+            },
+            ".port-body-highlighter": {
+              width: group === "out" ? this.get("size").width - 20 : 0,
+              x: -this.get("size").width + 10,
+              height: theme.row.height,
+              y: -theme.row.height / 2
             }
           }
         };
