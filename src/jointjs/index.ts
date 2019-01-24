@@ -667,7 +667,6 @@ export default class JointJS {
     if (cell) {
       links = this.graph.getConnectedLinks(cell);
     }
-    console.log(links);
     this.transitionLinkColor(this.graph.getLinks(), {
       targetColor: this.theme.colors.line.inactive
     });
