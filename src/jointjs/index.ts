@@ -344,50 +344,50 @@ export default class JointJS {
         rankSep: 400,
         rankDir: "LR"
       });
-      return this.resizeToFit({ animate });
-    }
-    const originalPositions = this.graph
-      .getCells()
-      .reduce((accumulator, cell) => {
-        if (cell.isElement()) {
-          accumulator[cell.attributes.id] = cell.getBBox();
-        }
-        return accumulator;
-      }, {});
-    joint.layout.DirectedGraph.layout(this.graph, {
-      nodeSep: 200,
-      rankSep: 500,
-      rankDir: "LR"
-    });
-    await this.resizeToFit({ animate });
-    await Promise.all(
-      this.graph
+    } else {
+      const originalPositions = this.graph
         .getCells()
-        .filter(cell => cell.isElement())
-        .map(async cell => {
-          const originalBBox = originalPositions[cell.attributes.id];
-          const targetBBox = cell.getBBox();
-          cell.position(originalBBox.x, originalBBox.y);
-          const links = this.graph.getConnectedLinks(cell);
-          this.graph.removeLinks(cell);
-          cell.transition("position/x", targetBBox.x, {
-            delay: 0,
-            duration: TRANSITION_DURATION * 2,
-            timingFunction: joint.util.timing.linear,
-            valueFunction: joint.util.interpolate.number
-          });
-          cell.transition("position/y", targetBBox.y, {
-            delay: 0,
-            duration: TRANSITION_DURATION * 2,
-            timingFunction: joint.util.timing.linear,
-            valueFunction: joint.util.interpolate.number
-          });
-          await setTimeoutAsync(() => {}, TRANSITION_DURATION * 2);
-          links.map(link => {
-            link.addTo(this.graph);
-          });
-        })
-    );
+        .reduce((accumulator, cell) => {
+          if (cell.isElement()) {
+            accumulator[cell.attributes.id] = cell.getBBox();
+          }
+          return accumulator;
+        }, {});
+      joint.layout.DirectedGraph.layout(this.graph, {
+        nodeSep: 200,
+        rankSep: 500,
+        rankDir: "LR"
+      });
+      await this.resizeToFit({ animate });
+      await Promise.all(
+        this.graph
+          .getCells()
+          .filter(cell => cell.isElement())
+          .map(async cell => {
+            const originalBBox = originalPositions[cell.attributes.id];
+            const targetBBox = cell.getBBox();
+            cell.position(originalBBox.x, originalBBox.y);
+            const links = this.graph.getConnectedLinks(cell);
+            this.graph.removeLinks(cell);
+            cell.transition("position/x", targetBBox.x, {
+              delay: 0,
+              duration: TRANSITION_DURATION * 2,
+              timingFunction: joint.util.timing.linear,
+              valueFunction: joint.util.interpolate.number
+            });
+            cell.transition("position/y", targetBBox.y, {
+              delay: 0,
+              duration: TRANSITION_DURATION * 2,
+              timingFunction: joint.util.timing.linear,
+              valueFunction: joint.util.interpolate.number
+            });
+            await setTimeoutAsync(() => {}, TRANSITION_DURATION * 2);
+            links.map(link => {
+              link.addTo(this.graph);
+            });
+          })
+      );
+    }
     await this.resizeToFit({ animate });
     await setTimeoutAsync(() => null, TRANSITION_DURATION * 2);
     this.graph.resetCells(this.graph.getCells());
