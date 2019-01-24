@@ -483,7 +483,7 @@ export default class JointJS {
         outPorts: Object.keys(fields).map(k => {
           const field = fields[k];
           const connectedType = getNestedType(field.type);
-          const id = `${field.name}_${connectedType.name}`;
+          const id = this.getPortId(type, field, connectedType);
           const label = getFieldLabel(field.type);
           return {
             id,
@@ -499,7 +499,7 @@ export default class JointJS {
           Object.keys(fields).map(async k => {
             const field = fields[k];
             const connectedType = getNestedType(field.type);
-            const id = `${field.name}_${connectedType.name}`;
+            const id = this.getPortId(type, field, connectedType);
             if (
               toRenderTypes.findIndex(
                 type => type.name === connectedType.name
@@ -565,6 +565,10 @@ export default class JointJS {
       this.addTools(link);
     });
   }
+  private getPortId(type, field, connectedType) {
+    return `${type.name}_${field.name}_${connectedType.name}`;
+  }
+
   private transitionLinkOpacity(
     link: any,
     opts: { targetOpacity: number; transitionDuration: number }
@@ -613,19 +617,60 @@ export default class JointJS {
     //   linkView.hideTools();
     // });
 
-    this.paper.on("cell:mouseover", (cell: any) => {
-      this.activateCellLinks(cell);
+    this.paper.on("cell:mouseover", (cell: any, evt: any) => {
+      let activeLink = this.getHoveredPortLink(cell, evt);
+      if (!activeLink) {
+        return this.highlightLinks({ cell: cell.model });
+      }
+      return this.highlightLinks({
+        links: [activeLink]
+      });
     });
 
     this.paper.on("blank:mouseover cell:mouseover", () => {
       this.paper.hideTools();
     });
   }
-  private activateCellLinks(cell: any) {
+  private getHoveredPortLink(cell: any, evt: any) {
+    const relBBox = this.joint.util.getElementBBox(cell.$el);
+    const cellBBox = cell.model.getBBox();
+    const getRelHeight = height => (height * relBBox.height) / cellBBox.height;
+    const headerOffset = getRelHeight(this.theme.header.container.height);
+    const relRowHeight = getRelHeight(this.theme.row.height);
+    const relCursorPosition = {
+      x: evt.clientX - relBBox.x,
+      y: evt.clientY - (relBBox.y + headerOffset)
+    };
+    if (relCursorPosition.y < 0) {
+      return null;
+    }
+    const port = cell.model.get("outPorts").find((p, index) => {
+      const yMin = relRowHeight * index;
+      const yMax = relRowHeight * (index + 1) - 1;
+      if (relCursorPosition.y >= yMin && relCursorPosition.y <= yMax) {
+        return true;
+      }
+      return false;
+    });
+    return port
+      ? this.graph
+          .getCells()
+          .find(
+            cell => cell.isLink() && cell.attributes.source.port === port.id
+          )
+      : null;
+  }
+
+  private highlightLinks(args: { cell?: any; links?: any }) {
+    const { cell, links: lks } = args;
+    let links = lks;
+    if (cell) {
+      links = this.graph.getConnectedLinks(cell);
+    }
+    console.log(links);
     this.transitionLinkColor(this.graph.getLinks(), {
       targetColor: this.theme.colors.line.inactive
     });
-    const links = this.graph.getConnectedLinks(cell.model);
     this.transitionLinkColor(links, {
       targetColor: this.theme.colors.line.active
     });
