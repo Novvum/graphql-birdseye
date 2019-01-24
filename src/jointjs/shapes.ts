@@ -11,7 +11,7 @@ export default (joint, theme) => {
       attrs: {
         ".": {
           magnet: false,
-          opacity: 0
+          opacity: 1
         },
         ".label": {
           ...theme.header.label,
