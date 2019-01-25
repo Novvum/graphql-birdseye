@@ -9,6 +9,7 @@ import { GraphQLSchema } from "graphql/type/schema";
 export interface GraphqlBirdseyeProps {
   schema: GraphQLSchema | null;
   theme?: Theme;
+  style?: any;
 }
 
 export interface State {
@@ -63,7 +64,9 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
         style={{
           position: "relative",
           width: "100%",
-          height: "90vh"
+          height: "90vh",
+          fontFamily: "Helvetica",
+          ...(this.props.style || {})
         }}
       >
         <div
