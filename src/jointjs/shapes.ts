@@ -223,6 +223,30 @@ export default (joint, theme: Theme) => {
             resolve();
           });
         });
+      },
+      transitionOpacity: function(opacity, { delay = 0, duration = 100 }) {
+        return this.transitionAsync("attrs/./opacity", opacity, {
+          delay: delay,
+          duration: duration,
+          timingFunction: joint.util.timing.cubic,
+          valueFunction: joint.util.interpolate.number
+        });
+      },
+      transitionPosition: function(targetBBox, { delay = 0, duration = 100 }) {
+        return Promise.all([
+          this.transitionAsync("position/x", targetBBox.x, {
+            delay,
+            duration,
+            timingFunction: joint.util.timing.cubic,
+            valueFunction: joint.util.interpolate.number
+          }),
+          this.transitionAsync("position/y", targetBBox.y, {
+            delay,
+            duration,
+            timingFunction: joint.util.timing.cubic,
+            valueFunction: joint.util.interpolate.number
+          })
+        ]);
       }
     }
   );
@@ -267,6 +291,22 @@ export default (joint, theme: Theme) => {
           this.on("transition:end", () => {
             resolve();
           });
+        });
+      },
+      transitionColor: function(color, { delay = 0, duration = 100 }) {
+        return this.transitionAsync("attrs/line/stroke", color, {
+          delay: 0,
+          duration: duration,
+          timingFunction: joint.util.timing.cubic,
+          valueFunction: joint.util.interpolate.hexColor
+        });
+      },
+      transitionOpacity: function(opacity, { delay = 0, duration = 100 }) {
+        return this.transitionAsync("attrs/line/opacity", opacity, {
+          delay: delay,
+          duration: duration,
+          timingFunction: joint.util.timing.cubic,
+          valueFunction: joint.util.interpolate.number
         });
       }
     }
