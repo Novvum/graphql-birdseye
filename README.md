@@ -2,7 +2,9 @@
 
 # graphql-birdseye
 
-<p align="center"><img src="https://rawcdn.githack.com/Novvum/graphql-birdseye/376d8fcd6b56d8137cb8e6c5e08742f159bc8aa3/docs/assets/animated-birdseye-multiple.gif" width="400"/></p>
+<p align="center"><img src="docs/assets/animated-birdseye-multiple.gif" width="100%"/></p>
+
+
 
 > graphql visualizer
 
