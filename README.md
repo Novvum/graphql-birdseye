@@ -14,8 +14,16 @@ GraphQL Visualizer for better development workflows. Still a **WIP**!
 
 ## Install
 
+### NPM
+
 ```bash
-npm install --save graphql-view
+npm install --save graphql-birdseye
+```
+
+### Yarn
+
+```bash
+yarn add graphql-birdseye
 ```
 
 ## Usage
@@ -23,11 +31,11 @@ npm install --save graphql-view
 ```tsx
 import * as React from "react";
 
-import MyComponent from "graphql-view";
+import GraphqlBirdseye from "graphql-birdseye";
 
 class Example extends React.Component {
   render() {
-    return <MyComponent />;
+    return <GraphqlBirdseye schema={this.props.schema} />;
   }
 }
 ```
