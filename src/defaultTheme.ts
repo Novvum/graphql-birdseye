@@ -54,7 +54,7 @@ export default {
   line: {
     stroke: colors.line.inactive,
     fill: "transparent",
-    strokeWidth: 2,
+    strokeWidth: 4,
     strokeLinejoin: "round",
     targetMarker: {
       type: "path",
