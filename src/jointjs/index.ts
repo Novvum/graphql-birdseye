@@ -116,7 +116,10 @@ export default class JointJS {
     await this.renderElements({ typeMap: newTypeMap });
   }
   async setActiveType(activeType: any) {
-    if (this.graph.getCell(activeType).attributes.type === "devs.Model") {
+    if (
+      this.graph.getCell(activeType).attributes.type === "devs.Model" &&
+      this.activeType !== activeType
+    ) {
       this.activeType = activeType;
       await this.renderElements();
     }
