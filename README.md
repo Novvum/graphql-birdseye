@@ -2,6 +2,8 @@
 
 # graphql-birdseye
 
+<p align="center"><img src="https://rawcdn.githack.com/Novvum/graphql-birdseye/376d8fcd6b56d8137cb8e6c5e08742f159bc8aa3/docs/assets/animated-birdseye-multiple.gif?raw=true" width="400"></p>
+
 > graphql visualizer
 
 [![NPM](https://img.shields.io/npm/v/graphql-view.svg)](https://www.npmjs.com/package/graphql-view) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
