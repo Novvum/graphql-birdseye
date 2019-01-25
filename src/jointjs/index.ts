@@ -33,16 +33,16 @@ export type FilteredGraphqlOutputType = Exclude<
 export type EventType = "loading:start" | "loading:stop";
 
 export default class JointJS {
-  joint: any;
-  theme: Theme;
-  graph: any;
-  paper: any;
-  shadowPaper: any;
-  panZoom: any;
-  maxZoom: number = 20;
-  typeMap: TypeMap;
-  activeType: string = "root";
-  eventMap: { [key in EventType]?: () => any } = {};
+  private joint: any;
+  private theme: Theme;
+  private graph: any;
+  private paper: any;
+  private panZoom: any;
+  private maxZoom: number = 20;
+  private typeMap: TypeMap;
+  private activeType: string = "root";
+  private eventMap: { [key in EventType]?: () => any } = {};
+  private animation: boolean = true;
   constructor(opts: { theme?: Theme }) {
     const { theme = defaultTheme } = opts;
     injectCustomShapes(joint, theme);
@@ -90,6 +90,9 @@ export default class JointJS {
   on(key: EventType, callback: () => any) {
     this.eventMap[key] = callback;
   }
+  get(key) {
+    return this[key];
+  }
   startLoading() {
     const onStart = this.eventMap["loading:start"];
     if (onStart) {
@@ -102,14 +105,20 @@ export default class JointJS {
       onStop();
     }
   }
+  enableAnimation() {
+    this.animation = true;
+  }
+  disableAnimation() {
+    this.animation = false;
+  }
   async setTypeMap(newTypeMap) {
     this.typeMap = newTypeMap;
-    await this.renderElements(newTypeMap);
+    await this.renderElements({ typeMap: newTypeMap });
   }
-  setActiveType(activeType: any) {
+  async setActiveType(activeType: any) {
     if (this.graph.getCell(activeType).attributes.type === "devs.Model") {
       this.activeType = activeType;
-      this.renderElements();
+      await this.renderElements();
     }
   }
   private async resizeToFit(opts?: { graph?: any; animate?: boolean }) {
@@ -177,25 +186,27 @@ export default class JointJS {
     activeType?: string;
     animate?: boolean;
   }) {
+    await this.startLoading();
     const {
       typeMap = this.typeMap,
       activeType = this.activeType,
-      animate = true
+      animate = this.animation
     } = opts || {};
     const toRenderTypes: FilteredGraphqlOutputType[] = this.getToRenderTypes(
       typeMap,
       activeType
     );
-    this.startLoading();
     await Promise.all([
       this.removeUnusedElements(toRenderTypes, animate),
       this.addNewElements(toRenderTypes, animate)
     ]);
-    this.transitionLinkColor(this.graph.getLinks(), {
-      targetColor: this.theme.colors.line.active
-    });
-    await this.layoutGraph({ animate });
-    this.stopLoading();
+    await Promise.all([
+      this.transitionLinkColor(this.graph.getLinks(), {
+        targetColor: this.theme.colors.line.active
+      }),
+      this.layoutGraph({ animate })
+    ]);
+    await this.stopLoading();
   }
   private async layoutGraph(opts?: { animate?: boolean }) {
     const { animate = true } = opts || {};
@@ -205,7 +216,7 @@ export default class JointJS {
         rankSep: 400,
         rankDir: "LR"
       });
-      await this.resizeToFit({ animate });
+      await this.resizeToFit();
     } else {
       const originalPositions = this.graph
         .getCells()
