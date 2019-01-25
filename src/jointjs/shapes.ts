@@ -215,6 +215,14 @@ export default (joint, theme: Theme) => {
       },
       changeOutGroup: function(properties: any, opt: any) {
         return this._changeGroup("out", properties, opt);
+      },
+      transitionAsync: function(...args) {
+        return new Promise(resolve => {
+          this.transition(...args);
+          this.on("transition:end", () => {
+            resolve();
+          });
+        });
       }
     }
   );
@@ -252,7 +260,15 @@ export default (joint, theme: Theme) => {
             "pointer-events": "none"
           }
         }
-      ]
+      ],
+      transitionAsync: function(...args) {
+        return new Promise(resolve => {
+          this.transition(...args);
+          this.on("transition:end", () => {
+            resolve();
+          });
+        });
+      }
     }
   );
 };
