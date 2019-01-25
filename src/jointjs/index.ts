@@ -1,7 +1,6 @@
 import injectCustomRouter from "./router";
 import injectCustomShapes from "./shapes";
 import {
-  setTimeoutAsync,
   isFilteredEntity,
   isBaseEntity,
   isRelatedType,
@@ -34,16 +33,16 @@ export type FilteredGraphqlOutputType = Exclude<
 export type EventType = "loading:start" | "loading:stop";
 
 export default class JointJS {
-  joint: any;
-  theme: any;
-  graph: any;
-  paper: any;
-  shadowPaper: any;
-  panZoom: any;
-  maxZoom: number = 20;
-  typeMap: TypeMap;
-  activeType: string = "root";
-  eventMap: { [key in EventType]?: () => any } = {};
+  private joint: any;
+  private theme: Theme;
+  private graph: any;
+  private paper: any;
+  private panZoom: any;
+  private maxZoom: number = 20;
+  private typeMap: TypeMap;
+  private activeType: string = "root";
+  private eventMap: { [key in EventType]?: () => any } = {};
+  private animation: boolean = true;
   constructor(opts: { theme?: Theme }) {
     const { theme = defaultTheme } = opts;
     injectCustomShapes(joint, theme);
@@ -84,14 +83,6 @@ export default class JointJS {
     this.paper.hideTools();
     // enable tools
     this.bindToolEvents();
-    this.paper.on("link:pointerclick", (linkView: any) => {
-      const activeType = linkView.model.attributes.target.id;
-      this.setActiveType(activeType);
-    });
-    this.paper.on("cell:pointerclick", (linkView: any) => {
-      const activeType = linkView.model.id;
-      this.setActiveType(activeType);
-    });
     this.resizeToFit({ animate: false });
   }
   /**
@@ -99,6 +90,9 @@ export default class JointJS {
    */
   on(key: EventType, callback: () => any) {
     this.eventMap[key] = callback;
+  }
+  get(key) {
+    return this[key];
   }
   startLoading() {
     const onStart = this.eventMap["loading:start"];
@@ -112,14 +106,23 @@ export default class JointJS {
       onStop();
     }
   }
+  enableAnimation() {
+    this.animation = true;
+  }
+  disableAnimation() {
+    this.animation = false;
+  }
   async setTypeMap(newTypeMap) {
     this.typeMap = newTypeMap;
-    await this.renderElements(newTypeMap);
+    await this.renderElements({ typeMap: newTypeMap });
   }
-  setActiveType(activeType: any) {
-    if (this.graph.getCell(activeType).attributes.type === "devs.Model") {
+  async setActiveType(activeType: any) {
+    if (
+      this.graph.getCell(activeType).attributes.type === "devs.Model" &&
+      this.activeType !== activeType
+    ) {
       this.activeType = activeType;
-      this.renderElements();
+      await this.renderElements();
     }
   }
   private async resizeToFit(opts?: { graph?: any; animate?: boolean }) {
@@ -143,9 +146,9 @@ export default class JointJS {
       });
     }
     this.panZoom.updateBBox();
-    animate && this.focusElement(this.paper.getContentBBox());
+    animate && this.focusBBox(this.paper.getContentBBox());
   }
-  focusElement(bBox) {
+  focusBBox(bBox) {
     const bbBox = bBox;
     let currentPan = this.panZoom.getPan();
     bbBox.y = currentPan.y;
@@ -187,23 +190,27 @@ export default class JointJS {
     activeType?: string;
     animate?: boolean;
   }) {
+    await this.startLoading();
     const {
       typeMap = this.typeMap,
       activeType = this.activeType,
-      animate = true
+      animate = this.animation
     } = opts || {};
     const toRenderTypes: FilteredGraphqlOutputType[] = this.getToRenderTypes(
       typeMap,
       activeType
     );
-    this.startLoading();
-    await this.removeUnusedElements(toRenderTypes, animate);
-    await this.addNewElements(toRenderTypes, animate);
-    this.transitionLinkColor(this.graph.getLinks(), {
-      targetColor: this.theme.colors.line.active
-    });
-    await this.layoutGraph({ animate });
-    this.stopLoading();
+    await Promise.all([
+      this.removeUnusedElements(toRenderTypes, animate),
+      this.addNewElements(toRenderTypes, animate)
+    ]);
+    await Promise.all([
+      this.transitionLinkColor(this.graph.getLinks(), {
+        targetColor: this.theme.colors.line.active
+      }),
+      this.layoutGraph({ animate })
+    ]);
+    await this.stopLoading();
   }
   private async layoutGraph(opts?: { animate?: boolean }) {
     const { animate = true } = opts || {};
@@ -213,6 +220,7 @@ export default class JointJS {
         rankSep: 400,
         rankDir: "LR"
       });
+      await this.resizeToFit();
     } else {
       const originalPositions = this.graph
         .getCells()
@@ -227,7 +235,7 @@ export default class JointJS {
         rankSep: 500,
         rankDir: "LR"
       });
-      await this.resizeToFit({ animate });
+      this.resizeToFit();
       await Promise.all(
         this.graph
           .getCells()
@@ -238,27 +246,33 @@ export default class JointJS {
             cell.position(originalBBox.x, originalBBox.y);
             const links = this.graph.getConnectedLinks(cell);
             this.graph.removeLinks(cell);
-            cell.transition("position/x", targetBBox.x, {
-              delay: 0,
-              duration: TRANSITION_DURATION * 2,
-              timingFunction: joint.util.timing.linear,
-              valueFunction: joint.util.interpolate.number
-            });
-            cell.transition("position/y", targetBBox.y, {
-              delay: 0,
-              duration: TRANSITION_DURATION * 2,
-              timingFunction: joint.util.timing.linear,
-              valueFunction: joint.util.interpolate.number
-            });
-            await setTimeoutAsync(() => {}, TRANSITION_DURATION * 2);
-            links.map(link => {
-              link.addTo(this.graph);
-            });
+            await Promise.all([
+              cell.transitionAsync("position/x", targetBBox.x, {
+                delay: 0,
+                duration: TRANSITION_DURATION * 2,
+                timingFunction: joint.util.timing.quad,
+                valueFunction: joint.util.interpolate.number
+              }),
+              cell.transitionAsync("position/y", targetBBox.y, {
+                delay: 0,
+                duration: TRANSITION_DURATION * 2,
+                timingFunction: joint.util.timing.quad,
+                valueFunction: joint.util.interpolate.number
+              })
+            ]);
+            await Promise.all(
+              links.map(async link => {
+                link.prop("attrs/line/opacity", 0);
+                link.addTo(this.graph);
+                await this.transitionLinkOpacity(link, {
+                  targetOpacity: 1,
+                  transitionDuration: TRANSITION_DURATION
+                });
+              })
+            );
           })
       );
     }
-    await this.resizeToFit({ animate });
-    await setTimeoutAsync(() => null, TRANSITION_DURATION * 2);
     this.graph.resetCells(this.graph.getCells());
   }
 
@@ -305,25 +319,21 @@ export default class JointJS {
       (elem: any) => !toRenderTypes.find(type => type.name === elem.id)
     );
     toRemove.map(async (element: any) => {
-      animate &&
-        element.transition("attrs/./opacity", 0, {
-          delay: 0,
-          duration: TRANSITION_DURATION,
-          timingFunction: joint.util.timing.linear,
-          valueFunction: joint.util.interpolate.number
-        });
       const links = this.graph.getConnectedLinks(element);
       animate &&
-        this.transitionLinkColor(links, {
+        (await this.transitionLinkColor(links, {
           transitionDuration: TRANSITION_DURATION,
           targetColor: this.theme.colors.white
-        });
+        }));
+      animate &&
+        (await element.transitionAsync("attrs/./opacity", 0, {
+          delay: 0,
+          duration: TRANSITION_DURATION,
+          timingFunction: joint.util.timing.quad,
+          valueFunction: joint.util.interpolate.number
+        }));
     });
-    animate &&
-      (await setTimeoutAsync(
-        () => this.graph.removeCells(...toRemove),
-        TRANSITION_DURATION
-      ));
+    this.graph.removeCells(...toRemove);
   }
   private async addNewElements(
     toRenderTypes: FilteredGraphqlOutputType[],
@@ -341,9 +351,6 @@ export default class JointJS {
           this.graph.getBBox() || this.paper.getContentBBox()
         ).topLeft(),
         attrs: {
-          ".": {
-            opacity: animate ? 0 : 1
-          },
           ".label": {
             text: type.name
           }
@@ -352,7 +359,7 @@ export default class JointJS {
         outPorts: Object.keys(fields).map(k => {
           const field = fields[k];
           const connectedType = getNestedType(field.type);
-          const id = `${field.name}_${connectedType.name}`;
+          const id = this.getPortId(type, field, connectedType);
           const label = getFieldLabel(field.type);
           return {
             id,
@@ -411,31 +418,17 @@ export default class JointJS {
               }
             }
           });
-          animate && link.prop("attrs/line/opacity", 0);
           link.addTo(this.graph);
         });
       })
     );
-    animate && (await setTimeoutAsync(() => null, TRANSITION_DURATION));
-    animate &&
-      cells.map((cell: any) => {
-        cell.transition("attrs/./opacity", 1, {
-          delay: 0,
-          duration: TRANSITION_DURATION,
-          timingFunction: joint.util.timing.linear,
-          valueFunction: joint.util.interpolate.number
-        });
-      });
-    this.graph.getLinks().map(async link => {
-      animate &&
-        this.transitionLinkOpacity(link, {
-          targetOpacity: 1,
-          transitionDuration: TRANSITION_DURATION
-        });
-      this.addTools(link);
-    });
+    return cells;
   }
-  private transitionLinkOpacity(
+  private getPortId(type, field, connectedType) {
+    return `${type.name}_${field.name}_${connectedType.name}`;
+  }
+
+  private async transitionLinkOpacity(
     link: any,
     opts: { targetOpacity: number; transitionDuration: number }
   ) {
@@ -443,10 +436,10 @@ export default class JointJS {
       targetOpacity = 1,
       transitionDuration = TRANSITION_DURATION
     } = opts;
-    link.transition("attrs/line/opacity", targetOpacity, {
+    await link.transitionAsync("attrs/line/opacity", targetOpacity, {
       delay: 0,
       duration: transitionDuration,
-      timingFunction: joint.util.timing.linear,
+      timingFunction: joint.util.timing.quad,
       valueFunction: joint.util.interpolate.number
     });
   }
@@ -476,26 +469,97 @@ export default class JointJS {
       linkView.showTools();
     });
 
-    // hide link tools
-    // paper.on("link:mouseout", function(linkView: any) {
-    //   const links = graph.getLinks();
-    //   // animateLinkOpacity(links, { targetOpacity: 0 });
-    //   linkView.hideTools();
-    // });
+    this.paper.on("cell:mouseover", (cell: any, evt: any) => {
+      if (!cell.model.isElement()) {
+        return null;
+      }
+      cell.model.toFront();
+      let activePort = this.getHoveredPort(cell, evt);
+      cell.model.getPorts().map(port => {
+        cell.model.portProp(
+          port.id,
+          "attrs/.port-body-highlighter/fill",
+          "transparent"
+        );
+      });
+      if (!activePort) {
+        return this.highlightLinks({ cell: cell.model });
+      }
+      if (activePort) {
+        cell.model.portProp(
+          activePort.id,
+          "attrs/.port-body-highlighter/fill",
+          this.theme.colors.background
+        );
+      }
 
-    this.paper.on("cell:mouseover", (cell: any) => {
-      this.activateCellLinks(cell);
+      const activeLink = activePort && activePort.link;
+      if (!activeLink) {
+        return this.highlightLinks({ cell: cell.model });
+      }
+      return this.highlightLinks({
+        links: [activeLink]
+      });
     });
-
     this.paper.on("blank:mouseover cell:mouseover", () => {
       this.paper.hideTools();
     });
+    this.paper.on("link:pointerclick", (linkView: any) => {
+      const activeType = linkView.model.attributes.target.id;
+      this.setActiveType(activeType);
+    });
+    this.paper.on("cell:pointerclick", (linkView: any) => {
+      const activeType = linkView.model.id;
+      this.setActiveType(activeType);
+    });
   }
-  private activateCellLinks(cell: any) {
+  private getHoveredPort(cell: any, evt: any) {
+    if (!cell.model.isElement()) {
+      return null;
+    }
+    const relBBox = this.joint.util.getElementBBox(cell.$el);
+    const cellBBox = cell.model.getBBox();
+    const getRelHeight = height => (height * relBBox.height) / cellBBox.height;
+    const headerOffset = getRelHeight(
+      this.theme.header.height + this.theme.gap - this.theme.row.height / 2
+    );
+    const relRowHeight = getRelHeight(this.theme.row.height);
+    const relCursorPosition = {
+      x: evt.clientX - relBBox.x,
+      y: evt.clientY - (relBBox.y + headerOffset)
+    };
+    if (relCursorPosition.y < 0) {
+      return null;
+    }
+    const port = cell.model.get("outPorts").find((p, index) => {
+      const yMin = relRowHeight * index;
+      const yMax = relRowHeight * (index + 1) - 1;
+      if (relCursorPosition.y >= yMin && relCursorPosition.y <= yMax) {
+        return true;
+      }
+      return false;
+    });
+    return port
+      ? {
+          ...port,
+          link: this.graph
+            .getCells()
+            .find(
+              cell => cell.isLink() && cell.attributes.source.port === port.id
+            )
+        }
+      : null;
+  }
+
+  private highlightLinks(args: { cell?: any; links?: any }) {
+    const { cell, links: lks } = args;
+    let links = lks;
+    if (cell) {
+      links = this.graph.getConnectedLinks(cell);
+    }
     this.transitionLinkColor(this.graph.getLinks(), {
       targetColor: this.theme.colors.line.inactive
     });
-    const links = this.graph.getConnectedLinks(cell.model);
     this.transitionLinkColor(links, {
       targetColor: this.theme.colors.line.active
     });
@@ -509,14 +573,15 @@ export default class JointJS {
       transitionDuration = 100,
       targetColor: color = this.theme.colors.primary
     } = opts || {};
-    links.map((link: any) => {
-      link.transition("attrs/line/stroke", color, {
-        delay: 0,
-        duration: transitionDuration,
-        timingFunction: joint.util.timing.linear,
-        valueFunction: joint.util.interpolate.hexColor
-      });
-    });
-    await setTimeoutAsync(() => null, transitionDuration);
+    await Promise.all(
+      links.map((link: any) =>
+        link.transitionAsync("attrs/line/stroke", color, {
+          delay: 0,
+          duration: transitionDuration,
+          timingFunction: joint.util.timing.quad,
+          valueFunction: joint.util.interpolate.hexColor
+        })
+      )
+    );
   }
 }

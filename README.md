@@ -1,7 +1,10 @@
 <p align="center"><img src="https://i.imgur.com/JBBZ9Yn.png" width="269"></p>
 
-
 # graphql-birdseye
+
+<p align="center"><img src="docs/assets/animated-birdseye-multiple.gif" width="100%"/></p>
+
+
 
 > graphql visualizer
 
@@ -9,24 +12,34 @@
 
 GraphQL Visualizer for better development workflows. Still a **WIP**!
 
+## Demo
+
+[![Edit graphql-birdseye-demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/xp9mp9rzwo)
+
 ## Install
 
+### NPM
+
 ```bash
-npm install --save graphql-view
+npm install --save graphql-birdseye
+```
+
+### Yarn
+
+```bash
+yarn add graphql-birdseye
 ```
 
 ## Usage
 
 ```tsx
-import * as React from 'react'
+import * as React from 'react';
 
-import MyComponent from 'graphql-view'
+import GraphqlBirdseye from 'graphql-birdseye';
 
 class Example extends React.Component {
-  render () {
-    return (
-      <MyComponent />
-    )
+  render() {
+    return <GraphqlBirdseye schema={this.props.schema} />;
   }
 }
 ```
@@ -35,6 +48,6 @@ class Example extends React.Component {
 
 MIT © [novvum](https://github.com/novvum)
 
-
 ---
+
 <p align="center">Made by <a href="https://www.novvum.io">Novvum</a> ❤️</p>

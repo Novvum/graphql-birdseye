@@ -1,40 +1,52 @@
 const colors = {
   primary: "#548f9e",
-  background: "#ffffff",
+  background: "#212C32",
   white: "#ffffff",
   line: {
-    active: "#38616b",
-    inactive: "#E8E8E8"
+    active: "#8F9599", // "#38616b",
+    inactive: "#31424B"
   }
 };
 
 const nodeStyles = {
+  gap: 15,
+  container: {
+    fill: "#31424B",
+    rx: 15
+  },
   header: {
+    height: 36,
     label: {
       "font-size": 18,
       "text-anchor": "middle",
-      fill: "white"
+      fill: "#ffffff"
     },
     container: {
-      height: 36,
-      fill: colors.primary,
-      stroke: colors.primary
+      fill: "transparent" // colors.primary,
+      // stroke: colors.primary
     }
   },
-  body: {
-    stroke: colors.primary
-  },
+  divider: {
+    height: 1,
+    stroke: colors.background,
+    fill: colors.background
+  } as Rect,
   row: {
-    height: 36,
-    label: {
-      fill: "#000"
+    height: 26,
+    fieldNameLabel: {
+      fill: "#f6f8fa",
+      "font-weight": "lighter"
+    },
+    fieldTypeLabel: {
+      fill: "#959da5",
+      weight: "lighter"
     },
     body: {
       fill: "transparent",
-      stroke: colors.primary,
-      height: 40
+      stroke: "transparent", // colors.primary,
+      height: 25
     }
-  }
+  } as Row
 };
 export default {
   colors,
@@ -49,68 +61,59 @@ export default {
       d: "M 10 -5 0 0 10 5 z"
     }
   }
-};
+} as Theme;
 
 export interface Theme {
+  gap: number;
   colors: Colors;
   header: Header;
-  body: Body;
+  container: Rect;
+  divider: Rect;
   row: Row;
-  line: Line2;
+  line: Line;
 }
 
-interface Line2 {
-  stroke: string;
-  fill: string;
-  strokeWidth: number;
-  strokeLinejoin: string;
+interface Rect {
+  [key: string]: any;
+}
+
+interface Text {
+  [key: string]: any;
+}
+
+interface Line {
+  [key: string]: any;
   targetMarker: TargetMarker;
 }
 
 interface TargetMarker {
+  [key: string]: any;
   type: string;
   d: string;
 }
 
 interface Row {
+  [key: string]: any;
   height: number;
-  label: Label2;
-  body: Container;
-}
-
-interface Label2 {
-  fill: string;
-}
-
-interface Body {
-  stroke: string;
+  fieldNameLabel: Text;
+  fieldTypeLabel: Text;
+  body: Rect;
 }
 
 interface Header {
-  label: Label;
-  container: Container;
-}
-
-interface Container {
   height: number;
-  fill: string;
-  stroke: string;
-}
-
-interface Label {
-  "font-size": number;
-  "text-anchor": string;
-  fill: string;
+  label: Text;
+  container: Rect;
 }
 
 interface Colors {
   primary: string;
   background: string;
   white: string;
-  line: Line;
+  line: LineColors;
 }
 
-interface Line {
+interface LineColors {
   active: string;
   inactive: string;
 }
