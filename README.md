@@ -8,7 +8,7 @@
 
 > graphql visualizer
 
-[![NPM](https://img.shields.io/npm/v/graphql-view.svg)](https://www.npmjs.com/package/graphql-view) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+[![NPM](https://img.shields.io/npm/v/graphql-birdseye.svg)](https://www.npmjs.com/package/graphql-birdseye) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 GraphQL Visualizer for better development workflows. Still a **WIP**!
 

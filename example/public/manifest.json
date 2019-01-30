@@ -1,6 +1,6 @@
 {
-  "short_name": "graphql-view",
-  "name": "graphql-view",
+  "short_name": "graphql-birdseye",
+  "name": "graphql-birdseye",
   "start_url": "./index.html",
   "display": "standalone",
   "theme_color": "#000000",
