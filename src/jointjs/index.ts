@@ -192,6 +192,10 @@ export default class JointJS {
       await this.renderElements();
     }
   }
+  async setSize(width: number, height: number) {
+    this.paper.setDimensions(width, height);
+    this.panZoom.resize()
+  }
 
   /**
    *
