@@ -44,7 +44,8 @@ const nodeStyles = {
     body: {
       fill: "transparent",
       stroke: "transparent", // colors.primary,
-      height: 25
+      height: 25,
+      cursor: "pointer"
     }
   } as Row
 };

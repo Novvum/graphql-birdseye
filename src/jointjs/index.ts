@@ -72,11 +72,12 @@ export default class JointJS {
       },
       defaultConnector: { name: "rounded", args: { radius: 200 } },
       interactive: {
-        linkMove: false
-      }
+        linkMove: false,
+        elementMove: false
+      },
+      validateMagnet: () => false
     });
-    this.paper.setInteractivity(false);
-    // enable interactions
+    // this.paper.setInteractivity(false);
     await this.renderElements({ animate: false });
     // tools are visible by default
     this.paper.hideTools();
@@ -100,32 +101,36 @@ export default class JointJS {
       linkView.model.toFront();
       linkView.showTools();
     });
-
+    this.paper.on("element:magnet:pointerclick", (cell: any, evt: any, port: any, x, y) => {
+      evt.stopPropagation()
+      console.log(cell, evt, port, x, y)
+    })
     this.paper.on("cell:mouseover", (cell: any, evt: any) => {
       if (!cell.model.isElement()) {
         return null;
       }
       cell.model.toFront();
+      // return;
       let activePort = this.getHoveredPort(cell, evt);
       cell.model.getPorts().map(port => {
         cell.model.portProp(
           port.id,
-          "attrs/.port-body-highlighter/fill",
+          "attrs/.port-body/fill",
           "transparent"
         );
       });
       if (!activePort) {
         return this.highlightLinks({ cell: cell.model });
       }
-      if (activePort) {
-        cell.model.portProp(
-          activePort.id,
-          "attrs/.port-body-highlighter/fill",
-          this.theme.colors.background
-        );
-      }
+      // if (activePort) {
+      //   cell.model.portProp(
+      //     activePort.id,
+      //     "attrs/.port-body/magnet",
+      //     true
+      //   );
+      // }
 
-      const activeLink = activePort && activePort.link;
+      const activeLink = activePort.link;
       if (!activeLink) {
         return this.highlightLinks({ cell: cell.model });
       }
@@ -180,7 +185,7 @@ export default class JointJS {
   }
   async setActiveType(activeType: any) {
     if (
-      this.graph.getCell(activeType).attributes.type === "devs.Model" &&
+      this.graph.getCell(activeType).isElement() &&
       this.activeType !== activeType
     ) {
       this.activeType = activeType;
@@ -423,7 +428,7 @@ export default class JointJS {
    */
 
   private addNode(node: any) {
-    var a1 = new joint.shapes.devs.Model(node);
+    var a1 = new joint.shapes.devs.Type(node);
     this.graph.addCells([a1]);
     return a1;
   }
@@ -437,38 +442,31 @@ export default class JointJS {
     if (!cell.model.isElement()) {
       return null;
     }
-    const relBBox = this.joint.util.getElementBBox(cell.$el);
-    const cellBBox = cell.model.getBBox();
-    const getRelHeight = height => (height * relBBox.height) / cellBBox.height;
-    const headerOffset = getRelHeight(
-      this.theme.header.height + this.theme.gap - this.theme.row.height / 2
-    );
-    const relRowHeight = getRelHeight(this.theme.row.height);
-    const relCursorPosition = {
-      x: evt.clientX - relBBox.x,
-      y: evt.clientY - (relBBox.y + headerOffset)
-    };
-    if (relCursorPosition.y < 0) {
-      return null;
-    }
-    const port = cell.model.get("outPorts").find((p, index) => {
-      const yMin = relRowHeight * index;
-      const yMax = relRowHeight * (index + 1) - 1;
-      if (relCursorPosition.y >= yMin && relCursorPosition.y <= yMax) {
-        return true;
-      }
-      return false;
-    });
-    return port
-      ? {
-          ...port,
-          link: this.graph
-            .getCells()
-            .find(
-              cell => cell.isLink() && cell.attributes.source.port === port.id
-            )
-        }
-      : null;
+    var port = cell.findAttribute('port', evt.target);
+    // const outPort = cell.model.get("outPorts").find((p, index) => {
+    //   const yMin = relRowHeight * index;
+    //   const yMax = relRowHeight * (index + 1) - 1;
+    //   if (relCursorPosition.y >= yMin && relCursorPosition.y <= yMax) {
+    //     return true;
+    //   }
+    //   return false;
+    // });
+    // const inPort = cell.model.get("inPorts").find((p, index) => {
+    //   const yMin = relRowHeight * index;
+    //   const yMax = relRowHeight * (index + 1) - 1;
+    //   if (relCursorPosition.y >= yMin && relCursorPosition.y <= yMax) {
+    //     return true;
+    //   }
+    //   return false;
+    // });
+    return port ? {
+      id: port,
+      link: this.graph
+        .getCells()
+        .find(
+          cell => cell.isLink() && cell.attributes.source.port === port
+        )
+    } : null
   }
   private highlightLinks(args: { cell?: any; links?: any }) {
     const { cell, links: lks } = args;
