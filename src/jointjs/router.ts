@@ -1,15 +1,15 @@
 "use strict";
 
-export default function(joint) {
+export default function (joint) {
   var g = joint.g;
-  joint.routers.manhattan = (function(g, asd, joint, util) {
+  joint.routers.manhattan = (function (g, asd, joint, util) {
     var config = {
       // size of the step to find a route (the grid of the manhattan pathfinder)
       step: 10,
 
       // the number of route finding loops that cause the router to abort
       // returns fallback route instead
-      maximumLoops: 50000,
+      maximumLoops: 90000,
 
       // the number of decimal places to round floating point coordinates
       precision: 10,
@@ -29,7 +29,7 @@ export default function(joint) {
       excludeTypes: ["basic.Text"],
 
       // possible starting directions from an element
-      startDirections: ["top", "right", "left"],
+      startDirections: ["top", "right", "bottom", "left"],
 
       // possible ending directions to an element
       endDirections: ["top", "right", "bottom", "left"],
@@ -43,13 +43,13 @@ export default function(joint) {
       },
 
       // cost of an orthogonal step
-      cost: function() {
+      cost: function () {
         return this.step;
       },
 
       // an array of directions to find next points on the route
       // different from start/end directions
-      directions: function() {
+      directions: function () {
         var step = this.step;
         var cost = this.cost();
 
@@ -62,7 +62,7 @@ export default function(joint) {
       },
 
       // a penalty received for direction change
-      penalties: function() {
+      penalties: function () {
         return {
           0: 0,
           45: this.step / 2,
@@ -71,7 +71,7 @@ export default function(joint) {
       },
 
       // padding applied on the element bounding boxes
-      paddingBox: function() {
+      paddingBox: function () {
         var step = this.step;
 
         return {
@@ -84,7 +84,7 @@ export default function(joint) {
 
       // a router to use when the manhattan router fails
       // (one of the partial routes returns null)
-      fallbackRouter: function(vertices, opt, linkView) {
+      fallbackRouter: function (vertices, opt, linkView) {
         if (!util.isFunction(joint.routers.orthogonal)) {
           throw new Error(
             "Manhattan requires the orthogonal router as default fallback."
@@ -101,7 +101,7 @@ export default function(joint) {
       /* Deprecated */
       // a simple route used in situations when main routing method fails
       // (exceed max number of loop iterations, inaccessible)
-      fallbackRoute: function(from, to, opt) {
+      fallbackRoute: function (from, to, opt) {
         return null; // null result will trigger the fallbackRouter
 
         // left for reference:
@@ -128,13 +128,13 @@ export default function(joint) {
       this.mapGridSize = 100;
     }
 
-    ObstacleMap.prototype.build = function(graph, link) {
+    ObstacleMap.prototype.build = function (graph, link) {
       var opt = this.options;
 
       // source or target element could be excluded from set of obstacles
       var excludedEnds = util
         .toArray(opt.excludeEnds)
-        .reduce(function(res, item) {
+        .reduce(function (res, item) {
           var end = link.get(item);
           if (end) {
             var cell = graph.getCell(end.id);
@@ -149,25 +149,25 @@ export default function(joint) {
       // Exclude any embedded elements from the source and the target element.
       var excludedAncestors: any = [];
 
-      // var source = graph.getCell(link.get("source").id);
-      // if (source) {
-      //   excludedAncestors = util.union(
-      //     excludedAncestors,
-      //     source.getAncestors().map(function(cell) {
-      //       return cell.id;
-      //     })
-      //   );
-      // }
+      var source = graph.getCell(link.get("source").id);
+      if (source) {
+        excludedAncestors = util.union(
+          excludedAncestors,
+          source.getAncestors().map(function (cell) {
+            return cell.id;
+          })
+        );
+      }
 
-      // var target = graph.getCell(link.get("target").id);
-      // if (target) {
-      //   excludedAncestors = util.union(
-      //     excludedAncestors,
-      //     target.getAncestors().map(function(cell) {
-      //       return cell.id;
-      //     })
-      //   );
-      // }
+      var target = graph.getCell(link.get("target").id);
+      if (target) {
+        excludedAncestors = util.union(
+          excludedAncestors,
+          target.getAncestors().map(function (cell) {
+            return cell.id;
+          })
+        );
+      }
 
       // Builds a map of all elements for quicker obstacle queries (i.e. is a point contained
       // in any obstacle?) (a simplified grid search).
@@ -176,11 +176,11 @@ export default function(joint) {
       // don't need to go through all obstacles, we check only those in a particular cell.
       var mapGridSize = this.mapGridSize;
 
-      graph.getElements().reduce(function(map, element) {
+      graph.getElements().reduce(function (map, element) {
         var isExcludedType = util
           .toArray(opt.excludeTypes)
           .includes(element.get("type"));
-        var isExcludedEnd = excludedEnds.find(function(excluded) {
+        var isExcludedEnd = excludedEnds.find(function (excluded) {
           return excluded.id === element.id;
         });
         var isExcludedAncestor: any = excludedAncestors.includes(element.id);
@@ -207,13 +207,13 @@ export default function(joint) {
       return this;
     };
 
-    ObstacleMap.prototype.isPointAccessible = function(point) {
+    ObstacleMap.prototype.isPointAccessible = function (point) {
       var mapKey = point
         .clone()
         .snapToGrid(this.mapGridSize)
         .toString();
 
-      return util.toArray(this.map[mapKey]).every(function(obstacle) {
+      return util.toArray(this.map[mapKey]).every(function (obstacle) {
         return !obstacle.containsPoint(point);
       });
     };
@@ -228,7 +228,7 @@ export default function(joint) {
       this.CLOSE = 2;
     }
 
-    SortedSet.prototype.add = function(item, value) {
+    SortedSet.prototype.add = function (item, value) {
       if (this.hash[item]) {
         // item removal
         this.items.splice(this.items.indexOf(item), 1);
@@ -241,7 +241,7 @@ export default function(joint) {
       var index = joint.util.sortedIndex(
         this.items,
         item,
-        function(i) {
+        function (i) {
           return this.values[i];
         }.bind(this)
       );
@@ -249,23 +249,23 @@ export default function(joint) {
       this.items.splice(index, 0, item);
     };
 
-    SortedSet.prototype.remove = function(item) {
+    SortedSet.prototype.remove = function (item) {
       this.hash[item] = this.CLOSE;
     };
 
-    SortedSet.prototype.isOpen = function(item) {
+    SortedSet.prototype.isOpen = function (item) {
       return this.hash[item] === this.OPEN;
     };
 
-    SortedSet.prototype.isClose = function(item) {
+    SortedSet.prototype.isClose = function (item) {
       return this.hash[item] === this.CLOSE;
     };
 
-    SortedSet.prototype.isEmpty = function() {
+    SortedSet.prototype.isEmpty = function () {
       return this.items.length === 0;
     };
 
-    SortedSet.prototype.pop = function() {
+    SortedSet.prototype.pop = function () {
       var item = this.items.shift();
       this.remove(item);
       return item;
@@ -348,7 +348,7 @@ export default function(joint) {
     function getGridOffsets(directions, grid, opt) {
       var step = opt.step;
 
-      util.toArray(opt.directions).forEach(function(direction) {
+      util.toArray(opt.directions).forEach(function (direction) {
         direction.gridOffsetX = (direction.offsetX / step) * grid.x;
         direction.gridOffsetY = (direction.offsetY / step) * grid.y;
       });
@@ -478,7 +478,7 @@ export default function(joint) {
 
       var keys = util.isObject(directionMap) ? Object.keys(directionMap) : [];
       var dirList = util.toArray(directionList);
-      var rectPoints = keys.reduce(function(res: any, key) {
+      var rectPoints = keys.reduce(function (res: any, key) {
         if (dirList.includes(key)) {
           var direction = directionMap[key];
 
@@ -486,9 +486,9 @@ export default function(joint) {
           // even if anchor lies outside of bbox
           var endpoint = new g.Point(
             snappedAnchor.x +
-              direction.x * (Math.abs(anchorCenterVector.x) + bbox.width),
+            direction.x * (Math.abs(anchorCenterVector.x) + bbox.width),
             snappedAnchor.y +
-              direction.y * (Math.abs(anchorCenterVector.y) + bbox.height)
+            direction.y * (Math.abs(anchorCenterVector.y) + bbox.height)
           );
           var intersectionLine = new g.Line(anchor, endpoint);
 
@@ -633,7 +633,7 @@ export default function(joint) {
 
         var endPointsKeys = util
           .toArray(endPoints)
-          .reduce(function(res, endPoint) {
+          .reduce(function (res, endPoint) {
             var key = getKey(endPoint);
             res.push(key);
             return res;
@@ -781,7 +781,7 @@ export default function(joint) {
       opt.penalties = util.result(opt, "penalties");
       opt.paddingBox = util.result(opt, "paddingBox");
 
-      util.toArray(opt.directions).forEach(function(direction) {
+      util.toArray(opt.directions).forEach(function (direction) {
         var point1 = new g.Point(0, 0);
         var point2 = new g.Point(direction.offsetX, direction.offsetY);
 
@@ -870,24 +870,24 @@ export default function(joint) {
     }
 
     // public function
-    return function(vertices, opt, linkView) {
+    return function (vertices, opt, linkView) {
       return router(vertices, util.assign({}, config, opt), linkView);
     };
   })(g, null, joint, joint.util);
 
-  joint.routers.metro = (function(util) {
+  joint.routers.metro = (function (util) {
     var config = {
       maxAllowedDirectionChange: 45,
 
       // cost of a diagonal step
-      diagonalCost: function(): any {
+      diagonalCost: function (): any {
         var step = (this as any).step;
         return Math.ceil(Math.sqrt((step * step) << 1));
       },
 
       // an array of directions to find next points on the route
       // different from start/end directions
-      directions: function() {
+      directions: function () {
         var step = (this as any).step;
         var cost = (this as any).cost();
         var diagonalCost = this.diagonalCost();
@@ -906,7 +906,7 @@ export default function(joint) {
 
       // a simple route used in situations when main routing method fails
       // (exceed max number of loop iterations, inaccessible)
-      fallbackRoute: function(from: any, to: any, opt: any) {
+      fallbackRoute: function (from: any, to: any, opt: any) {
         // Find a route which breaks by 45 degrees ignoring all obstacles.
 
         var theta = from.theta(to);
@@ -953,7 +953,7 @@ export default function(joint) {
     };
 
     // public function
-    return function(vertices: any, opt: any, linkView: any) {
+    return function (vertices: any, opt: any, linkView: any) {
       if (!util.isFunction(joint.routers.manhattan)) {
         throw new Error("Metro requires the manhattan router.");
       }

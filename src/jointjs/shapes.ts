@@ -1,20 +1,14 @@
 import { Theme } from "../defaultTheme";
 
 export default (joint, theme: Theme) => {
-  joint.shapes.basic.Generic.define(
-    "devs.Model",
+  joint.shapes.devs.Model.define(
+    "devs.Type",
     {
-      inPorts: [],
-      outPorts: [],
       size: {
         width: 300,
         height: "auto"
       },
       attrs: {
-        ".": {
-          magnet: false,
-          opacity: 1
-        },
         ".container": {
           ...theme.container,
           "ref-width": "100%",
@@ -56,7 +50,6 @@ export default (joint, theme: Theme) => {
               ".port-body": {
                 ...theme.row.body,
                 y: -theme.row.height / 2,
-                magnet: true
               },
               ".port-body-highlighter": {
                 rx: 5,
@@ -83,7 +76,13 @@ export default (joint, theme: Theme) => {
             attrs: {
               ".port-label": theme.row.fieldNameLabel,
               ".port-body": {
-                magnet: false
+                ...theme.row.body,
+                y: -theme.row.height / 2,
+              },
+              ".port-body-highlighter": {
+                rx: 5,
+                fill: "transparent",
+                cursor: "pointer"
               }
             },
             label: {
@@ -102,14 +101,14 @@ export default (joint, theme: Theme) => {
       markup:
         '<g class="rotatable"><rect class="container"/><rect class="header"/><text class="label"/><rect class="divider" /></g>',
       portMarkup:
-        '<g class="port-body-container"><rect class="port-body"/><rect class="port-body-highlighter" /></g>',
+        '<g class="port-body-container"><rect class="port-body-highlighter" /><rect class="port-body"/></g>',
       portLabelMarkup: '<text class="port-label"/>',
-      initialize: function() {
+      initialize: function () {
         joint.shapes.basic.Generic.prototype.initialize.apply(this, arguments);
         this.on("change:inPorts change:outPorts", this.updatePortItems, this);
         this.updatePortItems();
       },
-      updatePortItems: function(_model: any, _changed: any, opt: any) {
+      updatePortItems: function (_model: any, _changed: any, opt: any) {
         // Make sure all ports are unique.
         var inPorts = joint.util.uniq(this.get("inPorts"));
         var outPorts = joint.util.difference(
@@ -125,7 +124,7 @@ export default (joint, theme: Theme) => {
         );
         this._setSize();
       },
-      _setSize: function() {
+      _setSize: function () {
         var portCount = Math.max(
           this.get("inPorts").length,
           this.get("outPorts").length
@@ -153,7 +152,7 @@ export default (joint, theme: Theme) => {
           width
         });
       },
-      createPortItem: function(group: any, port: any) {
+      createPortItem: function (group: any, port: any) {
         this._setSize();
         return {
           id: typeof port === "object" ? port.id : port,
@@ -163,24 +162,24 @@ export default (joint, theme: Theme) => {
               text: typeof port === "object" ? port.label : port
             },
             ".port-body": {
-              width: group === "out" ? this.get("size").width : 0,
-              x: -this.get("size").width
+              width: this.get("size").width,
+              x: group === "out" ? -this.get("size").width : 0
             },
             ".port-body-highlighter": {
-              width: group === "out" ? this.get("size").width - 20 : 0,
-              x: -this.get("size").width + 10,
+              width: this.get("size").width - 20,
+              x: group === "out" ? -this.get("size").width + 10 : 10,
               height: theme.row.height,
               y: -theme.row.height / 2
             }
           }
         };
       },
-      createPortItems: function(group: any, ports: any) {
+      createPortItems: function (group: any, ports: any) {
         return joint.util
           .toArray(ports)
           .map(this.createPortItem.bind(this, group));
       },
-      _addGroupPort: function(port: any, group: any, opt: any) {
+      _addGroupPort: function (port: any, group: any, opt: any) {
         var ports = this.get(group);
         return this.set(
           group,
@@ -188,35 +187,35 @@ export default (joint, theme: Theme) => {
           opt
         );
       },
-      addOutPort: function(port: any, opt: any) {
+      addOutPort: function (port: any, opt: any) {
         return this._addGroupPort(port, "outPorts", opt);
       },
-      addInPort: function(port: any, opt: any) {
+      addInPort: function (port: any, opt: any) {
         return this._addGroupPort(port, "inPorts", opt);
       },
-      _removeGroupPort: function(port: any, group: any, opt: any) {
+      _removeGroupPort: function (port: any, group: any, opt: any) {
         return this.set(group, joint.util.without(this.get(group), port), opt);
       },
-      removeOutPort: function(port: any, opt: any) {
+      removeOutPort: function (port: any, opt: any) {
         return this._removeGroupPort(port, "outPorts", opt);
       },
-      removeInPort: function(port: any, opt: any) {
+      removeInPort: function (port: any, opt: any) {
         return this._removeGroupPort(port, "inPorts", opt);
       },
-      _changeGroup: function(group: any, properties: any, opt: any) {
+      _changeGroup: function (group: any, properties: any, opt: any) {
         return this.prop(
           "ports/groups/" + group,
           joint.util.isObject(properties) ? properties : {},
           opt
         );
       },
-      changeInGroup: function(properties: any, opt: any) {
+      changeInGroup: function (properties: any, opt: any) {
         return this._changeGroup("in", properties, opt);
       },
-      changeOutGroup: function(properties: any, opt: any) {
+      changeOutGroup: function (properties: any, opt: any) {
         return this._changeGroup("out", properties, opt);
       },
-      transitionAsync: function(...args) {
+      transitionAsync: function (...args) {
         return new Promise(resolve => {
           this.transition(...args);
           this.on("transition:end", () => {
@@ -224,7 +223,7 @@ export default (joint, theme: Theme) => {
           });
         });
       },
-      transitionOpacity: function(opacity, { delay = 0, duration = 100 }) {
+      transitionOpacity: function (opacity, { delay = 0, duration = 100 }) {
         return this.transitionAsync("attrs/./opacity", opacity, {
           delay: delay,
           duration: duration,
@@ -232,7 +231,7 @@ export default (joint, theme: Theme) => {
           valueFunction: joint.util.interpolate.number
         });
       },
-      transitionPosition: function(targetBBox, { delay = 0, duration = 100 }) {
+      transitionPosition: function (targetBBox, { delay = 0, duration = 100 }) {
         return Promise.all([
           this.transitionAsync("position/x", targetBBox.x, {
             delay,
@@ -285,7 +284,7 @@ export default (joint, theme: Theme) => {
           }
         }
       ],
-      transitionAsync: function(...args) {
+      transitionAsync: function (...args) {
         return new Promise(resolve => {
           this.transition(...args);
           this.on("transition:end", () => {
@@ -293,7 +292,7 @@ export default (joint, theme: Theme) => {
           });
         });
       },
-      transitionColor: function(color, { delay = 0, duration = 100 }) {
+      transitionColor: function (color, { delay = 0, duration = 100 }) {
         return this.transitionAsync("attrs/line/stroke", color, {
           delay: 0,
           duration: duration,
@@ -301,7 +300,7 @@ export default (joint, theme: Theme) => {
           valueFunction: joint.util.interpolate.hexColor
         });
       },
-      transitionOpacity: function(opacity, { delay = 0, duration = 100 }) {
+      transitionOpacity: function (opacity, { delay = 0, duration = 100 }) {
         return this.transitionAsync("attrs/line/opacity", opacity, {
           delay: delay,
           duration: duration,

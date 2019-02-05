@@ -5,6 +5,7 @@ import JointJS from "./jointjs/index";
 import { IntrospectionQuery } from "graphql/utilities/introspectionQuery";
 import { buildClientSchema } from "graphql/utilities/buildClientSchema";
 import { GraphQLSchema } from "graphql/type/schema";
+import { withResizeDetector } from 'react-resize-detector';
 
 export interface GraphqlBirdseyeProps {
   schema: GraphQLSchema | null;
@@ -12,18 +13,23 @@ export interface GraphqlBirdseyeProps {
   style?: any;
 }
 
+interface ResizeDetectorProps {
+  width: number;
+  height: number;
+}
+
 export interface State {
   activeType: string;
   loading: boolean;
 }
-class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
+class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps & ResizeDetectorProps> {
   ref: any;
-  jointjs: any;
+  jointjs: JointJS;
   state: State = {
     activeType: "Query",
     loading: false
   };
-  constructor(props: GraphqlBirdseyeProps) {
+  constructor(props: GraphqlBirdseyeProps & ResizeDetectorProps) {
     super(props);
     this.jointjs = new JointJS({ theme: props.theme });
   }
@@ -40,6 +46,15 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps> {
       bounds,
       this.props.schema.getTypeMap()
     );
+  }
+
+  componentWillUnmount() {
+    this.jointjs.destroy()
+  }
+  componentWillReceiveProps(nextProps: ResizeDetectorProps) {
+    if (this.props.width !== nextProps.width || this.props.height !== nextProps.height) {
+      this.jointjs.setSize(nextProps.width, nextProps.height)
+    }
   }
 
   private stopLoading = () =>
@@ -104,7 +119,7 @@ const schemaProvider = (
 ) => {
   return class SchemaProvider extends React.PureComponent<
     GraphqlBirdseyeProps & SchemaProviderProps
-  > {
+    > {
     // displayName: `schemaProvider(${Component.displayName})`
     render() {
       const { introspectionQuery, schema: schemaProp, ...props } = this
@@ -120,4 +135,4 @@ const schemaProvider = (
   };
 };
 
-export default schemaProvider(GraphqlBirdseye);
+export default schemaProvider(withResizeDetector(GraphqlBirdseye));

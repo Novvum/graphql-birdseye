@@ -44,7 +44,8 @@ const nodeStyles = {
     body: {
       fill: "transparent",
       stroke: "transparent", // colors.primary,
-      height: 25
+      height: 25,
+      cursor: "pointer"
     }
   } as Row
 };
@@ -52,9 +53,9 @@ export default {
   colors,
   ...nodeStyles,
   line: {
-    stroke: colors.line.active,
+    stroke: colors.line.inactive,
     fill: "transparent",
-    strokeWidth: 2,
+    strokeWidth: 4,
     strokeLinejoin: "round",
     targetMarker: {
       type: "path",
