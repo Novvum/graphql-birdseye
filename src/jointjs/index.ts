@@ -343,9 +343,10 @@ export default class JointJS {
           const existingLinks = this.graph.getConnectedLinks(sourceCell);
           if (
             existingLinks.find(
-              (link: any) =>
-                link.attributes.source.id === type.name &&
-                link.attributes.target.id === targetId
+              (link: any) => {
+                return link.get("source").id === type.name &&
+                  link.get("target") === targetId
+              }
             )
           ) {
             return;
@@ -436,26 +437,10 @@ export default class JointJS {
       return null;
     }
     var port = cell.findAttribute('port', evt.target);
-    // const outPort = cell.model.get("outPorts").find((p, index) => {
-    //   const yMin = relRowHeight * index;
-    //   const yMax = relRowHeight * (index + 1) - 1;
-    //   if (relCursorPosition.y >= yMin && relCursorPosition.y <= yMax) {
-    //     return true;
-    //   }
-    //   return false;
-    // });
-    // const inPort = cell.model.get("inPorts").find((p, index) => {
-    //   const yMin = relRowHeight * index;
-    //   const yMax = relRowHeight * (index + 1) - 1;
-    //   if (relCursorPosition.y >= yMin && relCursorPosition.y <= yMax) {
-    //     return true;
-    //   }
-    //   return false;
-    // });
     return port ? {
       id: port,
       link: this.graph
-        .getCells()
+        .getLinks(cell)
         .find(
           cell => cell.isLink() && cell.attributes.source.port === port
         )
