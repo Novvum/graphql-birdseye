@@ -5,6 +5,13 @@
   "author": "novvum",
   "license": "MIT",
   "repository": "novvum/graphql-birdseye",
+  "keywords": [
+    "graphql-visualizer",
+    "graphql",
+    "graphql-birdseye",
+    "jointjs",
+    "graphql-playground"
+  ],
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "jsnext:main": "dist/index.es.js",
