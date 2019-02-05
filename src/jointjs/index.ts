@@ -33,7 +33,6 @@ export type FilteredGraphqlOutputType = Exclude<
 export type EventType = "loading:start" | "loading:stop";
 
 export default class JointJS {
-  private joint: any;
   private theme: Theme;
   private graph: any;
   private paper: any;
@@ -47,7 +46,6 @@ export default class JointJS {
     const { theme = defaultTheme } = opts;
     injectCustomShapes(joint, theme);
     injectCustomRouter(joint);
-    this.joint = joint;
     this.theme = theme;
   }
   async init(el: any, bounds: any, typeMap: TypeMap) {
@@ -62,6 +60,7 @@ export default class JointJS {
         color: this.theme.colors.background
       },
       gridSize: 1,
+      async: false,
       defaultRouter: {
         name: "metro",
         args: {
@@ -84,6 +83,16 @@ export default class JointJS {
     // enable tools
     this.bindToolEvents();
     this.resizeToFit({ animate: false });
+  }
+
+  async destroy() {
+    this.paper.cancelRenderViews();
+    this.paper.clearGrid();
+    this.graph.clear();
+    this.paper.remove();
+    delete this.graph;
+    delete this.paper;
+    delete this.panZoom;
   }
 
   private bindToolEvents() {
@@ -217,15 +226,10 @@ export default class JointJS {
       activeType
     );
     await Promise.all([
-      this.removeUnusedElements(toRenderTypes, animate),
+      this.removeUnusedElements(toRenderTypes),
       this.addNewElements(toRenderTypes, animate)
     ]);
     await Promise.all([
-      ...this.graph.getLinks().map(link =>
-        link.transitionColor(this.theme.colors.line.active, {
-          duration: TRANSITION_DURATION
-        })
-      ),
       this.layoutGraph({ animate })
     ]);
     await this.stopLoading();
@@ -265,29 +269,20 @@ export default class JointJS {
       .map(k => typeMap[k] as FilteredGraphqlOutputType);
   }
   private async removeUnusedElements(
-    toRenderTypes: FilteredGraphqlOutputType[],
-    animate: boolean
+    toRenderTypes: FilteredGraphqlOutputType[]
   ) {
     const currentElements = this.graph.getElements();
     const toRemove = currentElements.filter(
       (elem: any) => !toRenderTypes.find(type => type.name === elem.id)
     );
-    toRemove.map(async (element: any) => {
-      const links = this.graph.getConnectedLinks(element);
-      animate &&
-        (await Promise.all(
-          links.map(link =>
-            link.transitionColor(this.theme.colors.white, {
-              duration: TRANSITION_DURATION
-            })
-          )
-        ));
-      animate &&
-        (await element.transitionOpacity(0, {
-          duration: TRANSITION_DURATION
-        }));
-    });
     this.graph.removeCells(...toRemove);
+    for (let e in toRemove) {
+      const links = this.graph.getLinks(toRemove[e]);
+      for (let l in links) {
+        delete links[l];
+      }
+      delete toRemove[e];
+    }
   }
   private async addNewElements(
     toRenderTypes: FilteredGraphqlOutputType[],
@@ -412,15 +407,9 @@ export default class JointJS {
           await cell.transitionPosition(targetBBox, {
             duration: TRANSITION_DURATION
           });
-          await Promise.all(
-            links.map(async link => {
-              link.prop("attrs/line/opacity", 0);
-              link.addTo(this.graph);
-              await link.transitionOpacity(1, {
-                duration: TRANSITION_DURATION
-              });
-            })
-          );
+          links.map(async link => {
+            link.addTo(this.graph);
+          })
         })
     ]);
     this.graph.resetCells(this.graph.getCells());
@@ -498,7 +487,7 @@ export default class JointJS {
   private async resizeToFit(opts?: { graph?: any; animate?: boolean }) {
     const { graph = this.graph, animate = true } = opts || {};
     if (!this.panZoom) {
-      this.panZoom = svgPanZoom("#v-2", {
+      this.panZoom = svgPanZoom(`#${this.paper.svg.id}`, {
         fit: true,
         controlIconsEnabled: true,
         maxZoom: this.maxZoom,

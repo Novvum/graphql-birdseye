@@ -33,7 +33,7 @@
     "svg-pan-zoom": "^3.6.0"
   },
   "peerDependencies": {
-    "graphql": "^14.0.2",
+    "graphql": "0.12.3",
     "prop-types": "^15.5.4",
     "react": "^15.0.0 || ^16.0.0",
     "react-dom": "^15.0.0 || ^16.0.0"
@@ -48,7 +48,7 @@
     "babel-runtime": "^6.26.0",
     "cross-env": "^5.1.4",
     "gh-pages": "^1.2.0",
-    "graphql": "^14.0.2",
+    "graphql": "0.12.3",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-scripts-ts": "^2.16.0",
