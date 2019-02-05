@@ -1,6 +1,44 @@
 import { Theme } from "../defaultTheme";
 
 export default (joint, theme: Theme) => {
+  joint.dia.FastPaper = joint.dia.Paper.extend({
+
+    sortViews: () => undefined,
+
+    // beforeRenderViews: function () {
+    //   this.documentFragment = document.createDocumentFragment();
+    // },
+
+    // renderView: function (cell) {
+
+    //   var view = this._views[cell.id] = this.createViewForModel(cell);
+
+    //   // Keep the document fragment sorted. First goes links and then elements. L-L-L-L-L-E-E-E-E-E-E
+    //   // Note that built-in JointJS `z` index will be completely ignored.
+    //   // Links stays always under elements.
+    //   if (cell.isLink()) {
+    //     this.documentFragment.insertBefore(view.el, this.documentFragment.firstChild);
+    //   } else {
+    //     this.documentFragment.appendChild(view.el);
+    //   }
+
+    //   view.paper = this;
+    //   view.render();
+
+    //   return view;
+    // },
+
+    // asyncBatchAdded: function () {
+
+    //   if (this.documentFragment.childNodes.length) {
+    //     // Insert the document fragment after last link. i.e. If the viewport is sorted having
+    //     // L1-L2-L3-E1-E2-E3 and the fragment contains L4-E4 we want the viewport stay sorted.
+    //     // -> L1-L2-L3-L4-E4-E1-E2-E3
+    //     this.viewport.insertBefore(this.documentFragment, this.viewport.querySelector('.element'));
+    //     this.documentFragment = document.createDocumentFragment();
+    //   }
+    // }
+  });
   joint.shapes.devs.Model.define(
     "devs.Type",
     {
@@ -17,8 +55,8 @@ export default (joint, theme: Theme) => {
         },
         ".label": {
           ...theme.header.label,
-          "ref-x": 0.5,
-          "ref-y": 10
+          "x": 0,
+          "y": 15
         },
         ".header": {
           ...theme.header.container,
@@ -99,9 +137,9 @@ export default (joint, theme: Theme) => {
     },
     {
       markup:
-        '<g class="rotatable"><rect class="container"/><rect class="header"/><text class="label"/><rect class="divider" /></g>',
+        '<rect class="container"/><rect class="header"/><text class="label"/><rect class="divider" />',
       portMarkup:
-        '<g class="port-body-container"><rect class="port-body-highlighter" /><rect class="port-body"/></g>',
+        '<rect class="port-body"/>',
       portLabelMarkup: '<text class="port-label"/>',
       initialize: function () {
         joint.shapes.basic.Generic.prototype.initialize.apply(this, arguments);

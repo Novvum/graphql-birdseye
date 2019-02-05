@@ -42,6 +42,8 @@ export default class JointJS {
   private activeType: string = "root";
   private eventMap: { [key in EventType]?: () => any } = {};
   private animation: boolean = true;
+  private cachedCells = {};
+  private cachedLinks = {};
   constructor(opts: { theme?: Theme }) {
     const { theme = defaultTheme } = opts;
     injectCustomShapes(joint, theme);
@@ -51,7 +53,7 @@ export default class JointJS {
   async init(el: any, bounds: any, typeMap: TypeMap) {
     this.typeMap = typeMap;
     this.graph = new joint.dia.Graph();
-    this.paper = new joint.dia.Paper({
+    this.paper = new joint.dia.FastPaper({
       el,
       model: this.graph,
       width: bounds.width,
@@ -76,12 +78,8 @@ export default class JointJS {
       },
       validateMagnet: () => false
     });
-    // this.paper.setInteractivity(false);
     await this.renderElements({ animate: false });
-    // tools are visible by default
-    this.paper.hideTools();
-    // enable tools
-    this.bindToolEvents();
+    this.bindInteractionEvents();
     this.resizeToFit({ animate: false });
   }
 
@@ -95,7 +93,7 @@ export default class JointJS {
     delete this.panZoom;
   }
 
-  private bindToolEvents() {
+  private bindInteractionEvents() {
     // show link tools
     this.paper.on("link:mouseover", (linkView: any) => {
       const links = this.graph.getLinks();
@@ -276,13 +274,6 @@ export default class JointJS {
       (elem: any) => !toRenderTypes.find(type => type.name === elem.id)
     );
     this.graph.removeCells(...toRemove);
-    for (let e in toRemove) {
-      const links = this.graph.getLinks(toRemove[e]);
-      for (let l in links) {
-        delete links[l];
-      }
-      delete toRemove[e];
-    }
   }
   private async addNewElements(
     toRenderTypes: FilteredGraphqlOutputType[],
@@ -295,9 +286,9 @@ export default class JointJS {
     const filtered = toRenderTypes.filter(type => {
       return !currentElements.find((elem: any) => elem.id === type.name);
     });
-    filtered.map(type => {
+    const nodes = filtered.map(type => {
       const fields = type.getFields();
-      return this.addNode({
+      return this.createNode({
         id: type.name,
         position: (
           this.graph.getBBox() || this.paper.getContentBBox()
@@ -320,6 +311,7 @@ export default class JointJS {
         })
       });
     });
+    this.graph.addCells(nodes);
     await Promise.all(
       toRenderTypes.map(async type => {
         const fields = type.getFields();
@@ -338,7 +330,7 @@ export default class JointJS {
           }
           return accumulator;
         }, {});
-        Object.keys(targetMap).map(targetId => {
+        this.graph.addCells(Object.keys(targetMap).map(targetId => {
           const sourceCell = this.graph.getCell(type.name);
           const existingLinks = this.graph.getConnectedLinks(sourceCell);
           if (
@@ -351,39 +343,19 @@ export default class JointJS {
           ) {
             return;
           }
-          var link = new joint.shapes.devs.Link();
-          link.source({
-            id: type.name,
-            anchor: {
-              name: `top`,
-              args: {
-                dy: 5
-              }
-            }
-          });
-          link.target({
-            id: targetId,
-            anchor: {
-              name: `top`, // `${dy > 0 ? "top" : "bottom"}`,
-              args: {
-                dy: this.theme.row.height - 5, // dy > 0 ? ROW_HEIGHT / 2 : 0
-                dx: 10
-              }
-            }
-          });
-          link.addTo(this.graph);
-        });
+          const sourceId = type.name;
+          return this.createLink(sourceId, targetId);
+        }));
       })
     );
   }
+
   private async layoutGraph(opts?: { animate?: boolean }) {
     const { animate = true } = opts || {};
     const originalPositions = this.graph
-      .getCells()
+      .getElements()
       .reduce((accumulator, cell) => {
-        if (cell.isElement()) {
-          accumulator[cell.attributes.id] = cell.getBBox();
-        }
+        accumulator[cell.attributes.id] = cell.getBBox();
         return accumulator;
       }, {});
     joint.layout.DirectedGraph.layout(this.graph, {
@@ -421,10 +393,43 @@ export default class JointJS {
    * Helpers
    */
 
-  private addNode(node: any) {
+  private createNode(node: any) {
+    const cachedCell = this.cachedCells[node.id];
+    if (cachedCell) {
+      return cachedCell
+    }
     var a1 = new joint.shapes.devs.Type(node);
-    this.graph.addCells([a1]);
+    this.cachedCells[node.id] = a1;
     return a1;
+  }
+  private createLink(sourceId: string, targetId: string) {
+    const hash = `${sourceId}_${targetId}`;
+    const cachedLink = this.cachedLinks[hash]
+    if (cachedLink) {
+      return cachedLink;
+    }
+    var link = new joint.shapes.devs.Link();
+    link.source({
+      id: sourceId,
+      anchor: {
+        name: `top`,
+        args: {
+          dy: 5
+        }
+      }
+    });
+    link.target({
+      id: targetId,
+      anchor: {
+        name: `top`,
+        args: {
+          dy: this.theme.row.height - 5,
+          dx: 10
+        }
+      }
+    });
+    this.cachedLinks[hash] = link;
+    return link;
   }
   private addTools(link: any) {
     var toolsView = new joint.dia.ToolsView({
