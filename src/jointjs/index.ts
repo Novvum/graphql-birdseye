@@ -272,8 +272,8 @@ export default class JointJS {
     const currentElements = this.graph.getElements();
     const toRemove = currentElements.filter(
       (elem: any) => !toRenderTypes.find(type => type.name === elem.id)
-    );
-    this.graph.removeCells(...toRemove);
+    ).map(elem => [elem, ...this.graph.getConnectedLinks(elem)]);
+    this.graph.removeCells(...[].concat.apply([], toRemove));
   }
   private async addNewElements(
     toRenderTypes: FilteredGraphqlOutputType[],
