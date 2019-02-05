@@ -4104,7 +4104,7 @@ graphlib@2.1.5, graphlib@^2.1.5:
   dependencies:
     lodash "^4.11.1"
 
-graphql@0.12.6:
+graphql@0.12.3:
   version "0.12.3"
   resolved "https://registry.npmjs.org/graphql/-/graphql-0.12.3.tgz#11668458bbe28261c0dcb6e265f515ba79f6ce07"
   dependencies:

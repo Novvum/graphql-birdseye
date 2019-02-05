@@ -323,55 +323,56 @@ export default class JointJS {
     await Promise.all(
       toRenderTypes.map(async type => {
         const fields = type.getFields();
-        await Promise.all(
-          Object.keys(fields).map(async k => {
-            const field = fields[k];
-            const connectedType = getNestedType(field.type);
-            const id = getPortId(type, field, connectedType);
-            if (
-              toRenderTypes.findIndex(
-                type => type.name === connectedType.name
-              ) > -1
-            ) {
-              const sourceCell = this.graph.getCell(type.name);
-              const existingLinks = this.graph.getConnectedLinks(sourceCell);
-              if (
-                existingLinks.find(
-                  (link: any) => link.attributes.source.port === id
-                )
-              ) {
-                return;
+        const fieldArr = Object.keys(fields);
+        const targetMap = fieldArr.reduce((accumulator, k) => {
+          const field = fields[k];
+          const connectedType = getNestedType(field.type);
+          if (
+            toRenderTypes.findIndex(type => type.name === connectedType.name) >
+            -1
+          ) {
+            accumulator[connectedType.name] = [
+              ...(accumulator[connectedType.name] || []),
+              field
+            ];
+          }
+          return accumulator;
+        }, {});
+        Object.keys(targetMap).map(targetId => {
+          const sourceCell = this.graph.getCell(type.name);
+          const existingLinks = this.graph.getConnectedLinks(sourceCell);
+          if (
+            existingLinks.find(
+              (link: any) => {
+                return link.get("source").id === type.name &&
+                  link.get("target") === targetId
               }
-              const sourcePortPosition = sourceCell.getPortsPositions("out")[
-                id
-              ];
-              const targetCenterPosition = this.graph
-                .getCell(connectedType.name)
-                .getBBox()
-                .center();
-              const dx = targetCenterPosition.x - sourcePortPosition.x;
-              var link = new joint.shapes.devs.Link();
-              link.source({
-                id: type.name,
-                port: id,
-                anchor: {
-                  name: `${dx > 0 ? "right" : "left"}`
-                }
-              });
-              link.target({
-                id: connectedType.name,
-                anchor: {
-                  name: `top`, // `${dy > 0 ? "top" : "bottom"}`,
-                  args: {
-                    dy: this.theme.row.height / 2 // dy > 0 ? ROW_HEIGHT / 2 : 0
-                  }
-                }
-              });
-              link.addTo(this.graph);
-              this.addTools(link);
+            )
+          ) {
+            return;
+          }
+          var link = new joint.shapes.devs.Link();
+          link.source({
+            id: type.name,
+            anchor: {
+              name: `top`,
+              args: {
+                dy: 5
+              }
             }
-          })
-        );
+          });
+          link.target({
+            id: targetId,
+            anchor: {
+              name: `top`, // `${dy > 0 ? "top" : "bottom"}`,
+              args: {
+                dy: this.theme.row.height - 5, // dy > 0 ? ROW_HEIGHT / 2 : 0
+                dx: 10
+              }
+            }
+          });
+          link.addTo(this.graph);
+        });
       })
     );
   }
@@ -436,26 +437,10 @@ export default class JointJS {
       return null;
     }
     var port = cell.findAttribute('port', evt.target);
-    // const outPort = cell.model.get("outPorts").find((p, index) => {
-    //   const yMin = relRowHeight * index;
-    //   const yMax = relRowHeight * (index + 1) - 1;
-    //   if (relCursorPosition.y >= yMin && relCursorPosition.y <= yMax) {
-    //     return true;
-    //   }
-    //   return false;
-    // });
-    // const inPort = cell.model.get("inPorts").find((p, index) => {
-    //   const yMin = relRowHeight * index;
-    //   const yMax = relRowHeight * (index + 1) - 1;
-    //   if (relCursorPosition.y >= yMin && relCursorPosition.y <= yMax) {
-    //     return true;
-    //   }
-    //   return false;
-    // });
     return port ? {
       id: port,
       link: this.graph
-        .getCells()
+        .getLinks(cell)
         .find(
           cell => cell.isLink() && cell.attributes.source.port === port
         )
