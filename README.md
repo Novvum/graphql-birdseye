@@ -52,4 +52,4 @@ MIT © [novvum](https://github.com/novvum)
 
 ---
 
-<p align="center">Made by <a href="https://www.novvum.io">Novvum</a> ❤️</p>
+<p align="center">Made with ❤️ by <a href="https://www.novvum.io">Novvum</a></p>
