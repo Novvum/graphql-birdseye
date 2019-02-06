@@ -86,14 +86,14 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps & ResizeDetec
     return (
       <div
         style={{
-          position: "relative",
-          ...(this.props.style || {})
+          ...(this.props.style || {}),
+          display: "flex",
         }}
       >
         <div
           id="playground"
           ref={this.setRef}
-          style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}
+          style={{ flex: 1 }}
         />
         {this.state.loading && (
           <Loader colors={theme.colors} />
