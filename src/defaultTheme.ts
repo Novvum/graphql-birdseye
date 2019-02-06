@@ -107,7 +107,7 @@ interface Header {
   container: Rect;
 }
 
-interface Colors {
+export interface Colors {
   primary: string;
   background: string;
   white: string;

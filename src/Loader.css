@@ -1,0 +1,226 @@
+.container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+}
+.background {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #212C32;
+  opacity: 0.5;
+  z-index: 0;
+}
+.canvas {
+  align-items: center;
+  border-radius: 50%;
+  display: flex;
+  height: 10em;
+  justify-content: center;
+  margin: 1em 1em 2em 1em;
+  width: 10em;
+}
+
+/* Spinner 1 starts here */
+.spinner1 {
+  align-items: center;
+  border: .3em solid transparent;
+  border-top: .3em solid #548f9e;
+  border-right: .3em solid #548f9e;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.spinnerMax {
+  animation: spinnerOne 3s linear infinite;
+  height: 3em;
+  width: 3em;
+}
+
+.spinnerMid {
+  animation: spinnerOne 5s linear infinite;
+  height: 2.4em;
+  width: 2.4em;
+}
+
+.spinnerMin {
+  animation: spinnerOne 5s linear infinite;
+  height: 1.8em;
+  width: 1.8em;
+}
+
+@keyframes spinnerOne {
+  0% {
+    transform: rotate(0deg)
+  }
+  100% {
+    transform: rotate(360deg)
+  }
+}
+/* Spinner 1 ends here */
+
+/* Spinner 2 starts here */
+.canvas2 {
+  position: relative;
+}
+
+.spinner2 {
+  animation: spinnerTwo 1s linear infinite;
+  background: #548f9e;
+  border-radius: 100px;
+  height: 3em;
+  transform-origin: top;
+  position: absolute;
+  top: 50%;
+  width: .22em;
+}
+
+.hourHand {
+  animation: spinnerTwo 7s linear infinite;
+  background: #548f9e;
+  border-radius: 100px;
+  height: 2em;
+  transform-origin: top;
+  position: absolute;
+  top: 50%;
+  width: .2em;
+}
+
+.dot {
+  background: #548f9e;
+  border-radius: 100%;
+  height: .5em;
+  width: .5em;
+}
+
+@keyframes spinnerTwo {
+  0% {
+    transform: rotate(0deg)
+  }
+  100% {
+    transform: rotate(360deg)
+  }
+}
+/* Spinner 2 ends here */
+
+/* Spinner 3 starts here */
+.spinner3 {
+  animation: spinnerThree 1s linear infinite;
+  background: #548f9e;
+  border-radius: 100%;
+  width: 3em;
+  height: 3em;
+}
+
+@keyframes spinnerThree {
+  0%, 35% {
+    background: #548f9e;
+    transform: scale(1);
+  }
+  20%, 50% {
+    background: #80CBC4;
+    transform: scale(1.3);
+  }
+}
+/* Spinner 3 ends here */
+
+/* Spinner 4 starts here */
+.spinner4 {
+  animation: spinnerFour 1s linear infinite;
+  border: solid 7px transparent;
+  border-top: solid 7px #548f9e;
+  border-radius: 100%;
+  width: 3em;
+  height: 3em;
+}
+
+@keyframes spinnerFour {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+/* Spinner 4 ends here */
+
+/* Spinner 5 starts here */
+.spinner5 {
+  animation: spinnerFive 1s linear infinite;
+  border: solid 1.5em #548f9e;
+  border-right: solid 1.5em transparent;
+  border-left: solid 1.5em transparent;
+  border-radius: 100%;
+  width: 0;
+  height: 0;
+}
+
+@keyframes spinnerFive {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(60deg)
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+/* Spinner 5 ends here */
+
+/* Spinner 6 starts here */
+.spinner6 {
+  background: #548f9e;
+  border-radius: 50%;
+  height: 1em;
+  margin: .1em;
+  width: 1em;
+}
+
+.p1 {
+  animation: fall 1s linear .3s infinite;
+}
+
+.p2 {
+  animation: fall 1s linear .2s infinite;
+}
+
+.p3 {
+  animation: fall 1s linear .1s infinite;
+}
+
+.p4 {
+  animation: fall 1s linear infinite;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-15px);
+  }
+  25%, 75% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-15px);
+  }
+}
+/* Spinner 6 ends here */
+
+@media (max-width: 600px) {
+  .container {
+    align-items: center;
+    flex-direction: column;
+  }
+  .canvas {
+    margin: 1em;
+  }
+}

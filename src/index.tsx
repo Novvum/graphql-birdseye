@@ -1,12 +1,12 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { Theme } from "./defaultTheme";
+import defaultTheme, { Theme } from "./defaultTheme";
 import JointJS from "./jointjs/index";
 import { IntrospectionQuery } from "graphql/utilities/introspectionQuery";
 import { buildClientSchema } from "graphql/utilities/buildClientSchema";
 import { GraphQLSchema } from "graphql/type/schema";
 import { withResizeDetector } from 'react-resize-detector';
-
+import Loader from "./Loader";
 export interface GraphqlBirdseyeProps {
   schema: GraphQLSchema | null;
   theme?: Theme;
@@ -82,13 +82,11 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps & ResizeDetec
   }
 
   render() {
+    const { theme = defaultTheme } = this.props;
     return (
       <div
         style={{
           position: "relative",
-          width: "100%",
-          height: "90vh",
-          fontFamily: "Helvetica",
           ...(this.props.style || {})
         }}
       >
@@ -98,9 +96,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps & ResizeDetec
           style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}
         />
         {this.state.loading && (
-          <div style={{ position: "absolute", top: "50%", left: "50%" }}>
-            Loading...
-          </div>
+          <Loader colors={theme.colors} />
         )}
       </div>
     );
