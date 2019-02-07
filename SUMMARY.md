@@ -1,4 +1,4 @@
 # Table of contents
 
-* [graphql-birdseye](README.md)
+* [Overview](README.md)
 

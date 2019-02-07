@@ -1,4 +1,4 @@
-# graphql-birdseye
+# Overview
 
 > graphql visualizer
 
