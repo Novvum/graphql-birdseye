@@ -15,7 +15,7 @@
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: #212C32;
+  background-color: #212c32;
   opacity: 0.5;
   z-index: 0;
 }
@@ -32,9 +32,9 @@
 /* Spinner 1 starts here */
 .spinner1 {
   align-items: center;
-  border: .3em solid transparent;
-  border-top: .3em solid #548f9e;
-  border-right: .3em solid #548f9e;
+  border: 0.3em solid transparent;
+  border-top: 0.3em solid #e2e2e2;
+  border-right: 0.3em solid #e2e2e2;
   border-radius: 100%;
   display: flex;
   justify-content: center;
@@ -60,10 +60,10 @@
 
 @keyframes spinnerOne {
   0% {
-    transform: rotate(0deg)
+    transform: rotate(0deg);
   }
   100% {
-    transform: rotate(360deg)
+    transform: rotate(360deg);
   }
 }
 /* Spinner 1 ends here */
@@ -75,39 +75,39 @@
 
 .spinner2 {
   animation: spinnerTwo 1s linear infinite;
-  background: #548f9e;
+  background: #e2e2e2;
   border-radius: 100px;
   height: 3em;
   transform-origin: top;
   position: absolute;
   top: 50%;
-  width: .22em;
+  width: 0.22em;
 }
 
 .hourHand {
   animation: spinnerTwo 7s linear infinite;
-  background: #548f9e;
+  background: #e2e2e2;
   border-radius: 100px;
   height: 2em;
   transform-origin: top;
   position: absolute;
   top: 50%;
-  width: .2em;
+  width: 0.2em;
 }
 
 .dot {
-  background: #548f9e;
+  background: #e2e2e2;
   border-radius: 100%;
-  height: .5em;
-  width: .5em;
+  height: 0.5em;
+  width: 0.5em;
 }
 
 @keyframes spinnerTwo {
   0% {
-    transform: rotate(0deg)
+    transform: rotate(0deg);
   }
   100% {
-    transform: rotate(360deg)
+    transform: rotate(360deg);
   }
 }
 /* Spinner 2 ends here */
@@ -115,19 +115,21 @@
 /* Spinner 3 starts here */
 .spinner3 {
   animation: spinnerThree 1s linear infinite;
-  background: #548f9e;
+  background: #e2e2e2;
   border-radius: 100%;
   width: 3em;
   height: 3em;
 }
 
 @keyframes spinnerThree {
-  0%, 35% {
-    background: #548f9e;
+  0%,
+  35% {
+    background: #e2e2e2;
     transform: scale(1);
   }
-  20%, 50% {
-    background: #80CBC4;
+  20%,
+  50% {
+    background: #80cbc4;
     transform: scale(1.3);
   }
 }
@@ -137,7 +139,7 @@
 .spinner4 {
   animation: spinnerFour 1s linear infinite;
   border: solid 7px transparent;
-  border-top: solid 7px #548f9e;
+  border-top: solid 7px #e2e2e2;
   border-radius: 100%;
   width: 3em;
   height: 3em;
@@ -156,7 +158,7 @@
 /* Spinner 5 starts here */
 .spinner5 {
   animation: spinnerFive 1s linear infinite;
-  border: solid 1.5em #548f9e;
+  border: solid 1.5em #e2e2e2;
   border-right: solid 1.5em transparent;
   border-left: solid 1.5em transparent;
   border-radius: 100%;
@@ -169,7 +171,7 @@
     transform: rotate(0deg);
   }
   50% {
-    transform: rotate(60deg)
+    transform: rotate(60deg);
   }
   100% {
     transform: rotate(360deg);
@@ -179,23 +181,23 @@
 
 /* Spinner 6 starts here */
 .spinner6 {
-  background: #548f9e;
+  background: #e2e2e2;
   border-radius: 50%;
   height: 1em;
-  margin: .1em;
+  margin: 0.1em;
   width: 1em;
 }
 
 .p1 {
-  animation: fall 1s linear .3s infinite;
+  animation: fall 1s linear 0.3s infinite;
 }
 
 .p2 {
-  animation: fall 1s linear .2s infinite;
+  animation: fall 1s linear 0.2s infinite;
 }
 
 .p3 {
-  animation: fall 1s linear .1s infinite;
+  animation: fall 1s linear 0.1s infinite;
 }
 
 .p4 {
@@ -206,7 +208,8 @@
   0% {
     transform: translateY(-15px);
   }
-  25%, 75% {
+  25%,
+  75% {
     transform: translateY(0);
   }
   100% {
@@ -222,5 +225,20 @@
   }
   .canvas {
     margin: 1em;
+  }
+}
+
+.spinner7 {
+  animation: rotation 1s infinite linear;
+  border: 1px solid #e2e2e2;
+  border-radius: 50%;
+  border-top-color: #31424b;
+  height: 2em;
+  width: 2em;
+}
+
+@keyframes rotation {
+  to {
+    transform: rotate(360deg);
   }
 }
