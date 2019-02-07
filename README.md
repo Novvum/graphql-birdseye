@@ -2,7 +2,7 @@
 
 # graphql-birdseye
 
-<p align="center"><img src="docs/assets/animated-birdseye-multiple.gif" width="100%"/></p>
+<p align="center"><img src="docs/assets/animated-birdseye.gif" width="100%"/></p>
 
 
 
