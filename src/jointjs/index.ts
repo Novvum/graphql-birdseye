@@ -42,6 +42,7 @@ export default class JointJS {
   private activeType: string = "root";
   private eventMap: { [key in EventType]?: () => any } = {};
   private animation: boolean = true;
+  private mounted: boolean = false;
   private cachedCells = {};
   private cachedLinks = {};
   constructor(opts: { theme?: Theme }) {
@@ -62,7 +63,7 @@ export default class JointJS {
         color: this.theme.colors.background
       },
       gridSize: 1,
-      async: false,
+      async: true,
       defaultRouter: {
         name: "metro",
         args: {
@@ -80,7 +81,11 @@ export default class JointJS {
     });
     await this.renderElements({ animate: false });
     this.bindInteractionEvents();
-    this.resizeToFit({ animate: false });
+    this.paper.on("render:done", () => {
+      this.paper.options.async = false;
+      this.resizeToFit({ animate: false });
+      this.mounted = true;
+    })
   }
 
   async destroy() {
@@ -168,16 +173,16 @@ export default class JointJS {
   on(key: EventType, callback: () => any) {
     this.eventMap[key] = callback;
   }
-  startLoading() {
+  async startLoading() {
     const onStart = this.eventMap["loading:start"];
     if (onStart) {
-      onStart();
+      return await onStart();
     }
   }
-  stopLoading() {
+  async stopLoading() {
     const onStop = this.eventMap["loading:stop"];
     if (onStop) {
-      onStop();
+      return await onStop();
     }
   }
   enableAnimation() {
@@ -201,7 +206,7 @@ export default class JointJS {
   }
   async setSize(width: number, height: number) {
     this.paper.setDimensions(width, height);
-    this.panZoom.resize()
+    this.panZoom && this.panZoom.resize()
   }
 
   /**
@@ -214,6 +219,7 @@ export default class JointJS {
     animate?: boolean;
   }) {
     await this.startLoading();
+    const newGraph = new joint.dia.Graph().fromJSON(this.graph.toJSON())
     const {
       typeMap = this.typeMap,
       activeType = this.activeType,
@@ -224,12 +230,10 @@ export default class JointJS {
       activeType
     );
     await Promise.all([
-      this.removeUnusedElements(toRenderTypes),
-      this.addNewElements(toRenderTypes, animate)
+      this.removeUnusedElements(toRenderTypes, newGraph),
+      this.addNewElements(toRenderTypes, newGraph)
     ]);
-    await Promise.all([
-      this.layoutGraph({ animate })
-    ]);
+    await this.layoutGraph({ animate, newGraph: newGraph });
     await this.stopLoading();
   }
   private getToRenderTypes(
@@ -267,22 +271,23 @@ export default class JointJS {
       .map(k => typeMap[k] as FilteredGraphqlOutputType);
   }
   private async removeUnusedElements(
-    toRenderTypes: FilteredGraphqlOutputType[]
+    toRenderTypes: FilteredGraphqlOutputType[],
+    graph = this.graph
   ) {
-    const currentElements = this.graph.getElements();
+    const currentElements = graph.getElements();
     const toRemove = currentElements.filter(
       (elem: any) => !toRenderTypes.find(type => type.name === elem.id)
-    ).map(elem => [elem, ...this.graph.getConnectedLinks(elem)]);
-    this.graph.removeCells(...[].concat.apply([], toRemove));
+    ).map(elem => [elem, ...graph.getConnectedLinks(elem)]);
+    graph.removeCells(...[].concat.apply([], toRemove));
   }
   private async addNewElements(
     toRenderTypes: FilteredGraphqlOutputType[],
-    animate: boolean
+    graph = this.graph
   ) {
     function getPortId(t, f, ct) {
       return `${t.name}_${f.name}_${ct.name}`;
     }
-    const currentElements = this.graph.getElements();
+    const currentElements = graph.getElements();
     const filtered = toRenderTypes.filter(type => {
       return !currentElements.find((elem: any) => elem.id === type.name);
     });
@@ -291,7 +296,7 @@ export default class JointJS {
       return this.createNode({
         id: type.name,
         position: (
-          this.graph.getBBox() || this.paper.getContentBBox()
+          graph.getBBox() || this.paper.getContentBBox()
         ).topLeft(),
         attrs: {
           ".label": {
@@ -311,73 +316,56 @@ export default class JointJS {
         })
       });
     });
-    this.graph.addCells(nodes);
-    await Promise.all(
-      toRenderTypes.map(async type => {
-        const fields = type.getFields();
-        const fieldArr = Object.keys(fields);
-        const targetMap = fieldArr.reduce((accumulator, k) => {
-          const field = fields[k];
-          const connectedType = getNestedType(field.type);
-          if (
-            toRenderTypes.findIndex(type => type.name === connectedType.name) >
-            -1
-          ) {
-            accumulator[connectedType.name] = [
-              ...(accumulator[connectedType.name] || []),
-              field
-            ];
-          }
-          return accumulator;
-        }, {});
-        this.graph.addCells(Object.keys(targetMap).map(targetId => {
-          const sourceCell = this.graph.getCell(type.name);
-          const existingLinks = this.graph.getConnectedLinks(sourceCell);
-          if (
-            existingLinks.find(
-              (link: any) => {
-                return link.get("source").id === type.name &&
-                  link.get("target") === targetId
-              }
-            )
-          ) {
-            return;
-          }
-          const sourceId = type.name;
-          return this.createLink(sourceId, targetId);
-        }));
-      })
-    );
-  }
-
-  private async layoutGraph(opts?: { animate?: boolean }) {
-    const { animate = true } = opts || {};
-    const originalPositions = this.graph
-      .getElements()
-      .reduce((accumulator, cell) => {
-        accumulator[cell.attributes.id] = cell.getBBox();
+    const links = toRenderTypes.map(type => {
+      const fields = type.getFields();
+      const fieldArr = Object.keys(fields);
+      const targetMap = fieldArr.reduce((accumulator, k) => {
+        const field = fields[k];
+        const connectedType = getNestedType(field.type);
+        if (
+          toRenderTypes.findIndex(type => type.name === connectedType.name) >
+          -1
+        ) {
+          accumulator[connectedType.name] = [
+            ...(accumulator[connectedType.name] || []),
+            field
+          ];
+        }
         return accumulator;
       }, {});
-    joint.layout.DirectedGraph.layout(this.graph, {
+      return (Object.keys(targetMap).map(targetId => this.createLink(type.name, targetId)));
+    })
+    graph.addCells([...nodes, ...[].concat.apply([], links)]);
+  }
+
+  private async layoutGraph(opts?: { animate?: boolean; newGraph: any }) {
+    const { animate = true, newGraph = this.graph } = opts || {};
+    const originalPositions = newGraph
+      .getElements()
+      .reduce((accumulator, cell) => {
+        accumulator[cell.attributes.id] = cell.position();
+        return accumulator;
+      }, {});
+    joint.layout.DirectedGraph.layout(newGraph, {
       nodeSep: 200,
       rankSep: 500,
       rankDir: "LR"
     });
+    this.graph.fromJSON(newGraph.toJSON());
     await Promise.all([
-      this.resizeToFit(),
+      this.mounted && this.resizeToFit(),
       ...this.graph
-        .getCells()
-        .filter(cell => cell.isElement())
+        .getElements()
         .map(async cell => {
           if (!animate) {
             return;
           }
-          const originalBBox = originalPositions[cell.attributes.id];
-          const targetBBox = cell.getBBox();
-          cell.position(originalBBox.x, originalBBox.y);
+          const originalPosition = originalPositions[cell.attributes.id];
+          const targetPosition = cell.position();
+          cell.position(originalPosition.x, originalPosition.y);
           const links = this.graph.getConnectedLinks(cell);
           this.graph.removeLinks(cell);
-          await cell.transitionPosition(targetBBox, {
+          await cell.transitionPosition(targetPosition, {
             duration: TRANSITION_DURATION
           });
           links.map(async link => {
@@ -475,7 +463,7 @@ export default class JointJS {
    * Zoom
    */
   private async resizeToFit(opts?: { graph?: any; animate?: boolean }) {
-    const { graph = this.graph, animate = true } = opts || {};
+    const { animate = true } = opts || {};
     if (!this.panZoom) {
       this.panZoom = svgPanZoom(`#${this.paper.svg.id}`, {
         fit: true,
