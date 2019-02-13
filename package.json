@@ -1,6 +1,6 @@
 {
   "name": "graphql-birdseye",
-  "version": "1.0.6",
+  "version": "1.0.6-rc1",
   "description": "graphql visualizer",
   "author": "novvum",
   "license": "MIT",
@@ -33,8 +33,6 @@
   },
   "dependencies": {
     "@f/animate": "^1.0.1",
-    "@types/graphql": "^14.0.3",
-    "@types/lodash": "^4.14.118",
     "jointjs": "^2.2.1",
     "react-resize-detector": "^3.4.0",
     "svg-pan-zoom": "^3.6.0"
@@ -48,7 +46,9 @@
   "devDependencies": {
     "@svgr/rollup": "^2.4.1",
     "@types/backbone": "^1.3.45",
+    "@types/graphql": "^14.0.3",
     "@types/jest": "^23.1.5",
+    "@types/lodash": "^4.14.118",
     "@types/react": "^16.3.13",
     "@types/react-dom": "^16.0.5",
     "babel-core": "^6.26.3",
