@@ -1,6 +1,6 @@
 {
   "name": "graphql-birdseye",
-  "version": "1.0.6-rc1",
+  "version": "1.0.6-rc2",
   "description": "graphql visualizer",
   "author": "novvum",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "npm": ">=5"
   },
   "scripts": {
-    "install": "yarn --cwd ./example install",
+    "install:demo": "yarn --cwd ./example install",
     "test": "cross-env CI=1 react-scripts-ts test --env=jsdom",
     "test:watch": "react-scripts-ts test --env=jsdom",
     "build": "rollup -c",
