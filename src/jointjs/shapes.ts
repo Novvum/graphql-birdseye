@@ -296,20 +296,24 @@ export default (joint, theme: Theme) => {
         });
       },
       transitionColor: function (color, { delay = 0, duration = 100 }) {
-        return this.transitionAsync("attrs/line/stroke", color, {
-          delay: 0,
-          duration: duration,
-          timingFunction: joint.util.timing.cubic,
-          valueFunction: joint.util.interpolate.hexColor
-        });
+        return this.prop("attrs/line/stroke", color
+          // , {
+          //   delay: 0,
+          //   duration: duration,
+          //   timingFunction: joint.util.timing.cubic,
+          //   valueFunction: joint.util.interpolate.hexColor
+          // }
+        );
       },
       transitionOpacity: function (opacity, { delay = 0, duration = 100 }) {
-        return this.transitionAsync("attrs/line/opacity", opacity, {
-          delay: delay,
-          duration: duration,
-          timingFunction: joint.util.timing.cubic,
-          valueFunction: joint.util.interpolate.number
-        });
+        return this.prop("attrs/line/opacity", opacity
+          // , {
+          //   delay: delay,
+          //   duration: duration,
+          //   timingFunction: joint.util.timing.cubic,
+          //   valueFunction: joint.util.interpolate.number
+          // }
+        );
       }
     }
   );

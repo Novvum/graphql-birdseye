@@ -33,18 +33,26 @@ export type FilteredGraphqlOutputType = Exclude<
 export type EventType = "loading:start" | "loading:stop";
 
 export default class JointJS {
+  /**
+   * config
+   */
   private theme: Theme;
+  private activeType: string = "root";
+  private animation: boolean = true;
+  private typeMap: TypeMap;
+  private maxZoom: number = 20;
+
+  /**
+   * internal
+   */
+  private eventMap: { [key in EventType]?: () => any } = {};
   private graph: any;
   private paper: any;
   private panZoom: any;
-  private maxZoom: number = 20;
-  private typeMap: TypeMap;
-  private activeType: string = "root";
-  private eventMap: { [key in EventType]?: () => any } = {};
-  private animation: boolean = true;
-  private mounted: boolean = false;
   private cachedCells = {};
   private cachedLinks = {};
+  private mounted: boolean = false;
+
   constructor(opts: { theme?: Theme }) {
     const { theme = defaultTheme } = opts;
     injectCustomShapes(joint, theme);
@@ -102,15 +110,21 @@ export default class JointJS {
     // show link tools
     this.paper.on("link:mouseover", (linkView: any) => {
       const links = this.graph.getLinks();
-      links.map(link =>
+      links.map(link => {
+        if (link === linkView.model) {
+          return;
+        }
         link.transitionColor(this.theme.colors.line.inactive, {
-          duration: TRANSITION_DURATION
+          duration: TRANSITION_DURATION / 2
         })
-      );
-      linkView.model.transitionColor(this.theme.colors.line.active, {
-        duration: TRANSITION_DURATION
+        link.toBack()
       });
-      linkView.model.toFront();
+      linkView.model.transitionColor(this.theme.colors.line.active, {
+        duration: TRANSITION_DURATION / 2
+      });
+      linkView.model.toFront({
+        deep: true
+      });
       linkView.showTools();
     });
     this.paper.on("element:magnet:pointerclick", (cell: any, evt: any, port: any, x, y) => {
@@ -121,7 +135,9 @@ export default class JointJS {
       if (!cell.model.isElement()) {
         return null;
       }
-      cell.model.toFront();
+      cell.model.toFront({
+        deep: true
+      });
       // return;
       let activePort = this.getHoveredPort(cell, evt);
       cell.model.getPorts().map(port => {
@@ -134,13 +150,6 @@ export default class JointJS {
       if (!activePort) {
         return this.highlightLinks({ cell: cell.model });
       }
-      // if (activePort) {
-      //   cell.model.portProp(
-      //     activePort.id,
-      //     "attrs/.port-body/magnet",
-      //     true
-      //   );
-      // }
 
       const activeLink = activePort.link;
       if (!activeLink) {
@@ -193,7 +202,10 @@ export default class JointJS {
   }
   async setTypeMap(newTypeMap) {
     this.typeMap = newTypeMap;
-    await this.renderElements({ typeMap: newTypeMap });
+    delete this.cachedCells, this.cachedLinks;
+    this.cachedCells = {};
+    this.cachedLinks = {};
+    await this.renderElements({ typeMap: newTypeMap, animate: false });
   }
   async setActiveType(activeType: any) {
     if (
@@ -377,7 +389,6 @@ export default class JointJS {
   }
 
   /**
-   *
    * Helpers
    */
 
@@ -449,17 +460,19 @@ export default class JointJS {
       link.transitionColor(this.theme.colors.line.inactive, {
         duration: TRANSITION_DURATION
       });
+      link.toBack()
     });
-    links.map(link =>
+    links.map(link => {
       link.transitionColor(this.theme.colors.line.active, {
         duration: TRANSITION_DURATION
       })
-    );
-    links.map(link => link.toFront());
+      link.toFront({
+        deep: true
+      })
+    });
   }
 
   /**
-   *
    * Zoom
    */
   private async resizeToFit(opts?: { graph?: any; animate?: boolean }) {
