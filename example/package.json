@@ -1,20 +1,43 @@
 {
-  "name": "graphql-birdseye-example",
-  "homepage": "https://novvum.github.io/graphql-birdseye",
-  "version": "0.0.0",
-  "license": "MIT",
-  "private": true,
+  "name": "birdseye-example",
+  "description": "GraphQL birdseye example project",
+  "version": "1.0.0",
+  "author": "Novvum",
   "dependencies": {
-    "prop-types": "^15.6.2",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
-    "react-scripts": "^1.1.4",
-    "graphql-birdseye": "link:.."
+    "@types/react": "^16.8.0",
+    "@types/react-dom": "16.8.0",
+    "@types/styled-components": "^4.1.12",
+    "babel-plugin-styled-components": "^1.10.0",
+    "gatsby": "^2.1.30",
+    "gatsby-plugin-react-helmet": "^3.0.1",
+    "gatsby-plugin-styled-components": "^3.0.4",
+    "gatsby-plugin-typescript": "^2.0.1",
+    "graphql-birdseye": "link:..",
+    "react": "^16.8.0",
+    "react-async-component": "^2.0.0",
+    "react-dom": "^16.8.0",
+    "react-helmet": "^5.2.0",
+    "styled-components": "^4.1.2"
   },
+  "keywords": [
+    "gatsby, typescript"
+  ],
+  "license": "MIT",
+  "main": "n/a",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "build": "gatsby build",
+    "develop": "gatsby develop",
+    "start": "yarn develop",
+    "format": "prettier --parser typescript --trailing-comma es5 --no-semi --single-quote --write \"src/**/*.ts*\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.15.1",
+    "eslint-loader": "^2.1.2",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-react": "^7.12.4",
+    "gatsby-plugin-eslint": "^2.0.4",
+    "prettier": "^1.8.2"
   }
 }

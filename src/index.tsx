@@ -5,7 +5,7 @@ import JointJS from "./jointjs/index";
 import { IntrospectionQuery } from "graphql/utilities/introspectionQuery";
 import { buildClientSchema } from "graphql/utilities/buildClientSchema";
 import { GraphQLSchema } from "graphql/type/schema";
-import { withResizeDetector } from 'react-resize-detector';
+import { withResizeDetector } from "react-resize-detector";
 import Loader from "./Loader";
 export interface GraphqlBirdseyeProps {
   schema: GraphQLSchema | null;
@@ -22,7 +22,9 @@ export interface State {
   activeType: string;
   loading: boolean;
 }
-class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps & ResizeDetectorProps> {
+class GraphqlBirdseye extends React.Component<
+  GraphqlBirdseyeProps & ResizeDetectorProps
+> {
   ref: any;
   jointjs: JointJS;
   state: State = {
@@ -49,14 +51,19 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps & ResizeDetec
   }
 
   componentWillUnmount() {
-    this.jointjs.destroy()
+    this.jointjs.destroy();
   }
-  componentWillReceiveProps(nextProps: GraphqlBirdseyeProps & ResizeDetectorProps) {
-    if (this.props.width !== nextProps.width || this.props.height !== nextProps.height) {
-      this.jointjs.setSize(nextProps.width, nextProps.height)
+  componentWillReceiveProps(
+    nextProps: GraphqlBirdseyeProps & ResizeDetectorProps
+  ) {
+    if (
+      this.props.width !== nextProps.width ||
+      this.props.height !== nextProps.height
+    ) {
+      this.jointjs.setSize(nextProps.width, nextProps.height);
     }
     if (nextProps.schema && this.props.schema !== nextProps.schema) {
-      this.jointjs.setTypeMap(nextProps.schema.getTypeMap())
+      this.jointjs.setTypeMap(nextProps.schema.getTypeMap());
     }
   }
 
@@ -90,17 +97,11 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps & ResizeDetec
       <div
         style={{
           ...(this.props.style || {}),
-          display: "flex",
+          display: "flex"
         }}
       >
-        <div
-          id="playground"
-          ref={this.setRef}
-          style={{ flex: 1 }}
-        />
-        {this.state.loading && (
-          <Loader colors={theme.colors} />
-        )}
+        <div id="playground" ref={this.setRef} style={{ flex: 1 }} />
+        {this.state.loading && <Loader colors={theme.colors} />}
       </div>
     );
   }
@@ -118,7 +119,7 @@ const schemaProvider = (
 ) => {
   return class SchemaProvider extends React.PureComponent<
     GraphqlBirdseyeProps & SchemaProviderProps
-    > {
+  > {
     // displayName: `schemaProvider(${Component.displayName})`
     render() {
       const { introspectionQuery, schema: schemaProp, ...props } = this
