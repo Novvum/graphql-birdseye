@@ -47,6 +47,7 @@ export default class JointJS {
    */
   private eventMap: { [key in EventType]?: () => any } = {};
   private graph: any;
+  private masterGraph: any;
   private paper: any;
   private panZoom: any;
   private cachedCells = {};
@@ -61,6 +62,7 @@ export default class JointJS {
   }
   async init(el: any, bounds: any, typeMap: TypeMap) {
     this.typeMap = typeMap;
+    this.constructMasterGraph();
     this.graph = new joint.dia.Graph();
     this.paper = new joint.dia.FastPaper({
       el,
@@ -104,6 +106,35 @@ export default class JointJS {
     delete this.graph;
     delete this.paper;
     delete this.panZoom;
+  }
+
+  async constructMasterGraph() {
+    const graph = this.masterGraph = new joint.dia.Graph();
+    const toRenderTypes = this.getToRenderTypes({ activeType: null });
+    const nodes: any[] = [];
+    const links: any[] = [];
+    toRenderTypes.map(type => {
+      nodes.push(this.createNode({
+        id: type.name,
+      }, graph))
+      const fields = type.getFields();
+      const targetMap = Object.keys(fields).reduce((accumulator, k) => {
+        const field = fields[k];
+        const connectedType = getNestedType(field.type);
+        if (
+          toRenderTypes.findIndex(type => type.name === connectedType.name) >
+          -1
+        ) {
+          accumulator[connectedType.name] = [
+            ...(accumulator[connectedType.name] || []),
+            field
+          ];
+        }
+        return accumulator;
+      }, {});
+      return (Object.keys(targetMap).map(targetId => links.push(this.createLink(type.name, targetId, graph))));
+    })
+    graph.addCells([...nodes, ...links])
   }
 
   private bindInteractionEvents() {
@@ -237,10 +268,10 @@ export default class JointJS {
       activeType = this.activeType,
       animate = this.animation
     } = opts || {};
-    const toRenderTypes: FilteredGraphqlOutputType[] = this.getToRenderTypes(
+    const toRenderTypes: FilteredGraphqlOutputType[] = this.getToRenderTypes({
       typeMap,
       activeType
-    );
+    });
     await Promise.all([
       this.removeUnusedElements(toRenderTypes, newGraph),
       this.addNewElements(toRenderTypes, newGraph)
@@ -248,40 +279,53 @@ export default class JointJS {
     await this.layoutGraph({ animate, newGraph: newGraph });
     await this.stopLoading();
   }
-  private getToRenderTypes(
-    typeMap: TypeMap = this.typeMap,
-    activeType: string = this.activeType
-  ) {
+  private getToRenderTypes(args: {
+    typeMap?: TypeMap
+    activeType?: string | null
+  }) {
+    const {
+      typeMap = this.typeMap,
+      activeType = this.activeType
+    } = args;
+    const validTypes = this.filterValidTypes(typeMap);
+    if (activeType === null) {
+      return validTypes;
+    }
+    const getAdjacentTypes = (typeName) => {
+      const activeCell = this.masterGraph.getCell(typeName)
+      if (!activeCell) {
+        return []
+      }
+      const links = this.masterGraph.getConnectedLinks(activeCell);
+      return links.map(link => {
+        const sourceId = link.source().id;
+        const targetId = link.target().id;
+        return typeName === sourceId ? targetId : sourceId
+      })
+    }
+    let adjacentTypes: any[] = [];
+    if (activeType === "root") {
+      adjacentTypes = [...getAdjacentTypes("Query"), ...getAdjacentTypes("Mutation"), "Query", "Mutation"];
+    } else {
+      adjacentTypes = [...getAdjacentTypes(activeType), activeType];
+    }
+    const filtered = validTypes.filter(type => {
+      return adjacentTypes.includes(type.name)
+    })
+    return filtered;
+  }
+  private filterValidTypes(typeMap: TypeMap) {
     return Object.keys(typeMap)
       .filter(key => {
         const type = typeMap[key];
         if (isFilteredEntity(type) || isBaseEntity(type)) {
           return false;
         }
-        if (activeType === "root") {
-          if (type.name === "Query" || type.name === "Mutation") {
-            return true;
-          }
-          return (
-            (typeMap["Query"] &&
-              isRelatedType(typeMap["Query"] as GraphQLObjectType, type)) ||
-            (typeMap["Mutation"] &&
-              isRelatedType(typeMap["Mutation"] as GraphQLObjectType, type))
-          );
-        }
-        if (activeType === type.name) {
-          return true;
-        }
-        if (type.constructor.name === "GraphQLObjectType") {
-          return (
-            isRelatedType(type as GraphQLObjectType, typeMap[activeType]) ||
-            isRelatedType(typeMap[activeType] as GraphQLObjectType, type)
-          );
-        }
-        return false;
+        return true;
       })
       .map(k => typeMap[k] as FilteredGraphqlOutputType);
   }
+
   private async removeUnusedElements(
     toRenderTypes: FilteredGraphqlOutputType[],
     graph = this.graph
@@ -392,17 +436,18 @@ export default class JointJS {
    * Helpers
    */
 
-  private createNode(node: any) {
-    const cachedCell = this.cachedCells[node.id];
+  private createNode(node: any, graph = this.graph) {
+    const hash = `${graph.cid}_${node.id}`
+    const cachedCell = this.cachedCells[hash];
     if (cachedCell) {
       return cachedCell
     }
     var a1 = new joint.shapes.devs.Type(node);
-    this.cachedCells[node.id] = a1;
+    this.cachedCells[hash] = a1;
     return a1;
   }
-  private createLink(sourceId: string, targetId: string) {
-    const hash = `${sourceId}_${targetId}`;
+  private createLink(sourceId: string, targetId: string, graph = this.graph) {
+    const hash = `${graph.cid}_${sourceId}_${targetId}`;
     const cachedLink = this.cachedLinks[hash]
     if (cachedLink) {
       return cachedLink;

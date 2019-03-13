@@ -20,6 +20,15 @@ export function getNestedType(outputType: GraphQLOutputType): NestedType {
       (outputType as GraphQLList<any> | GraphQLNonNull<any>).ofType
     );
   }
+  if (outputType.constructor.name === "GraphQLObjectType") {
+    const fields = (outputType as GraphQLObjectType).getFields();
+    if (fields.edges && fields.edges.type.constructor.name === "GraphQLList") {
+      return getNestedType((fields.edges.type as GraphQLList<any> | GraphQLNonNull<any>).ofType);
+    }
+    if (fields.node) {
+      return fields.node.type as NestedType
+    }
+  }
   return outputType as NestedType;
 }
 
@@ -35,14 +44,14 @@ export function getFieldLabel(type: GraphQLType): string {
       GraphQLType,
       GraphQLList<GraphQLType> | GraphQLNonNull<GraphQLType>
     >).name
-  }`;
+    }`;
 }
 
 export function isBaseEntity(entity: GraphQLNamedType): boolean {
   return (
     entity.name.startsWith("__") ||
     baseEntities.indexOf(entity.name) > -1 ||
-    ["GraphQLEnumType", "GraphQLInputObjectType", "GraphQLScalarType"].includes(
+    ["GraphQLEnumType", "GraphQLInputObjectType", "GraphQLScalarType", "GraphQLUnionType"].includes(
       entity.constructor.name
     ) ||
     entity.name === "Mutation"
