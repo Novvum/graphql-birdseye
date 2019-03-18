@@ -272,7 +272,7 @@ export default class JointJS {
         if (activeType === type.name) {
           return true;
         }
-        if (type.constructor.name === "GraphQLObjectType") {
+        if (type.constructor.name === "GraphQLObjectType" || type instanceof GraphQLObjectType) {
           return (
             isRelatedType(type as GraphQLObjectType, typeMap[activeType]) ||
             isRelatedType(typeMap[activeType] as GraphQLObjectType, type)
@@ -320,7 +320,10 @@ export default class JointJS {
           const field = fields[k];
           const connectedType = getNestedType(field.type);
           const id = getPortId(type, field, connectedType);
-          const label = getFieldLabel(field.type);
+          let label = getFieldLabel(field.type);
+          if (!label || label === 'undefined') {
+            label = getFieldLabel(connectedType)
+          }
           return {
             id,
             label
