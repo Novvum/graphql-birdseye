@@ -4,20 +4,27 @@
   "version": "1.0.0",
   "author": "Novvum",
   "dependencies": {
-    "@types/react": "^16.8.0",
-    "@types/react-dom": "16.8.0",
-    "@types/styled-components": "^4.1.12",
+    "@rebass/grid": "^6.0.0-7",
     "babel-plugin-styled-components": "^1.10.0",
     "gatsby": "^2.1.30",
+    "gatsby-image": "^2.0.20",
     "gatsby-plugin-react-helmet": "^3.0.1",
+    "gatsby-plugin-sharp": "^2.0.30",
     "gatsby-plugin-styled-components": "^3.0.4",
     "gatsby-plugin-typescript": "^2.0.1",
+    "gatsby-plugin-typography": "^2.2.10",
+    "gatsby-source-filesystem": "^2.0.8",
+    "gatsby-transformer-sharp": "^2.1.17",
     "graphql-birdseye": "link:..",
     "react": "^16.8.0",
     "react-async-component": "^2.0.0",
     "react-dom": "^16.8.0",
     "react-helmet": "^5.2.0",
-    "styled-components": "^4.1.2"
+    "react-typography": "^0.16.19",
+    "styled-components": "^4.1.2",
+    "typography": "^0.16.18",
+    "typography-plugin-code": "^0.16.18",
+    "typography-theme-github": "^0.16.19"
   },
   "keywords": [
     "gatsby, typescript"
@@ -32,6 +39,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
+    "@types/react": "^16.8.0",
+    "@types/react-dom": "16.8.0",
+    "@types/rebass__grid": "^6.0.2",
+    "@types/styled-components": "^4.1.12",
     "babel-eslint": "^10.0.1",
     "eslint": "^5.15.1",
     "eslint-loader": "^2.1.2",

@@ -1,6 +1,10 @@
 import React from "react";
 
-import styled from "styled-components";
+import { styled, ThemeProvider, theme as styledTheme } from "../styled";
+
+interface LayoutProps {
+  children: any;
+}
 
 const Content = styled.div`
   height: 100%;
@@ -23,5 +27,11 @@ const Layout = ({ children }) => (
     <Content>{children}</Content>
   </Wrapper>
 );
+console;
+const WithTheme: React.SFC<LayoutProps> = ({ children, ...rest }) => (
+  <ThemeProvider theme={styledTheme}>
+    <Layout {...rest}>{children}</Layout>
+  </ThemeProvider>
+);
 
-export default Layout;
+export default WithTheme;

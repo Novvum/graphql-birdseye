@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import Hero from "../components/hero";
+import Layout from "../layouts";
 
 import { Container, Caption } from "../components/generic";
 import { asyncComponent } from "react-async-component";
@@ -31,7 +32,7 @@ const HomePage = () => {
   };
 
   return (
-    <div>
+    <Layout>
       <Hero>
         <h1>GraphQL Birdseye</h1>
         <Caption>A better way to visualize your data graph</Caption>
@@ -49,7 +50,7 @@ const HomePage = () => {
           )}
         </Container>
       </div>
-    </div>
+    </Layout>
   );
 };
 
