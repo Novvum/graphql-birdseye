@@ -51,12 +51,12 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps & ResizeDetec
   componentWillUnmount() {
     this.jointjs.destroy()
   }
-  componentWillReceiveProps(nextProps: GraphqlBirdseyeProps & ResizeDetectorProps) {
+  async componentWillReceiveProps(nextProps: GraphqlBirdseyeProps & ResizeDetectorProps) {
     if (this.props.width !== nextProps.width || this.props.height !== nextProps.height) {
       this.jointjs.setSize(nextProps.width, nextProps.height)
     }
     if (nextProps.schema && this.props.schema !== nextProps.schema) {
-      this.jointjs.setTypeMap(nextProps.schema.getTypeMap())
+      await this.jointjs.setTypeMap(nextProps.schema.getTypeMap())
     }
   }
 
