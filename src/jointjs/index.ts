@@ -5,8 +5,9 @@ import {
   isBaseEntity,
   isRelatedType,
   getNestedType,
-  getFieldLabel
-} from "../utils";
+  getFieldName,
+  FilteredGraphqlOutputType
+} from "../graphql/utils";
 import {
   GraphQLNamedType,
   GraphQLInputObjectType,
@@ -21,14 +22,6 @@ var joint = require("jointjs");
 var svgPanZoom = require("svg-pan-zoom");
 var animate = require("@f/animate");
 const TRANSITION_DURATION = 500;
-
-export type FilteredGraphqlOutputType = Exclude<
-  GraphQLNamedType,
-  | GraphQLInputObjectType
-  | GraphQLEnumType
-  | GraphQLScalarType
-  | GraphQLUnionType
->;
 
 export type EventType = "loading:start" | "loading:stop";
 
@@ -320,9 +313,9 @@ export default class JointJS {
           const field = fields[k];
           const connectedType = getNestedType(field.type);
           const id = getPortId(type, field, connectedType);
-          let label = getFieldLabel(field.type);
+          let label = getFieldName(field.type);
           if (!label || label === 'undefined') {
-            label = getFieldLabel(connectedType)
+            label = getFieldName(connectedType)
           }
           return {
             id,
