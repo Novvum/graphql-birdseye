@@ -9,7 +9,7 @@ export const Button = styled.button`
   flex: 0 0 auto;
   letter-spacing: 0.53px;
   font-size: 14px;
-  padding: 6px 9px 7px 10px;
+  padding: 6px 18px 7px 20px;
   border: ${p => p.theme.themeColors.buttonBorder};
   outline: none;
   cursor: pointer;

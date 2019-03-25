@@ -22,6 +22,11 @@ export const Container = styled.div`
   width: 100%;
 `;
 
+export const FullWidthContainer = styled.div`
+  width: 100%;
+  height: 100vh;
+`;
+
 export const GridItem = styled(Container)`
   flex: 1;
   display: flex;

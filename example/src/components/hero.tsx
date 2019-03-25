@@ -28,16 +28,9 @@ const BgImage = styled(Img)`
   width: 100%;
   z-index: -1;
   background-color: ${p => p.theme.colors.black};
-  height: auto;
-  & > img {
-    object-fit: !important;
-    object-position: !important;
-    object-repeat: ;
-  }
+  height: 100%;
   ${mobile(css`
     display: none;
-    min-height: 90vh;
-    top: 60px;
   `)}
 `;
 
@@ -45,6 +38,9 @@ const MobileBgImage = styled(BgImage)`
   display: none;
   ${mobile(css`
     display: block;
+    & > picture > img {
+      object-position: top !important;
+    }
   `)}
 `;
 
@@ -61,36 +57,36 @@ interface StaticQueryProps {
   };
 }
 
-const Hero = ({ children, height = "80vh" }) => {
+const BACKGROUND_IMAGES = graphql`
+  query SiteMetaDataQueryandBackground {
+    backgroundImage: file(relativePath: { eq: "background.png" }) {
+      childImageSharp {
+        fluid(maxWidth: 1000) {
+          ...GatsbyImageSharpFluid
+        }
+      }
+    }
+    mobileBackgroundImage: file(relativePath: { eq: "mobilebackground.png" }) {
+      childImageSharp {
+        fluid(maxWidth: 1000) {
+          ...GatsbyImageSharpFluid
+        }
+      }
+    }
+  }
+`;
+
+const Hero = ({ childRef, children, height = "80vh" }) => {
   return (
     <StaticQuery
       // tslint:disable-next-line:jsx-no-multiline-js
-      query={graphql`
-        query SiteMetaDataQueryandBackground {
-          backgroundImage: file(relativePath: { eq: "background.png" }) {
-            childImageSharp {
-              fluid(maxWidth: 1000) {
-                ...GatsbyImageSharpFluid
-              }
-            }
-          }
-          mobileBackgroundImage: file(
-            relativePath: { eq: "mobilebackground.png" }
-          ) {
-            childImageSharp {
-              fluid(maxWidth: 1000) {
-                ...GatsbyImageSharpFluid
-              }
-            }
-          }
-        }
-      `}
+      query={BACKGROUND_IMAGES}
       render={(data: StaticQueryProps) => {
         const background = data.backgroundImage.childImageSharp.fluid;
         const mobileBackground =
           data.mobileBackgroundImage.childImageSharp.fluid;
         return (
-          <HeroWrapper height={height}>
+          <HeroWrapper height={height} ref={childRef}>
             <BgImage fluid={background} />
             <MobileBgImage fluid={mobileBackground} />
             <Container>{children}</Container>

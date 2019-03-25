@@ -2,10 +2,13 @@ import { useState } from "react";
 
 const useForm = callback => {
   const [values, setValues] = useState({});
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = event => {
+  const handleSubmit = async event => {
     if (event) event.preventDefault();
-    callback();
+    setLoading(true);
+    await callback();
+    setLoading(false);
   };
 
   const handleChange = event => {
@@ -19,7 +22,9 @@ const useForm = callback => {
   return {
     handleChange,
     handleSubmit,
-    values
+    values,
+    loading,
+    setLoading
   };
 };
 

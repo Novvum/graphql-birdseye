@@ -1,5 +1,6 @@
 import shadows from "../shadows";
 import { ThemeInterface } from "./interface";
+import customBirdseyeTheme from "./birdseyeTheme";
 
 import transitions from "../transitions";
 
@@ -192,7 +193,8 @@ export const theme: ThemeInterface = {
   zIndex,
   shorthands,
   transitions,
-  themeColors
+  themeColors,
+  customBirdseyeTheme
 };
 
 export { ThemeInterface };

@@ -9,12 +9,6 @@ interface LayoutProps {
 const Content = styled.div`
   height: 100%;
   width: 100%;
-  .tp {
-    padding-top: 1rem;
-  }
-  .wp {
-    padding: 1rem 2.5rem 1rem 2.5rem;
-  }
 `;
 
 const Wrapper = styled.div`

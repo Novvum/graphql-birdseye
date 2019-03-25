@@ -8,9 +8,11 @@ const Input = styled.input`
   background-color: ${p => p.theme.themeColors.inputBackgroundColor};
   color: ${p => p.theme.themeColors.text};
   border: ${p => p.theme.themeColors.inputBorder};
-  padding: 6px 9px 7px 10px;
+  padding: 15px 9px 15px 10px;
   width: 100%;
   max-width: 600px;
+  margin-top: ${p => p.theme.sizes.small12};
+  margin-bottom: ${p => p.theme.sizes.small12};
 `;
 
 export default ({ onSubmit, error }) => {
@@ -18,7 +20,9 @@ export default ({ onSubmit, error }) => {
     onSubmit(values.schema);
   };
 
-  const { values, handleChange, handleSubmit }: any = useForm(setSchema);
+  const { values, handleChange, handleSubmit, loading }: any = useForm(
+    setSchema
+  );
 
   return (
     <div>
@@ -34,10 +38,11 @@ export default ({ onSubmit, error }) => {
               name="schema"
               value={values.schema}
               onChange={handleChange}
+              placeholder="Add url to introspect schema"
             />
           </Box>
           <Button style={{ marginTop: "20px" }} type="submit">
-            Visualize my schema
+            {loading ? "Sending messenger pigeons..." : "Visualize my schema"}
           </Button>
         </Flex>
         {error && <p>{error}</p>}
