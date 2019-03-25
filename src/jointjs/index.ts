@@ -74,7 +74,7 @@ export default class JointJS {
     })
   }
 
-  async destroy() {
+  destroy() {
     this.paper.cancelRenderViews();
     this.paper.clearGrid();
     this.graph.clear();
@@ -194,7 +194,7 @@ export default class JointJS {
       await this.renderElements();
     }
   }
-  async setSize(width: number, height: number) {
+  setSize(width: number, height: number) {
     this.paper.setDimensions(width, height);
     this.panZoom && this.panZoom.resize()
   }
