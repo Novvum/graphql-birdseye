@@ -9,8 +9,9 @@ import {
     isFilteredEntity,
     isBaseEntity,
     getNestedType,
-    getFieldName as getFieldTypeName,
-    FilteredGraphqlOutputType
+    getFieldLabel as getFieldTypeName,
+    FilteredGraphqlOutputType,
+    getFieldLabel
 } from "./utils";
 import { TypeMap } from 'graphql/type/schema';
 import { mapToArray } from '../utils';
@@ -18,7 +19,7 @@ import { mapToArray } from '../utils';
 export default class DataStructure extends Birdseye {
     constructor(schema: GraphQLSchema, config = {}) {
         super(config);
-        this.convert(schema.getTypeMap());
+        this.typeMap = this.convert(schema.getTypeMap());
     }
     convert(typeMap: TypeMap) {
         const filteredTypeMap = Object.keys(typeMap)
@@ -45,18 +46,23 @@ export default class DataStructure extends Birdseye {
                     const field = fields[key];
                     const birdseyeField = new BirdseyeField();
                     birdseyeField.name = field.name;
-                    const connectedType = getFieldTypeName(getNestedType(field.type));
-                    const target = birdseyeTypeMap[connectedType];
-                    birdseyeField.type = target || connectedType;
-                    if (target) {
-                        const birdseyeConnection = new BirdseyeConnection();
-                        birdseyeConnection.source = birdseyeType;
-                        birdseyeConnection.target = target;
-                        this.addConnection(birdseyeConnection);
+                    birdseyeField.typeLabel = getFieldLabel(field.type);
+                    if (!birdseyeField.typeLabel || birdseyeField.typeLabel === 'undefined') {
+                        birdseyeField.typeLabel = getFieldLabel(field.type)
                     }
+                    const type = getNestedType(field.type).name;
+                    const target = birdseyeTypeMap[type];
+                    birdseyeField.type = target || type;
+                    // if (target) {
+                    //     const birdseyeConnection = new BirdseyeConnection();
+                    //     birdseyeConnection.source = birdseyeType;
+                    //     birdseyeConnection.target = target;
+                    //     this.addConnection(birdseyeConnection);
+                    // }
+
                     birdseyeType.addField(birdseyeField);
                 }, {});
             })
-        this.typeMap = birdseyeTypeMap;
+        return birdseyeTypeMap;
     }
 }

@@ -39,12 +39,12 @@ export function getNestedType(outputType: GraphQLOutputType): NestedType {
     return outputType as NestedType;
 }
 
-export function getFieldName(type: GraphQLType): string {
+export function getFieldLabel(type: GraphQLType): string {
     if (type.constructor.name === "GraphQLList") {
-        return `[${getFieldName((type as GraphQLList<GraphQLType>).ofType)}]`;
+        return `[${getFieldLabel((type as GraphQLList<GraphQLType>).ofType)}]`;
     }
     if (type.constructor.name === "GraphQLNonNull") {
-        return `${getFieldName((type as GraphQLNonNull<GraphQLType>).ofType)}`;
+        return `${getFieldLabel((type as GraphQLNonNull<GraphQLType>).ofType)}`;
     }
     return `${
         (type as Exclude<

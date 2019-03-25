@@ -7,6 +7,7 @@ import { buildClientSchema } from "graphql/utilities/buildClientSchema";
 import { GraphQLSchema } from "graphql/type/schema";
 import { withResizeDetector } from 'react-resize-detector';
 import Loader from "./Loader";
+import Birdseye from "./graphql/schemaConverter";
 export interface GraphqlBirdseyeProps {
   schema: GraphQLSchema | null;
   theme?: Theme;
@@ -41,10 +42,11 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps & ResizeDetec
     const bounds = this.getBounds();
     this.jointjs.on("loading:start", this.startLoading);
     this.jointjs.on("loading:stop", this.stopLoading);
+    const dataStructure = new Birdseye(this.props.schema);
     await this.jointjs.init(
       ReactDOM.findDOMNode(this.ref),
       bounds,
-      this.props.schema.getTypeMap()
+      dataStructure
     );
   }
 
@@ -56,7 +58,7 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps & ResizeDetec
       this.jointjs.setSize(nextProps.width, nextProps.height)
     }
     if (nextProps.schema && this.props.schema !== nextProps.schema) {
-      this.jointjs.setTypeMap(nextProps.schema.getTypeMap())
+      this.jointjs.setDataStructure(new Birdseye(nextProps.schema))
     }
   }
 

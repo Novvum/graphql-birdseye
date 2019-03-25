@@ -43,6 +43,11 @@ describe('SchemaConverter', () => {
       it('can be String type', () => {
         expect(fields.title.type).toBe("String");
       })
+      it('has a name and typeLabel', () => {
+        const variants = fields.variants;
+        expect(variants.name).toBe("variants");
+        expect(variants.typeLabel).toBe("[Summary]");
+      })
     })
   })
 })
