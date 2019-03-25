@@ -8,6 +8,7 @@ jobs:
       - checkout
       - run: yarn install
       - run: yarn build
+      - run: yarn lint
       - run: yarn test
 
 workflows:
