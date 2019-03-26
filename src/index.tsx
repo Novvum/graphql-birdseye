@@ -7,6 +7,7 @@ import { buildClientSchema } from "graphql/utilities/buildClientSchema";
 import { GraphQLSchema } from "graphql/type/schema";
 import { withResizeDetector } from "react-resize-detector";
 import Loader from "./Loader";
+import Birdseye from "./graphql/schemaConverter";
 export interface GraphqlBirdseyeProps {
   schema: GraphQLSchema | null;
   theme?: Theme;
@@ -29,7 +30,7 @@ class GraphqlBirdseye extends React.Component<
   jointjs: JointJS;
   state: State = {
     activeType: "Query",
-    loading: false
+    loading: false,
   };
   constructor(props: GraphqlBirdseyeProps & ResizeDetectorProps) {
     super(props);
@@ -43,17 +44,18 @@ class GraphqlBirdseye extends React.Component<
     const bounds = this.getBounds();
     this.jointjs.on("loading:start", this.startLoading);
     this.jointjs.on("loading:stop", this.stopLoading);
+    const dataStructure = new Birdseye(this.props.schema);
     await this.jointjs.init(
       ReactDOM.findDOMNode(this.ref),
       bounds,
-      this.props.schema.getTypeMap()
+      dataStructure
     );
   }
 
   componentWillUnmount() {
     this.jointjs.destroy();
   }
-  componentWillReceiveProps(
+  async componentWillReceiveProps(
     nextProps: GraphqlBirdseyeProps & ResizeDetectorProps
   ) {
     if (
@@ -63,25 +65,25 @@ class GraphqlBirdseye extends React.Component<
       this.jointjs.setSize(nextProps.width, nextProps.height);
     }
     if (nextProps.schema && this.props.schema !== nextProps.schema) {
-      this.jointjs.setTypeMap(nextProps.schema.getTypeMap());
+      await this.jointjs.setDataStructure(new Birdseye(nextProps.schema));
     }
   }
 
   private stopLoading = () =>
-    new Promise(resolve =>
+    new Promise((resolve) =>
       this.setState(
         {
-          loading: false
+          loading: false,
         },
         resolve
       )
     );
 
   private startLoading = () =>
-    new Promise(resolve => {
+    new Promise((resolve) => {
       this.setState(
         {
-          loading: true
+          loading: true,
         },
         resolve
       );
@@ -97,7 +99,7 @@ class GraphqlBirdseye extends React.Component<
       <div
         style={{
           ...(this.props.style || {}),
-          display: "flex"
+          display: "flex",
         }}
       >
         <div id="playground" ref={this.setRef} style={{ flex: 1 }} />
