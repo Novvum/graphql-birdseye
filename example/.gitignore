@@ -1,0 +1,14 @@
+# Project dependencies
+.cache
+node_modules
+
+
+# Build directory
+/public
+.DS_Store
+
+#IDE
+.vscode
+package-lock.json
+yarn.lock
+.env*

@@ -1,27 +1,29 @@
-import { Row, Rect, Theme } from "./Theme";
+import { Theme, Rect, Row } from "graphql-birdseye/src/Theme.d";
+import { theme as styledTheme } from "../styled";
 
 const colors = {
-  primary: "#548f9e",
-  background: "#212C32",
+  primary: styledTheme.colors.pink,
+  background: styledTheme.colors.darkPurple,
   white: "#ffffff",
   line: {
-    active: "#8F9599", // "#38616b",
-    inactive: "#31424B"
+    active: styledTheme.colors.pink, // "#38616b",
+    inactive: styledTheme.colors.white
   }
 };
 
 const nodeStyles = {
   gap: 15,
   container: {
-    fill: "#31424B",
+    fill: styledTheme.colors.black,
     rx: 15
   },
   header: {
     height: 36,
     label: {
-      "font-size": 18,
+      "font-size": 22,
       "text-anchor": "middle",
-      fill: "#ffffff"
+      fill: "#ffffff",
+      "font-weight": "bold"
     },
     container: {
       fill: "transparent" // colors.primary,
@@ -29,19 +31,20 @@ const nodeStyles = {
     }
   },
   divider: {
-    height: 1,
+    height: 0,
     stroke: colors.background,
     fill: colors.background
   } as Rect,
   row: {
-    height: 26,
+    height: 35,
     fieldNameLabel: {
+      "font-size": 20,
       fill: "#f6f8fa",
-      "font-weight": "lighter"
+      "font-weight": "bold"
     },
     fieldTypeLabel: {
-      fill: "#959da5",
-      weight: "lighter"
+      "font-size": 18,
+      fill: "#959da5"
     },
     body: {
       fill: "transparent",
@@ -57,7 +60,7 @@ export default {
   line: {
     stroke: colors.line.inactive,
     fill: "transparent",
-    strokeWidth: 4,
+    strokeWidth: 3,
     strokeLinejoin: "round",
     targetMarker: {
       type: "path",
@@ -65,5 +68,3 @@ export default {
     }
   }
 } as Theme;
-
-export * from "./Theme";
