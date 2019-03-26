@@ -18,7 +18,7 @@
     "gatsby-source-filesystem": "^2.0.8",
     "gatsby-source-graphql": "^2.0.15",
     "gatsby-transformer-sharp": "^2.1.17",
-    "graphql-birdseye": "link:..",
+    "graphql-birdseye": "latest",
     "react": "^16.8.0",
     "react-async-component": "^2.0.0",
     "react-dom": "^16.8.0",
@@ -38,6 +38,7 @@
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop",
+    "serve": "gatsby serve",
     "start": "yarn develop",
     "format": "prettier --parser typescript --trailing-comma es5 --no-semi --single-quote --write \"src/**/*.ts*\"",
     "test": "echo \"Error: no test specified\" && exit 1"
