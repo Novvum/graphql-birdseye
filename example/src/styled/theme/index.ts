@@ -107,7 +107,7 @@ export const colors: Colors = {
   red: "#f25c54",
   orange: "rgba(241, 143, 1, 1)",
   blue: "#41B2FF",
-  darkPurple: "#13021D",
+  darkPurple: "#140f2a",
 
   paleText: "rgba(0, 0, 0, 0.5)",
   paleGrey: "#f3f4f4", // use for bgs, borders, etc

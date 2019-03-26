@@ -16,14 +16,15 @@ const Input = styled.input`
 `;
 
 export default ({ onSubmit, error }) => {
-  const setSchema = () => {
-    onSubmit(values.schema);
+  const setSchema = async () => {
+    await onSubmit(values.schema);
   };
 
   const { values, handleChange, handleSubmit, loading }: any = useForm(
     setSchema
   );
 
+  console.log(loading);
   return (
     <div>
       <form onSubmit={handleSubmit}>

@@ -1,6 +1,7 @@
 import React from "react";
 
 import { styled, ThemeProvider, theme as styledTheme } from "../styled";
+import Header from "../components/Header";
 
 interface LayoutProps {
   children: any;
@@ -19,6 +20,7 @@ const Wrapper = styled.div`
 
 const Layout = ({ children }) => (
   <Wrapper>
+    <Header />
     <Content>{children}</Content>
   </Wrapper>
 );

@@ -1,0 +1,12 @@
+siteMetadata:
+  title: "GraphQL Birdseye"
+  siteUrl: "https://www.graphqlbirdseye.com"
+  description: "Represent any GraphQL API as an interactive graph."
+  keywords: "GraphQL, graph, schema, open source"
+
+manifest:
+  name: "GraphQL Birdseye"
+  short_name: "Birdseye"
+  description: "Represent any GraphQL API as an interactive graph."
+  start_url: "/"
+  display: "minimal-ui"

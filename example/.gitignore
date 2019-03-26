@@ -1,8 +1,14 @@
 # Project dependencies
-# https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
+.cache
 node_modules
-.cache/
+
+
 # Build directory
-public/
+/public
 .DS_Store
-yarn-error.log
+
+#IDE
+.vscode
+package-lock.json
+yarn.lock
+.env*

@@ -1,12 +1,21 @@
+const req = require("require-yml");
+const config = req("./config.yml");
+
 module.exports = {
   siteMetadata: {
-    title: `Gatsby Typescript Starter`
+    ...config.siteMetadata
   },
   plugins: [
     `gatsby-plugin-react-helmet`,
     // Add typescript stack into webpack
     `gatsby-plugin-typescript`,
     "gatsby-plugin-styled-components",
+    {
+      resolve: "gatsby-plugin-react-svg",
+      options: {
+        include: /svg-icons/
+      }
+    },
     {
       resolve: `gatsby-plugin-typography`,
       options: {

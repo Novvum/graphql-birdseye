@@ -29,6 +29,9 @@ const BgImage = styled(Img)`
   z-index: -1;
   background-color: ${p => p.theme.colors.black};
   height: 100%;
+  & > picture > img {
+    object-position: top !important;
+  }
   ${mobile(css`
     display: none;
   `)}

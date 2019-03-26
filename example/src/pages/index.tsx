@@ -11,6 +11,7 @@ import birdseyeTheme from "../styled/theme/birdseyeTheme";
 import { styled } from "../styled";
 import { Button } from "../components/Buttons";
 import GetStarted from "../components/GetStarted";
+import { scrollToRef } from "../utils";
 
 //async component for gatsby production build
 const GraphqlBirdseye = asyncComponent({
@@ -26,16 +27,6 @@ const HomePage = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const getStartedRef = useRef<HTMLDivElement>(null);
 
-  const scrollToRef = async (
-    ref: RefObject<HTMLDivElement>,
-    cb?: () => void
-  ) => {
-    if (ref && ref.current) {
-      ref.current.scrollIntoView({ behavior: "smooth" });
-      cb && setTimeout(cb(), 1000);
-    }
-  };
-
   const fetchSchema = async (url: string) => {
     try {
       if (!url) return setSchemaError("Schema not valid");
@@ -49,7 +40,7 @@ const HomePage = () => {
           setSchema(res.data);
           scrollToRef(birdsEyeRef);
         })
-        .catch(e => setSchemaError("Schema not valid"));
+        .catch(() => setSchemaError("Schema not valid"));
     } catch {
       console.log("whoops");
     }
@@ -75,7 +66,7 @@ const HomePage = () => {
               </Button>
               <Button
                 onClick={() => {
-                  scrollToRef(getStartedRef);
+                  scrollToRef(getStartedRef, () => setSchema(null));
                 }}
                 style={{ marginLeft: "20px" }}
                 secondary={true}

@@ -19,7 +19,7 @@ const options: TypographyOptions = {
     "Segoe UI Symbol"
   ],
   bodyFontFamily: [
-    "Open Sans",
+    "Montserrat",
     "-apple-system",
     "BlinkMacSystemFont",
     "Segoe UI",
