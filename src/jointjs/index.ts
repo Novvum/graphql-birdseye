@@ -1,34 +1,12 @@
 import injectCustomRouter from "./router";
 import injectCustomShapes from "./shapes";
-import {
-  isFilteredEntity,
-  isBaseEntity,
-  isRelatedType,
-  getNestedType,
-  getFieldLabel
-} from "../utils";
-import {
-  GraphQLNamedType,
-  GraphQLInputObjectType,
-  GraphQLEnumType,
-  GraphQLScalarType,
-  GraphQLUnionType,
-  GraphQLObjectType
-} from "graphql/type/definition";
-import { TypeMap } from "graphql/type/schema";
 import defaultTheme, { Theme } from "../defaultTheme";
+import { Birdseye, Type as BirdseyeType } from "../dataStructure";
+import { mapToArray } from "../utils";
 var joint = require("jointjs");
 var svgPanZoom = require("svg-pan-zoom");
 var animate = require("@f/animate");
 const TRANSITION_DURATION = 500;
-
-export type FilteredGraphqlOutputType = Exclude<
-  GraphQLNamedType,
-  | GraphQLInputObjectType
-  | GraphQLEnumType
-  | GraphQLScalarType
-  | GraphQLUnionType
->;
 
 export type EventType = "loading:start" | "loading:stop";
 
@@ -39,7 +17,7 @@ export default class JointJS {
   private theme: Theme;
   private activeType: string = "root";
   private animation: boolean = true;
-  private typeMap: TypeMap;
+  private dataStructure: Birdseye;
   private maxZoom: number = 20;
 
   /**
@@ -59,8 +37,8 @@ export default class JointJS {
     injectCustomRouter(joint);
     this.theme = theme;
   }
-  async init(el: any, bounds: any, typeMap: TypeMap) {
-    this.typeMap = typeMap;
+  async init(el: any, bounds: any, dataStructure: Birdseye) {
+    this.dataStructure = dataStructure;
     this.graph = new joint.dia.Graph();
     this.paper = new joint.dia.FastPaper({
       el,
@@ -96,7 +74,7 @@ export default class JointJS {
     })
   }
 
-  async destroy() {
+  destroy() {
     this.paper.cancelRenderViews();
     this.paper.clearGrid();
     this.graph.clear();
@@ -200,12 +178,12 @@ export default class JointJS {
   disableAnimation() {
     this.animation = false;
   }
-  async setTypeMap(newTypeMap) {
-    this.typeMap = newTypeMap;
+  async setDataStructure(newTypeMap) {
+    this.dataStructure = newTypeMap;
     delete this.cachedCells, this.cachedLinks;
     this.cachedCells = {};
     this.cachedLinks = {};
-    await this.renderElements({ typeMap: newTypeMap, animate: false });
+    await this.renderElements({ dataStructure: newTypeMap, animate: false });
   }
   async setActiveType(activeType: any) {
     if (
@@ -216,7 +194,7 @@ export default class JointJS {
       await this.renderElements();
     }
   }
-  async setSize(width: number, height: number) {
+  setSize(width: number, height: number) {
     this.paper.setDimensions(width, height);
     this.panZoom && this.panZoom.resize()
   }
@@ -226,19 +204,18 @@ export default class JointJS {
    * Render
    */
   async renderElements(opts?: {
-    typeMap?: any;
+    dataStructure?: any;
     activeType?: string;
     animate?: boolean;
   }) {
     await this.startLoading();
     const newGraph = new joint.dia.Graph().fromJSON(this.graph.toJSON())
     const {
-      typeMap = this.typeMap,
+      dataStructure = this.dataStructure,
       activeType = this.activeType,
       animate = this.animation
     } = opts || {};
-    const toRenderTypes: FilteredGraphqlOutputType[] = this.getToRenderTypes(
-      typeMap,
+    const toRenderTypes: BirdseyeType[] = dataStructure.getAdjacentTypes(
       activeType
     );
     await Promise.all([
@@ -248,42 +225,9 @@ export default class JointJS {
     await this.layoutGraph({ animate, newGraph: newGraph });
     await this.stopLoading();
   }
-  private getToRenderTypes(
-    typeMap: TypeMap = this.typeMap,
-    activeType: string = this.activeType
-  ) {
-    return Object.keys(typeMap)
-      .filter(key => {
-        const type = typeMap[key];
-        if (isFilteredEntity(type) || isBaseEntity(type)) {
-          return false;
-        }
-        if (activeType === "root") {
-          if (type.name === "Query" || type.name === "Mutation") {
-            return true;
-          }
-          return (
-            (typeMap["Query"] &&
-              isRelatedType(typeMap["Query"] as GraphQLObjectType, type)) ||
-            (typeMap["Mutation"] &&
-              isRelatedType(typeMap["Mutation"] as GraphQLObjectType, type))
-          );
-        }
-        if (activeType === type.name) {
-          return true;
-        }
-        if (type.constructor.name === "GraphQLObjectType") {
-          return (
-            isRelatedType(type as GraphQLObjectType, typeMap[activeType]) ||
-            isRelatedType(typeMap[activeType] as GraphQLObjectType, type)
-          );
-        }
-        return false;
-      })
-      .map(k => typeMap[k] as FilteredGraphqlOutputType);
-  }
+
   private async removeUnusedElements(
-    toRenderTypes: FilteredGraphqlOutputType[],
+    toRenderTypes: BirdseyeType[],
     graph = this.graph
   ) {
     const currentElements = graph.getElements();
@@ -293,7 +237,7 @@ export default class JointJS {
     graph.removeCells(...[].concat.apply([], toRemove));
   }
   private async addNewElements(
-    toRenderTypes: FilteredGraphqlOutputType[],
+    toRenderTypes: BirdseyeType[],
     graph = this.graph
   ) {
     function getPortId(t, f, ct) {
@@ -316,11 +260,10 @@ export default class JointJS {
           }
         },
         inPorts: Object.keys(fields),
-        outPorts: Object.keys(fields).map(k => {
-          const field = fields[k];
-          const connectedType = getNestedType(field.type);
+        outPorts: mapToArray(fields).map(field => {
+          const connectedType = field.type;
           const id = getPortId(type, field, connectedType);
-          const label = getFieldLabel(field.type);
+          let label = field.typeLabel;
           return {
             id,
             label
@@ -330,12 +273,10 @@ export default class JointJS {
     });
     const links = toRenderTypes.map(type => {
       const fields = type.getFields();
-      const fieldArr = Object.keys(fields);
-      const targetMap = fieldArr.reduce((accumulator, k) => {
-        const field = fields[k];
-        const connectedType = getNestedType(field.type);
+      const targetMap = mapToArray(fields).reduce((accumulator, field) => {
+        const connectedType = field.type;
         if (
-          toRenderTypes.findIndex(type => type.name === connectedType.name) >
+          connectedType instanceof BirdseyeType && toRenderTypes.findIndex(type => type.name === connectedType.name) >
           -1
         ) {
           accumulator[connectedType.name] = [
