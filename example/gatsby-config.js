@@ -1,6 +1,10 @@
 const req = require("require-yml");
 const config = req("./config.yml");
 
+require("dotenv").config({
+  path: `.env`
+});
+
 module.exports = {
   siteMetadata: {
     ...config.siteMetadata
@@ -32,7 +36,7 @@ module.exports = {
         // HTTP headers
         headers: {
           // Learn about environment variables: https://gatsby.app/env-vars
-          Authorization: `bearer 9220cd3879eea626cae8ee8c86d3e5d1d5b38988`
+          Authorization: `bearer ${process.env.GITHUB_TOKEN}`
         },
         // Additional options to pass to node-fetch
         fetchOptions: {}

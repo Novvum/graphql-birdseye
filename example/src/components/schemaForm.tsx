@@ -15,6 +15,10 @@ const Input = styled.input`
   margin-bottom: ${p => p.theme.sizes.small12};
 `;
 
+const Error = styled.p`
+  color: ${p => p.theme.themeColors.errorText};
+`;
+
 export default ({ onSubmit, error }) => {
   const setSchema = async () => {
     await onSubmit(values.schema);
@@ -24,7 +28,6 @@ export default ({ onSubmit, error }) => {
     setSchema
   );
 
-  console.log(loading);
   return (
     <div>
       <form onSubmit={handleSubmit}>
@@ -42,11 +45,11 @@ export default ({ onSubmit, error }) => {
               placeholder="Add url to introspect schema"
             />
           </Box>
+          {error && <Error>{error}</Error>}
           <Button style={{ marginTop: "20px" }} type="submit">
             {loading ? "Sending messenger pigeons..." : "Visualize my schema"}
           </Button>
         </Flex>
-        {error && <p>{error}</p>}
       </form>
     </div>
   );

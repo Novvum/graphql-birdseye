@@ -1,5 +1,5 @@
 import React from "react";
-import Layout from "../layouts";
+
 import { StaticQuery, graphql } from "gatsby";
 
 import ReactMarkdown from "react-markdown";
@@ -28,12 +28,15 @@ class GetStarted extends React.Component<
                 }
               }
             `}
-            render={data => (
-              <ReactMarkdown
-                escapeHtml={false}
-                source={data.github.repository.object.text}
-              />
-            )}
+            render={data => {
+              console.log(data);
+              return (
+                <ReactMarkdown
+                  escapeHtml={false}
+                  source={data.github.repository.object.text}
+                />
+              );
+            }}
           />
         </Container>
       </div>

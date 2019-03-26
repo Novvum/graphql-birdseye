@@ -64,6 +64,7 @@ export interface ThemeColors {
   selection: string;
   cursorColor: string;
   lightText: string;
+  errorText: string;
   darkText: string;
   textInactive: string;
   background: string;
@@ -122,6 +123,7 @@ export const themeColors: ThemeColors = {
   cursorColor: "rgba(255, 255, 255, 0.4)",
   lightText: colors.white,
   darkText: colors.black,
+  errorText: colors.pink,
   textInactive: colors.white60,
   background: "#09141c",
   tab: "#172b3a",
