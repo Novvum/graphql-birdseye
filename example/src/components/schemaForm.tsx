@@ -6,7 +6,7 @@ import { Flex, Box } from "@rebass/grid";
 
 const Input = styled.input`
   background-color: ${p => p.theme.themeColors.inputBackgroundColor};
-  color: ${p => p.theme.themeColors.text};
+  color: ${p => p.theme.themeColors.lightText};
   border: ${p => p.theme.themeColors.inputBorder};
   padding: 15px 9px 15px 10px;
   width: 100%;

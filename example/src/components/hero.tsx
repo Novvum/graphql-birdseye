@@ -2,7 +2,7 @@ import React from "react";
 import { StaticQuery, graphql } from "gatsby";
 
 import { Container } from "./generic";
-import { styled, mobile, css } from "../styled";
+import { styled, mobile, css, theme } from "../styled";
 import Img from "gatsby-image";
 
 const HeroWrapper = styled.div<{ height: string; image?: string }>`
@@ -89,7 +89,9 @@ const Hero = ({ childRef, children, height = "80vh" }) => {
           <HeroWrapper height={height} ref={childRef}>
             <BgImage fluid={background} />
             <MobileBgImage fluid={mobileBackground} />
-            <Container>{children}</Container>
+            <Container style={{ color: theme.themeColors.lightText }}>
+              {children}
+            </Container>
           </HeroWrapper>
         );
       }}

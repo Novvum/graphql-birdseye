@@ -9,12 +9,14 @@ import { IntrospectionQuery } from "../utils/introspectionQuery";
 import SchemaForm from "../components/schemaForm";
 import birdseyeTheme from "../styled/theme/birdseyeTheme";
 import { styled } from "../styled";
+import { Button } from "../components/Buttons";
+import GetStarted from "../components/GetStarted";
 
 //async component for gatsby production build
 const GraphqlBirdseye = asyncComponent({
   resolve: () => require("graphql-birdseye"),
   LoadingComponent: () => <div />, // Optional
-  ErrorComponent: ({ error }) => <div>Uh oh..</div> // Optional
+  ErrorComponent: () => <div>Uh oh..</div> // Optional
 });
 
 const HomePage = () => {
@@ -22,10 +24,15 @@ const HomePage = () => {
   const [schemaError, setSchemaError] = useState("");
   const birdsEyeRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
+  const getStartedRef = useRef<HTMLDivElement>(null);
 
-  const scrollToRef = (ref: RefObject<HTMLDivElement>) => {
+  const scrollToRef = async (
+    ref: RefObject<HTMLDivElement>,
+    cb?: () => void
+  ) => {
     if (ref && ref.current) {
       ref.current.scrollIntoView({ behavior: "smooth" });
+      cb && setTimeout(cb(), 1000);
     }
   };
 
@@ -56,27 +63,43 @@ const HomePage = () => {
         <SchemaForm onSubmit={fetchSchema} error={schemaError} />
       </Hero>
       <div>
-        <FullWidthContainer ref={birdsEyeRef}>
-          <NewSchemaButton onClick={() => scrollToRef(heroRef)}>
-            New schema ^
-          </NewSchemaButton>
-          {schema && (
+        {schema && (
+          <FullWidthContainer ref={birdsEyeRef}>
+            <ButtonContainer>
+              <Button
+                onClick={() => {
+                  scrollToRef(heroRef, () => setSchema(null));
+                }}
+              >
+                Try different schema
+              </Button>
+              <Button
+                onClick={() => {
+                  scrollToRef(getStartedRef);
+                }}
+                style={{ marginLeft: "20px" }}
+                secondary={true}
+              >
+                Get Started
+              </Button>
+            </ButtonContainer>
             <GraphqlBirdseye
               introspectionQuery={schema}
               style={{ width: "100%", height: "100vh" }}
               theme={birdseyeTheme}
             />
-          )}
-        </FullWidthContainer>
+          </FullWidthContainer>
+        )}
+        <GetStarted childRef={getStartedRef} />
       </div>
     </Layout>
   );
 };
 
-const NewSchemaButton = styled.button`
+const ButtonContainer = styled.div`
   position: absolute;
-  top: 20;
-  left: 20;
+  top: 20px;
+  left: 20px;
 `;
 
 export default HomePage;

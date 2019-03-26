@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import { styled } from "../styled";
 
 export const Container = styled.div`
   @media (min-width: 576px) {
@@ -17,7 +17,6 @@ export const Container = styled.div`
   padding-right: 15px;
   padding-left: 15px;
   margin-right: auto;
-  color: white;
   margin-left: auto;
   width: 100%;
 `;
@@ -25,6 +24,7 @@ export const Container = styled.div`
 export const FullWidthContainer = styled.div`
   width: 100%;
   height: 100vh;
+  position: relative;
 `;
 
 export const GridItem = styled(Container)`
@@ -37,6 +37,4 @@ export const GridItem = styled(Container)`
   justify-content: center;
 `;
 
-export const Caption = styled.p`
-  color: white;
-`;
+export const Caption = styled.p``;

@@ -1,5 +1,4 @@
 import { Colors, Sizes, ZIndex, Shorthands, Shape, ThemeColors } from "./index";
-import { Theme } from "graphql-birdseye/dist/defaultTheme";
 export interface ThemeInterface {
   colors: Colors;
   sizes: Sizes;
@@ -9,5 +8,4 @@ export interface ThemeInterface {
   shorthands: Shorthands;
   transitions;
   themeColors: ThemeColors;
-  customBirdseyeTheme: Theme;
 }

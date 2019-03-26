@@ -1,11 +1,14 @@
 import { styled } from "../styled";
 
-export const Button = styled.button`
+export const Button = styled.button<{ secondary?: Boolean }>`
   text-transform: uppercase;
   font-family: "Source Code Pro";
   font-weight: 600;
   color: ${p => p.theme.themeColors.button};
-  background: ${p => p.theme.themeColors.buttonBackground};
+  background: ${p =>
+    p.secondary
+      ? p.theme.themeColors.buttonBackgroundSecondary
+      : p.theme.themeColors.buttonBackground};
   flex: 0 0 auto;
   letter-spacing: 0.53px;
   font-size: 14px;

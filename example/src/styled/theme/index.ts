@@ -1,6 +1,5 @@
 import shadows from "../shadows";
 import { ThemeInterface } from "./interface";
-import customBirdseyeTheme from "./birdseyeTheme";
 
 import transitions from "../transitions";
 
@@ -57,8 +56,6 @@ export interface Colors {
   lightGrey: string;
   lighterGrey: string;
   // New dynamic styles
-  text: string;
-  textInactive: string;
   tint: string;
 }
 
@@ -66,7 +63,8 @@ export interface ThemeColors {
   link: string;
   selection: string;
   cursorColor: string;
-  text: string;
+  lightText: string;
+  darkText: string;
   textInactive: string;
   background: string;
   tab: string;
@@ -81,6 +79,7 @@ export interface ThemeColors {
   inputBorder: string;
   button: string;
   buttonBackground: string;
+  buttonBackgroundSecondary: string;
   buttonBorder: string;
   buttonHover: string;
   buttonText: string;
@@ -114,9 +113,6 @@ export const colors: Colors = {
   paleGrey: "#f3f4f4", // use for bgs, borders, etc
   lightGrey: "#eeeff0",
   lighterGrey: "#f6f7f7",
-  // New colors
-  text: "rgba(255,255,255,0.6)",
-  textInactive: "#555e66",
   tint: "#474747"
 };
 
@@ -124,7 +120,8 @@ export const themeColors: ThemeColors = {
   link: colors.blue,
   selection: "rgba(255, 255, 255, 0.1)",
   cursorColor: "rgba(255, 255, 255, 0.4)",
-  text: colors.white,
+  lightText: colors.white,
+  darkText: colors.black,
   textInactive: colors.white60,
   background: "#09141c",
   tab: "#172b3a",
@@ -140,6 +137,7 @@ export const themeColors: ThemeColors = {
   inputBorder: `2px solid ${colors.pink}`,
   button: colors.white,
   buttonBackground: colors.pink,
+  buttonBackgroundSecondary: colors.darkPurple,
   buttonBorder: `2px solid ${colors.pink}`,
   buttonHover: colors.palePink,
   buttonText: colors.white
@@ -193,8 +191,7 @@ export const theme: ThemeInterface = {
   zIndex,
   shorthands,
   transitions,
-  themeColors,
-  customBirdseyeTheme
+  themeColors
 };
 
 export { ThemeInterface };

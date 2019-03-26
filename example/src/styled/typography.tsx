@@ -42,7 +42,7 @@ const options: TypographyOptions = {
     }
   ],
   scaleRatio: 2,
-  bodyColor: styledTheme.themeColors.text,
+  bodyColor: styledTheme.themeColors.darkText,
   headerWeight: 600,
   bodyWeight: "normal",
   boldWeight: 600,
@@ -52,25 +52,27 @@ const options: TypographyOptions = {
     h1: {
       paddingBottom: `calc(${rhythm(1 / 4)} - 1px)`,
       marginBottom: rhythm(3 / 4),
-      marginTop: rhythm(1.5)
+      marginTop: rhythm(1.5),
+      fontSize: "3em",
+      fontWeight: 800
     },
     h2: {
       paddingBottom: `calc(${rhythm(1 / 3)} - 1px)`,
       marginBottom: rhythm(1 / 3),
       marginTop: rhythm(1.3),
-      color: styledTheme.themeColors.text
+      color: styledTheme.themeColors.darkText
     },
     h3: {
-      color: styledTheme.themeColors.text
+      color: styledTheme.themeColors.darkText
     },
     h4: {
-      color: styledTheme.themeColors.text
+      color: styledTheme.themeColors.darkText
     },
     h5: {
-      color: styledTheme.themeColors.text
+      color: styledTheme.themeColors.darkText
     },
     h6: {
-      color: styledTheme.themeColors.text
+      color: styledTheme.themeColors.darkText
     },
     "h2,h3,h4,h5": {
       fontFamily:
@@ -93,10 +95,10 @@ const options: TypographyOptions = {
       textDecoration: "none"
     },
     "a:hover,a:active": {
-      color: styledTheme.colors.white
+      color: styledTheme.colors.darkPurple
     },
     blockquote: {
-      color: styledTheme.themeColors.text,
+      color: styledTheme.themeColors.darkText,
       marginTop: 0,
       marginRight: 0,
       marginLeft: 0,
@@ -106,15 +108,17 @@ const options: TypographyOptions = {
       borderRadius: "3px",
       fontFamily:
         '"Source Code Pro", "SFMono-Regular", Consolas,"Roboto Mono","Droid Sans Mono","Liberation Mono",Menlo,Courier,monospace',
-      padding: "0.12em 0.35em 0.16em"
+      padding: "0.12em 0.35em 0.16em",
+      color: styledTheme.themeColors.darkText
     },
     pre: {
       borderRadius: "3px",
       lineHeight: 1.42,
       overflow: "auto",
       wordWrap: "normal", // So code will scroll on Safari.
-      padding: "1rem 1.5rem 1rem 1.5rem",
-      margin: "25px 0px"
+      padding: "2rem 3rem 2rem 3rem",
+      margin: "25px 0px",
+      background: styledTheme.colors.lightGrey
     },
     "pre code": {
       background: "none",
