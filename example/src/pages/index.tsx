@@ -57,7 +57,7 @@ const HomePage = () => {
       console.log("whoops");
     }
   };
-  console.log(JSON.stringify(schema));
+
   return (
     <Layout>
       <Hero childRef={heroRef} height="100vh">
