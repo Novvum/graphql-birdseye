@@ -24,12 +24,13 @@
     "test": "cross-env CI=1 react-scripts-ts test --env=jsdom",
     "test:watch": "react-scripts-ts test --env=jsdom",
     "build": "rollup -c && prettier --write 'dist/**/*.ts'",
+    "build:demo": "cd example && yarn install && yarn run build",
     "lint": "tslint -p tsconfig.json",
     "start": "npm-run-all --parallel start:component start:demo",
     "start:component": "rollup -c -w",
     "start:demo": "yarn --cwd ./example start",
     "prepare": "yarn run build",
-    "predeploy": "cd example && yarn install && yarn run build",
+    "predeploy": "yarn build:demo",
     "deploy": "gh-pages -d example/build"
   },
   "dependencies": {
