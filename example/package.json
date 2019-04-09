@@ -18,7 +18,7 @@
     "gatsby-source-filesystem": "^2.0.8",
     "gatsby-source-graphql": "^2.0.15",
     "gatsby-transformer-sharp": "^2.1.17",
-    "graphql-birdseye": "1.0.8-rc1",
+    "graphql-birdseye": "link:../",
     "react": "^16.8.0",
     "react-async-component": "^2.0.0",
     "react-dom": "^16.8.0",
