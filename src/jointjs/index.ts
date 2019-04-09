@@ -1,6 +1,6 @@
 import injectCustomRouter from "./router";
 import injectCustomShapes from "./shapes";
-import defaultTheme, { Theme } from "../defaultTheme";
+import defaultTheme, { Theme } from "../theme";
 import { Birdseye, Type as BirdseyeType } from "../dataStructure";
 import { mapToArray } from "../utils";
 var joint = require("jointjs");

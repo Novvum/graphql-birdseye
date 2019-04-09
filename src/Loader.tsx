@@ -1,6 +1,6 @@
 import * as React from "react";
 import styles from "./Loader.css";
-import { Colors } from "./defaultTheme";
+import { Colors } from "./theme";
 
 export interface Props {
   colors: Colors;

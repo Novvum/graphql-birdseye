@@ -1,4 +1,4 @@
-import { Theme } from "../defaultTheme";
+import { Theme } from "../theme";
 
 export default (joint, theme: Theme) => {
   joint.dia.FastPaper = joint.dia.Paper.extend({
