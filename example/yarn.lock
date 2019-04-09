@@ -4620,9 +4620,15 @@ graphlib@^2.1.5:
   dependencies:
     lodash "^4.17.5"
 
-"graphql-birdseye@link:..":
-  version "0.0.0"
-  uid ""
+graphql-birdseye@1.0.8-rc1:
+  version "1.0.8-rc1"
+  resolved "https://registry.npmjs.org/graphql-birdseye/-/graphql-birdseye-1.0.8-rc1.tgz#52ac39b65ae098ded4cde74cdc29f2d1d046dde1"
+  dependencies:
+    "@f/animate" "^1.0.1"
+    jointjs "^2.2.1"
+    react-markdown "^4.0.6"
+    react-resize-detector "^3.4.0"
+    svg-pan-zoom "^3.6.0"
 
 graphql-config@^2.0.1:
   version "2.2.1"
@@ -8968,6 +8974,16 @@ styled-components@^4.1.2:
     stylis "^3.5.0"
     stylis-rule-sheet "^0.0.10"
     supports-color "^5.5.0"
+
+styled-config@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/styled-config/-/styled-config-3.0.1.tgz#3afbc3647e2f423a838c297f8c84e379b2b2a7db"
+
+styled-dropdown-component@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/styled-dropdown-component/-/styled-dropdown-component-3.0.1.tgz#be93e6669e959a5f66da9bdf40ee1467c323a797"
+  dependencies:
+    styled-config "^3.0.1"
 
 styled-system@^3.1.11:
   version "3.2.1"

@@ -28,8 +28,7 @@ class GetStarted extends React.Component<
                 }
               }
             `}
-            render={data => {
-              console.log(data);
+            render={(data) => {
               return (
                 <ReactMarkdown
                   escapeHtml={false}

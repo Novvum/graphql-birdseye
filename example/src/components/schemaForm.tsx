@@ -3,24 +3,29 @@ import useForm from "../utils/useForms";
 import { Button } from "./Buttons";
 import { styled } from "../styled";
 import { Flex, Box } from "@rebass/grid";
+import { SchemaDropdown } from "./SchemaDropdown";
 
 const Input = styled.input`
-  background-color: ${p => p.theme.themeColors.inputBackgroundColor};
-  color: ${p => p.theme.themeColors.lightText};
-  border: ${p => p.theme.themeColors.inputBorder};
+  background-color: ${(p) => p.theme.themeColors.inputBackgroundColor};
+  color: ${(p) => p.theme.themeColors.lightText};
+  border: ${(p) => p.theme.themeColors.inputBorder};
   padding: 15px 9px 15px 10px;
   width: 100%;
   max-width: 600px;
-  margin-top: ${p => p.theme.sizes.small12};
-  margin-bottom: ${p => p.theme.sizes.small12};
+  margin-top: ${(p) => p.theme.sizes.small12};
+  margin-bottom: ${(p) => p.theme.sizes.small12};
 `;
 
 const Error = styled.p`
-  color: ${p => p.theme.themeColors.errorText};
+  color: ${(p) => p.theme.themeColors.errorText};
 `;
 
-export default ({ onSubmit, error }) => {
-  const setSchema = async () => {
+export default ({ onSubmit, error, presetOptions }) => {
+  const setSchema = async (preset) => {
+    if (preset) {
+      await onSubmit("", preset);
+      return;
+    }
     await onSubmit(values.schema);
   };
 
@@ -46,9 +51,13 @@ export default ({ onSubmit, error }) => {
             />
           </Box>
           {error && <Error>{error}</Error>}
-          <Button style={{ marginTop: "20px" }} type="submit">
-            {loading ? "Sending messenger pigeons..." : "Visualize my schema"}
-          </Button>
+          <Flex style={{ marginTop: "20px" }} alignItems="center">
+            <Button style={{ marginRight: "15px" }} type="submit">
+              {loading ? "Sending messenger pigeons..." : "Visualize my schema"}
+            </Button>
+            or
+            <SchemaDropdown onSelect={setSchema} options={presetOptions} />
+          </Flex>
         </Flex>
       </form>
     </div>

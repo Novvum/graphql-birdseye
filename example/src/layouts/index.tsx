@@ -2,6 +2,11 @@ import React from "react";
 
 import { styled, ThemeProvider, theme as styledTheme } from "../styled";
 import Header from "../components/Header";
+import { theme as styledDropdowntheme } from "styled-config";
+const newTheme = {
+  ...styledTheme,
+  ...styledDropdowntheme,
+};
 
 interface LayoutProps {
   children: any;
@@ -26,7 +31,7 @@ const Layout = ({ children }) => (
 );
 console;
 const WithTheme: React.SFC<LayoutProps> = ({ children, ...rest }) => (
-  <ThemeProvider theme={styledTheme}>
+  <ThemeProvider theme={newTheme}>
     <Layout {...rest}>{children}</Layout>
   </ThemeProvider>
 );

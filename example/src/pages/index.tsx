@@ -1,4 +1,4 @@
-import React, { useState, useRef, RefObject } from "react";
+import React, { useState, useRef } from "react";
 
 import Hero from "../components/hero";
 import Layout from "../layouts";
@@ -12,12 +12,14 @@ import { styled } from "../styled";
 import { Button } from "../components/Buttons";
 import GetStarted from "../components/GetStarted";
 import { scrollToRef } from "../utils";
+import Tooltip from "../components/Tooltip";
+import { PRESETS } from "../../presets";
 
 //async component for gatsby production build
 const GraphqlBirdseye = asyncComponent({
   resolve: () => require("graphql-birdseye"),
   LoadingComponent: () => <div />, // Optional
-  ErrorComponent: () => <div>Uh oh..</div> // Optional
+  ErrorComponent: () => <div>Uh oh..</div>, // Optional
 });
 
 const HomePage = () => {
@@ -27,16 +29,26 @@ const HomePage = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const getStartedRef = useRef<HTMLDivElement>(null);
 
-  const fetchSchema = async (url: string) => {
+  const presetNames = Object.keys(PRESETS);
+
+  const fetchSchema = async (url: string, activePreset?: any) => {
     try {
+      if (activePreset) {
+        await setSchema(PRESETS[activePreset]);
+        scrollToRef(birdsEyeRef);
+        return;
+      }
       if (!url) return setSchemaError("Schema not valid");
       await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: IntrospectionQuery })
+        headers: {
+          "Content-Type": "application/json",
+          accept: "*/*",
+        },
+        body: JSON.stringify({ query: IntrospectionQuery }),
       })
-        .then(res => res.json())
-        .then(res => {
+        .then((res) => res.json())
+        .then((res) => {
           setSchema(res.data);
           scrollToRef(birdsEyeRef);
         })
@@ -51,16 +63,25 @@ const HomePage = () => {
       <Hero childRef={heroRef} height="100vh">
         <h1>GraphQL Birdseye</h1>
         <Caption>A better way to visualize your data graph</Caption>
-        <SchemaForm onSubmit={fetchSchema} error={schemaError} />
+        <SchemaForm
+          onSubmit={fetchSchema}
+          error={schemaError}
+          presetOptions={presetNames}
+        />
       </Hero>
       <div>
         {schema && (
           <FullWidthContainer ref={birdsEyeRef}>
+            <Tooltip
+              content="Click on a type to see its fields and connections"
+              startPosition="right"
+            />
             <ButtonContainer>
               <Button
                 onClick={() => {
                   scrollToRef(heroRef, () => setSchema(null));
                 }}
+                secondary={true}
               >
                 Try different schema
               </Button>
@@ -69,9 +90,8 @@ const HomePage = () => {
                   scrollToRef(getStartedRef, () => setSchema(null));
                 }}
                 style={{ marginLeft: "20px" }}
-                secondary={true}
               >
-                Get Started
+                Start using Birdseye
               </Button>
             </ButtonContainer>
             <GraphqlBirdseye
