@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import defaultTheme, { Theme } from "./defaultTheme";
+import defaultTheme, { Theme } from "./theme";
 import JointJS from "./jointjs/index";
 import { IntrospectionQuery } from "graphql/utilities/introspectionQuery";
 import { buildClientSchema } from "graphql/utilities/buildClientSchema";
