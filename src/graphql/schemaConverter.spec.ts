@@ -1,7 +1,7 @@
 import SchemaBirdseye from './schemaConverter';
-import { Birdseye, Type, Scalar } from '../dataStructure';
+import { Birdseye, Type } from '../dataStructure';
 import { buildClientSchema } from 'graphql';
-import { smallSchema /** smallSchema bigSchema */ as dummySchema } from "../../example/src/dummySchema";
+import dummySchema from './dummySchema';
 
 describe('SchemaConverter', () => {
   const schema = buildClientSchema(dummySchema.data);
@@ -51,3 +51,4 @@ describe('SchemaConverter', () => {
     })
   })
 })
+
