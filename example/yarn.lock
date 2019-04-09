@@ -8969,6 +8969,16 @@ styled-components@^4.1.2:
     stylis-rule-sheet "^0.0.10"
     supports-color "^5.5.0"
 
+styled-config@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/styled-config/-/styled-config-3.0.1.tgz#3afbc3647e2f423a838c297f8c84e379b2b2a7db"
+
+styled-dropdown-component@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/styled-dropdown-component/-/styled-dropdown-component-3.0.1.tgz#be93e6669e959a5f66da9bdf40ee1467c323a797"
+  dependencies:
+    styled-config "^3.0.1"
+
 styled-system@^3.1.11:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/styled-system/-/styled-system-3.2.1.tgz#491e1e6f88d7ee021f6f49376f12852cde8007cb"

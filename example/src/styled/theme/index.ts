@@ -7,7 +7,7 @@ export interface Shape {
   borderRadius: number;
 }
 const shape: Shape = {
-  borderRadius: 4
+  borderRadius: 4,
 };
 
 export interface ZIndex {
@@ -25,7 +25,7 @@ const zIndex: ZIndex = {
   drawer: 1200,
   modal: 1300,
   snackbar: 1400,
-  tooltip: 1500
+  tooltip: 1500,
 };
 
 export interface Colors {
@@ -114,7 +114,7 @@ export const colors: Colors = {
   paleGrey: "#f3f4f4", // use for bgs, borders, etc
   lightGrey: "#eeeff0",
   lighterGrey: "#f6f7f7",
-  tint: "#474747"
+  tint: "#474747",
 };
 
 export const themeColors: ThemeColors = {
@@ -142,7 +142,7 @@ export const themeColors: ThemeColors = {
   buttonBackgroundSecondary: colors.darkPurple,
   buttonBorder: `2px solid ${colors.pink}`,
   buttonHover: colors.palePink,
-  buttonText: colors.white
+  buttonText: colors.white,
 };
 
 export interface Sizes {
@@ -176,7 +176,7 @@ export const sizes: Sizes = {
   fontMedium: "20px",
 
   // others
-  smallRadius: "2px"
+  smallRadius: "2px",
 };
 
 export interface Shorthands {
@@ -193,7 +193,7 @@ export const theme: ThemeInterface = {
   zIndex,
   shorthands,
   transitions,
-  themeColors
+  themeColors,
 };
 
 export { ThemeInterface };

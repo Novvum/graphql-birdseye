@@ -18,7 +18,7 @@
     "gatsby-source-filesystem": "^2.0.8",
     "gatsby-source-graphql": "^2.0.15",
     "gatsby-transformer-sharp": "^2.1.17",
-    "graphql-birdseye": "latest",
+    "graphql-birdseye": "link:../",
     "react": "^16.8.0",
     "react-async-component": "^2.0.0",
     "react-dom": "^16.8.0",
@@ -26,6 +26,7 @@
     "react-typography": "^0.16.19",
     "require-yml": "^1.3.1",
     "styled-components": "^4.1.2",
+    "styled-dropdown-component": "^3.0.1",
     "typography": "^0.16.18",
     "typography-plugin-code": "^0.16.18",
     "typography-theme-github": "^0.16.19"
@@ -36,7 +37,8 @@
   "license": "MIT",
   "main": "n/a",
   "scripts": {
-    "build": "yarn install && gatsby build",
+    "build": "gatsby build",
+    "start:prod": "gatsby serve",
     "develop": "gatsby develop",
     "serve": "gatsby serve",
     "start": "yarn develop",
