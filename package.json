@@ -1,6 +1,6 @@
 {
   "name": "graphql-birdseye",
-  "version": "1.0.7",
+  "version": "1.0.8-rc1",
   "description": "graphql visualizer",
   "author": "novvum",
   "license": "MIT",
@@ -24,7 +24,7 @@
     "test": "cross-env CI=1 react-scripts-ts test --env=jsdom",
     "test:watch": "react-scripts-ts test --env=jsdom",
     "build": "rollup -c && prettier --write 'dist/**/*.ts'",
-    "build:demo": "cd example && yarn install && yarn run build",
+    "build:demo": "bash ./.scripts/build-demo.sh",
     "lint": "tslint -p tsconfig.json",
     "start": "npm-run-all --parallel start:component start:demo",
     "start:component": "rollup -c -w",

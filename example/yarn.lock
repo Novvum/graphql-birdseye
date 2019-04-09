@@ -4620,15 +4620,9 @@ graphlib@^2.1.5:
   dependencies:
     lodash "^4.17.5"
 
-graphql-birdseye@1.0.8-rc1:
-  version "1.0.8-rc1"
-  resolved "https://registry.npmjs.org/graphql-birdseye/-/graphql-birdseye-1.0.8-rc1.tgz#52ac39b65ae098ded4cde74cdc29f2d1d046dde1"
-  dependencies:
-    "@f/animate" "^1.0.1"
-    jointjs "^2.2.1"
-    react-markdown "^4.0.6"
-    react-resize-detector "^3.4.0"
-    svg-pan-zoom "^3.6.0"
+"graphql-birdseye@link:..":
+  version "0.0.0"
+  uid ""
 
 graphql-config@^2.0.1:
   version "2.2.1"
