@@ -1,13 +1,27 @@
-# gatsby-starter-typescript
-The [default Gatsby starter](https://github.com/gatsbyjs/gatsby-starter-default) converted to [TypeScript](https://www.typescriptlang.org/).
+<div align="center"><img src="https://i.imgur.com/JBBZ9Yn.png" width="400"></br></br>
+Birdseye is a dynamic and interactive tool that allows you to visualize any GraphQL schema. </br>
+Try it out now: http://birdseye.novvum.io/</br></br>
 
-For an overview of the project structure please refer to the [Gatsby documentation - Building with Components](https://www.gatsbyjs.org/docs/building-with-components/)
+# Birdseye Example Site
 
-Install this starter (assuming Gatsby is installed) by running from your CLI:
-```
-gatsby new gatsby-starter-typescript https://github.com/haysclark/gatsby-starter-typescript
-```
+You can find a demo of this example site here: http://birdseye.novvum.io. This project uses Gatsby and Typescript.
 
-## Deploy
+</div>
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/haysclark/gatsby-starter-typescript)
+### Installation
+
+1. Follow these instructions to install Gatsby https://www.gatsbyjs.org/tutorial/part-zero/
+2. Install dependencies with
+   `npm install` or `yarn`
+3. Run a local server with
+   `gatsby develop`
+
+_Don't forget to create a Github personal access token. See the .env.sample file for instructions_
+
+### Contributing
+
+This is an open source project. To learn how to contribute, please check out our contributor guidelines (coming soon).
+
+---
+
+<p align="center">Made by <a href="https://www.novvum.io">Novvum</a> ❤️</p>

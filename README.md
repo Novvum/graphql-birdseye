@@ -64,7 +64,8 @@ See a full [example](https://github.com/Novvum/graphql-birdseye/tree/master/exam
 |style|object|Pass in an object to style the container|
 |theme|object|An object defining the theme of the components. See a full [example](https://github.com/Novvum/graphql-birdseye/tree/master/example).|
 
-### RoadMap
+### Roadmap
+We have plans to keep improving Birdseye. Here's what is next.
 1. Improve performance for larger schemas
 2. Option to toggle zoom navigation style
 3. Smoother UI transitions and interactions
