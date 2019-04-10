@@ -19,14 +19,13 @@ export class Birdseye {
         return mapToArray(this.typeMap)
             .filter(type => {
                 if (activeType === "root") {
-                    if (type.name === "Query" || type.name === "Mutation") {
+                    if (["Query", "QueryRoot", "Mutation"].includes(type.name)) {
                         return true;
                     }
                     return (
-                        (this.getType("Query") &&
-                            this.getType("Query").isRelatedTo(type)) ||
-                        (this.getType("Mutation") &&
-                            this.getType("Mutation").isRelatedTo(type))
+                        this.checkRelation("Query", type) ||
+                        this.checkRelation("QueryRoot", type) ||
+                        this.checkRelation("Mutation", type)
                     );
                 }
                 if (activeType === type.name) {
@@ -37,6 +36,10 @@ export class Birdseye {
                     this.getType(activeType).isRelatedTo(type)
                 );
             });
+    }
+    private checkRelation(typeName: string, targetType: Type) {
+        return this.getType(typeName) &&
+            this.getType(typeName).isRelatedTo(targetType)
     }
 }
 
