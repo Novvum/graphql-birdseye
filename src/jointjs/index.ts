@@ -16,7 +16,7 @@ import {
   GraphQLObjectType
 } from "graphql/type/definition";
 import { TypeMap } from "graphql/type/schema";
-import defaultTheme, { Theme } from "../defaultTheme";
+import defaultTheme, { Theme } from "../theme";
 var joint = require("jointjs");
 var svgPanZoom = require("svg-pan-zoom");
 var animate = require("@f/animate");

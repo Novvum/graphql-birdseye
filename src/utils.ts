@@ -35,7 +35,7 @@ export function getFieldLabel(type: GraphQLType): string {
       GraphQLType,
       GraphQLList<GraphQLType> | GraphQLNonNull<GraphQLType>
     >).name
-  }`;
+    }`;
 }
 
 export function isBaseEntity(entity: GraphQLNamedType): boolean {
@@ -74,4 +74,8 @@ export function setTimeoutAsync(...args: Array<any>) {
       resolve();
     }, ...rest)
   );
+}
+
+export function mapToArray<T>(map: { [key: string]: T }): Array<T> {
+  return Object.keys(map).map(k => map[k]);
 }

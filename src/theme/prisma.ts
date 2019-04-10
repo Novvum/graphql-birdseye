@@ -1,4 +1,4 @@
-import { Row, Rect, Theme } from "./index.d";
+import { Row, Rect, Theme } from "./types";
 
 const colors = {
   primary: "#548f9e",
@@ -66,4 +66,4 @@ export default {
   },
 } as Theme;
 
-export * from "./index.d";
+export * from "./types";

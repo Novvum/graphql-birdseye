@@ -8,26 +8,26 @@ export interface Theme {
     line: Line;
 }
 
-interface Rect {
+export interface Rect {
     [key: string]: any;
 }
 
-interface Text {
+export interface Text {
     [key: string]: any;
 }
 
-interface Line {
+export interface Line {
     [key: string]: any;
     targetMarker: TargetMarker;
 }
 
-interface TargetMarker {
+export interface TargetMarker {
     [key: string]: any;
     type: string;
     d: string;
 }
 
-interface Row {
+export interface Row {
     [key: string]: any;
     height: number;
     fieldNameLabel: Text;
@@ -35,7 +35,7 @@ interface Row {
     body: Rect;
 }
 
-interface Header {
+export interface Header {
     height: number;
     label: Text;
     container: Rect;
@@ -48,7 +48,7 @@ export interface Colors {
     line: LineColors;
 }
 
-interface LineColors {
+export interface LineColors {
     active: string;
     inactive: string;
 }
