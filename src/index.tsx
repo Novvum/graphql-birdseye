@@ -5,8 +5,9 @@ import JointJS from "./jointjs/index";
 import { IntrospectionQuery } from "graphql/utilities/introspectionQuery";
 import { buildClientSchema } from "graphql/utilities/buildClientSchema";
 import { GraphQLSchema } from "graphql/type/schema";
-import { withResizeDetector } from 'react-resize-detector';
+import { withResizeDetector } from "react-resize-detector";
 import Loader from "./Loader";
+import Birdseye from "./graphql/schemaConverter";
 export interface GraphqlBirdseyeProps {
   schema: GraphQLSchema | null;
   theme?: Theme;
@@ -22,12 +23,14 @@ export interface State {
   activeType: string;
   loading: boolean;
 }
-class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps & ResizeDetectorProps> {
+class GraphqlBirdseye extends React.Component<
+  GraphqlBirdseyeProps & ResizeDetectorProps
+> {
   ref: any;
   jointjs: JointJS;
   state: State = {
     activeType: "Query",
-    loading: false
+    loading: false,
   };
   constructor(props: GraphqlBirdseyeProps & ResizeDetectorProps) {
     super(props);
@@ -41,40 +44,41 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps & ResizeDetec
     const bounds = this.getBounds();
     this.jointjs.on("loading:start", this.startLoading);
     this.jointjs.on("loading:stop", this.stopLoading);
+    const dataStructure = new Birdseye(this.props.schema);
     await this.jointjs.init(
       ReactDOM.findDOMNode(this.ref),
       bounds,
-      this.props.schema.getTypeMap()
+      dataStructure
     );
   }
 
   componentWillUnmount() {
-    this.jointjs.destroy()
+    this.jointjs.destroy();
   }
   async componentWillReceiveProps(nextProps: GraphqlBirdseyeProps & ResizeDetectorProps) {
     if (this.props.width !== nextProps.width || this.props.height !== nextProps.height) {
       this.jointjs.setSize(nextProps.width, nextProps.height)
     }
     if (nextProps.schema && this.props.schema !== nextProps.schema) {
-      await this.jointjs.setTypeMap(nextProps.schema.getTypeMap())
+      await this.jointjs.setDataStructure(new Birdseye(nextProps.schema))
     }
   }
 
   private stopLoading = () =>
-    new Promise(resolve =>
+    new Promise((resolve) =>
       this.setState(
         {
-          loading: false
+          loading: false,
         },
         resolve
       )
     );
 
   private startLoading = () =>
-    new Promise(resolve => {
+    new Promise((resolve) => {
       this.setState(
         {
-          loading: true
+          loading: true,
         },
         resolve
       );
@@ -93,14 +97,8 @@ class GraphqlBirdseye extends React.Component<GraphqlBirdseyeProps & ResizeDetec
           display: "flex",
         }}
       >
-        <div
-          id="playground"
-          ref={this.setRef}
-          style={{ flex: 1 }}
-        />
-        {this.state.loading && (
-          <Loader colors={theme.colors} />
-        )}
+        <div id="playground" ref={this.setRef} style={{ flex: 1 }} />
+        {this.state.loading && <Loader colors={theme.colors} />}
       </div>
     );
   }
@@ -118,7 +116,7 @@ const schemaProvider = (
 ) => {
   return class SchemaProvider extends React.PureComponent<
     GraphqlBirdseyeProps & SchemaProviderProps
-    > {
+  > {
     // displayName: `schemaProvider(${Component.displayName})`
     render() {
       const { introspectionQuery, schema: schemaProp, ...props } = this
