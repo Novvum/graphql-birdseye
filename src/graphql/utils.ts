@@ -1,8 +1,8 @@
 import {
     GraphQLOutputType,
-    GraphQLList,
     GraphQLNonNull,
     GraphQLNamedType,
+    GraphQLList,
     GraphQLType,
     GraphQLObjectType,
     GraphQLInputObjectType,
@@ -10,6 +10,10 @@ import {
     GraphQLScalarType,
     GraphQLUnionType
 } from "graphql/type/definition";
+import {
+    GraphQLList as GraphQLListClass,
+    GraphQLNonNull as GraphQLNonNullClass
+} from 'graphql/type/wrappers'
 
 export type FilteredGraphqlOutputType = Exclude<
     GraphQLNamedType,
@@ -40,10 +44,10 @@ export function getNestedType(outputType: GraphQLOutputType): NestedType {
 }
 
 export function getFieldLabel(type: GraphQLType): string {
-    if (type.constructor.name === "GraphQLList") {
+    if (type instanceof GraphQLListClass) {
         return `[${getFieldLabel((type as GraphQLList<GraphQLType>).ofType)}]`;
     }
-    if (type.constructor.name === "GraphQLNonNull") {
+    if (type instanceof GraphQLNonNullClass) {
         return `${getFieldLabel((type as GraphQLNonNull<GraphQLType>).ofType)}`;
     }
     return `${
@@ -58,11 +62,20 @@ export function isBaseEntity(entity: GraphQLNamedType): boolean {
     return (
         entity.name.startsWith("__") ||
         baseEntities.indexOf(entity.name) > -1 ||
-        ["GraphQLEnumType", "GraphQLInputObjectType", "GraphQLScalarType"].includes(
-            entity.constructor.name
+        instanceOf([GraphQLEnumType, GraphQLInputObjectType, GraphQLScalarType],
+            entity
         ) ||
         entity.name === "Mutation"
     );
+}
+
+function instanceOf(classes: any[], t: any) {
+    for (let c of classes) {
+        if (t instanceof c) {
+            return true;
+        }
+    }
+    return false;
 }
 
 export function isRelatedType(
