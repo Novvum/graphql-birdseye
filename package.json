@@ -1,6 +1,6 @@
 {
   "name": "graphql-birdseye",
-  "version": "1.0.9-rc10",
+  "version": "1.0.9",
   "description": "graphql visualizer",
   "author": "novvum",
   "license": "MIT",
