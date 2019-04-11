@@ -15,6 +15,8 @@ const CustomDropdownItem = styled(DropdownItem)`
   border: ${(props) => props.theme.themeColors.buttonBorder};
   background-color: transparent;
   color: white;
+  font-size: 14px;
+  padding: 10px;
 `;
 
 export class SchemaDropdown extends React.Component<
@@ -48,7 +50,7 @@ export class SchemaDropdown extends React.Component<
     const { hidden } = this.state;
 
     return (
-      <Dropdown style={{ marginLeft: "15px" }}>
+      <Dropdown style={{ marginLeft: "15px", minWidth: "200px" }}>
         <Button
           secondary={true}
           // dropdownToggle

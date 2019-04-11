@@ -7,15 +7,15 @@ const colors = {
   white: "#ffffff",
   line: {
     active: styledTheme.colors.pink, // "#38616b",
-    inactive: styledTheme.colors.white
-  }
+    inactive: styledTheme.colors.white,
+  },
 };
 
 const nodeStyles = {
   gap: 15,
   container: {
     fill: styledTheme.colors.black,
-    rx: 15
+    rx: 15,
   },
   header: {
     height: 36,
@@ -23,36 +23,37 @@ const nodeStyles = {
       "font-size": 22,
       "text-anchor": "middle",
       fill: "#ffffff",
-      "font-weight": "bold"
+      "font-weight": "bold",
+      cursor: "pointer",
     },
     container: {
-      fill: "transparent" // colors.primary,
+      fill: "transparent", // colors.primary,
       // stroke: colors.primary
-    }
+    },
   },
   divider: {
     height: 0,
     stroke: colors.background,
-    fill: colors.background
+    fill: colors.background,
   } as Rect,
   row: {
     height: 35,
     fieldNameLabel: {
       "font-size": 20,
       fill: "#f6f8fa",
-      "font-weight": "bold"
+      "font-weight": "bold",
     },
     fieldTypeLabel: {
       "font-size": 18,
-      fill: "#959da5"
+      fill: "#959da5",
     },
     body: {
       fill: "transparent",
       stroke: "transparent", // colors.primary,
       height: 25,
-      cursor: "pointer"
-    }
-  } as Row
+      cursor: "pointer",
+    },
+  } as Row,
 };
 export default {
   colors,
@@ -64,7 +65,7 @@ export default {
     strokeLinejoin: "round",
     targetMarker: {
       type: "path",
-      d: "M 10 -5 0 0 10 5 z"
-    }
-  }
+      d: "M 10 -5 0 0 10 5 z",
+    },
+  },
 } as Theme;
