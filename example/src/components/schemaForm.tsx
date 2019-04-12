@@ -47,16 +47,27 @@ export default ({ onSubmit, error, presetOptions }) => {
               name="schema"
               value={values.schema}
               onChange={handleChange}
-              placeholder="Add url to introspect schema"
+              placeholder="Add your public GraphQL endpoint"
             />
           </Box>
           {error && <Error>{error}</Error>}
-          <Flex style={{ marginTop: "20px" }} alignItems="center">
-            <Button style={{ marginRight: "15px" }} type="submit">
-              {loading ? "Sending messenger pigeons..." : "Visualize my schema"}
-            </Button>
-            or
-            <SchemaDropdown onSelect={setSchema} options={presetOptions} />
+          <Flex
+            style={{ marginTop: "20px" }}
+            alignItems="center"
+            justifyContent="flex-start"
+            flexWrap="wrap"
+          >
+            <Flex pb={20}>
+              <Button style={{ marginRight: "15px" }} type="submit">
+                {loading
+                  ? "Sending messenger pigeons..."
+                  : "Visualize my schema"}
+              </Button>
+            </Flex>
+            <Flex width={[1, 1 / 2]} alignItems="center" pb={20}>
+              or
+              <SchemaDropdown onSelect={setSchema} options={presetOptions} />
+            </Flex>
           </Flex>
         </Flex>
       </form>
