@@ -18,7 +18,6 @@
     "noImplicitReturns": true,
     "noImplicitThis": false, // true,
     "noImplicitAny": false, // true
-    "no-string-literal": false,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": false, // true
