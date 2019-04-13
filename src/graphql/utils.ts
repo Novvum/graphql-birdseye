@@ -1,92 +1,11 @@
-import {
-    GraphQLOutputType,
-    GraphQLNonNull,
-    GraphQLNamedType,
-    GraphQLList,
-    GraphQLType,
-    GraphQLObjectType,
-    GraphQLInputObjectType,
-    GraphQLEnumType,
-    GraphQLScalarType,
-    GraphQLUnionType
-} from "graphql/type/definition";
-import {
-    GraphQLList as GraphQLListClass,
-    GraphQLNonNull as GraphQLNonNullClass
-} from 'graphql/type/wrappers'
+export var baseEntities = ["Boolean", "Int", "String", "Float", "ID"];
+export var filteredTypes = ["DateTime"];
 
-export type FilteredGraphqlOutputType = Exclude<
-    GraphQLNamedType,
-    | GraphQLInputObjectType
-    | GraphQLEnumType
-    | GraphQLScalarType
-    | GraphQLUnionType
->;
-
-var baseEntities = ["Boolean", "Int", "String", "Float", "ID"];
-var filteredTypes = ["DateTime"];
-
-export function isFilteredEntity(entity: any) {
-    return filteredTypes.indexOf(entity.name) > -1;
-}
-
-export type NestedType = Exclude<
-    GraphQLOutputType,
-    GraphQLList<any> | GraphQLNonNull<any>
->;
-export function getNestedType(outputType: GraphQLOutputType): NestedType {
-    if (!Object.keys(outputType).includes("name")) {
-        return getNestedType(
-            (outputType as GraphQLList<any> | GraphQLNonNull<any>).ofType
-        );
-    }
-    return outputType as NestedType;
-}
-
-export function getFieldLabel(type: GraphQLType): string {
-    if (type instanceof GraphQLListClass) {
-        return `[${getFieldLabel((type as GraphQLList<GraphQLType>).ofType)}]`;
-    }
-    if (type instanceof GraphQLNonNullClass) {
-        return `${getFieldLabel((type as GraphQLNonNull<GraphQLType>).ofType)}`;
-    }
-    return `${
-        (type as Exclude<
-            GraphQLType,
-            GraphQLList<GraphQLType> | GraphQLNonNull<GraphQLType>
-        >).name
-        }`;
-}
-
-export function isBaseEntity(entity: GraphQLNamedType): boolean {
-    return (
-        entity.name.startsWith("__") ||
-        baseEntities.indexOf(entity.name) > -1 ||
-        instanceOf([GraphQLEnumType, GraphQLInputObjectType, GraphQLScalarType, GraphQLUnionType],
-            entity
-        ) ||
-        entity.name === "Mutation"
-    );
-}
-
-function instanceOf(classes: any[], t: any) {
+export function instanceOf(classes: any[], t: any) {
     for (let c of classes) {
         if (t instanceof c) {
             return true;
         }
     }
     return false;
-}
-
-export function isRelatedType(
-    source: GraphQLObjectType,
-    destination: GraphQLNamedType
-) {
-    const sourceFields = source.getFields();
-    const matchingField =
-        Object.keys(sourceFields).find(key => {
-            const fieldType = getNestedType(sourceFields[key].type);
-            return fieldType.name === destination.name;
-        }) || false;
-    return matchingField;
 }

@@ -3,13 +3,15 @@ import * as ReactDOM from "react-dom";
 import defaultTheme, { Theme } from "./theme";
 import JointJS from "./jointjs/index";
 import { IntrospectionQuery } from "graphql/utilities/introspectionQuery";
-import { buildClientSchema } from "graphql/utilities/buildClientSchema";
 import { GraphQLSchema } from "graphql/type/schema";
 import { withResizeDetector } from "react-resize-detector";
 import Loader from "./Loader";
-import Birdseye from "./graphql/schemaConverter";
+import SchemaBirdseye from "./graphql/schemaConverter";
+import IntrospectionBirdseye from "./graphql/introspectionConverter";
+import { Birdseye } from "./dataStructure";
+
 export interface GraphqlBirdseyeProps {
-  schema: GraphQLSchema | null;
+  dataStructure: Birdseye | null;
   theme?: Theme;
   style?: any;
 }
@@ -25,7 +27,7 @@ export interface State {
 }
 class GraphqlBirdseye extends React.Component<
   GraphqlBirdseyeProps & ResizeDetectorProps
-> {
+  > {
   ref: any;
   jointjs: JointJS;
   state: State = {
@@ -38,17 +40,16 @@ class GraphqlBirdseye extends React.Component<
   }
 
   async componentDidMount() {
-    if (!this.props.schema) {
+    if (!this.props.dataStructure) {
       return;
     }
     const bounds = this.getBounds();
     this.jointjs.on("loading:start", this.startLoading);
     this.jointjs.on("loading:stop", this.stopLoading);
-    const dataStructure = new Birdseye(this.props.schema);
     await this.jointjs.init(
       ReactDOM.findDOMNode(this.ref),
       bounds,
-      dataStructure
+      this.props.dataStructure
     );
   }
 
@@ -59,8 +60,8 @@ class GraphqlBirdseye extends React.Component<
     if (this.props.width !== nextProps.width || this.props.height !== nextProps.height) {
       this.jointjs.setSize(nextProps.width, nextProps.height)
     }
-    if (nextProps.schema && this.props.schema !== nextProps.schema) {
-      await this.jointjs.setDataStructure(new Birdseye(nextProps.schema))
+    if (nextProps.dataStructure && this.props.dataStructure !== nextProps.dataStructure) {
+      await this.jointjs.setDataStructure(nextProps.dataStructure)
     }
   }
 
@@ -116,18 +117,18 @@ const schemaProvider = (
 ) => {
   return class SchemaProvider extends React.PureComponent<
     GraphqlBirdseyeProps & SchemaProviderProps
-  > {
+    > {
     // displayName: `schemaProvider(${Component.displayName})`
     render() {
-      const { introspectionQuery, schema: schemaProp, ...props } = this
+      const { introspectionQuery, schema, ...props } = this
         .props as SchemaProviderProps;
-      let schema: any = null;
-      if (schemaProp) {
-        schema = schemaProp;
+      let dataStructure: any = null;
+      if (schema) {
+        dataStructure = new SchemaBirdseye(schema);
       } else if (introspectionQuery) {
-        schema = buildClientSchema(introspectionQuery);
+        dataStructure = new IntrospectionBirdseye(introspectionQuery.__schema);
       }
-      return <Component schema={schema} {...props} />;
+      return <Component dataStructure={dataStructure} {...props} />;
     }
   };
 };

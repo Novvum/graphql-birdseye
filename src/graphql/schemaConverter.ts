@@ -4,18 +4,30 @@ import {
     Connection as BirdseyeConnection,
     Field as BirdseyeField
 } from '../dataStructure';
-import { GraphQLSchema } from 'graphql';
+import { GraphQLSchema, GraphQLType, GraphQLList, GraphQLNonNull, GraphQLNamedType, GraphQLInputObjectType, GraphQLEnumType, GraphQLScalarType, GraphQLUnionType, GraphQLOutputType, GraphQLObjectType } from 'graphql';
 import {
-    isFilteredEntity,
-    isBaseEntity,
-    getNestedType,
-    getFieldLabel as getFieldTypeName,
-    FilteredGraphqlOutputType,
-    getFieldLabel
+    filteredTypes,
+    baseEntities,
+    instanceOf
 } from "./utils";
 import { TypeMap } from 'graphql/type/schema';
 import { mapToArray } from '../utils';
+import {
+    GraphQLList as GraphQLListClass,
+    GraphQLNonNull as GraphQLNonNullClass
+} from 'graphql/type/wrappers'
 
+export type FilteredGraphqlOutputType = Exclude<
+    GraphQLNamedType,
+    | GraphQLInputObjectType
+    | GraphQLEnumType
+    | GraphQLScalarType
+    | GraphQLUnionType
+>;
+export type NestedType = Exclude<
+    GraphQLOutputType,
+    GraphQLList<any> | GraphQLNonNull<any>
+>;
 export default class DataStructure extends Birdseye {
     constructor(schema: GraphQLSchema, config = {}) {
         super(config);
@@ -25,7 +37,7 @@ export default class DataStructure extends Birdseye {
         const filteredTypeMap = Object.keys(typeMap)
             .filter(key => {
                 const type = typeMap[key];
-                if (isFilteredEntity(type) || isBaseEntity(type)) {
+                if (this.isFilteredEntity(type) || this.isBaseEntity(type)) {
                     return false;
                 }
                 return true;
@@ -46,11 +58,11 @@ export default class DataStructure extends Birdseye {
                     const field = fields[key];
                     const birdseyeField = new BirdseyeField();
                     birdseyeField.name = field.name;
-                    birdseyeField.typeLabel = getFieldLabel(field.type);
+                    birdseyeField.typeLabel = this.getFieldLabel(field.type);
                     if (!birdseyeField.typeLabel || birdseyeField.typeLabel === 'undefined') {
-                        birdseyeField.typeLabel = getFieldLabel(field.type)
+                        birdseyeField.typeLabel = this.getFieldLabel(field.type)
                     }
-                    const type = getNestedType(field.type).name;
+                    const type = this.getNestedType(field.type).name;
                     const target = birdseyeTypeMap[type];
                     birdseyeField.type = target || type;
                     // if (target) {
@@ -64,5 +76,52 @@ export default class DataStructure extends Birdseye {
                 }, {});
             })
         return birdseyeTypeMap;
+    }
+    private isFilteredEntity(entity: any) {
+        return filteredTypes.indexOf(entity.name) > -1;
+    }
+    private isBaseEntity(entity: GraphQLNamedType): boolean {
+        return (
+            entity.name.startsWith("__") ||
+            baseEntities.indexOf(entity.name) > -1 ||
+            instanceOf([GraphQLEnumType, GraphQLInputObjectType, GraphQLScalarType, GraphQLUnionType],
+                entity
+            ) ||
+            entity.name === "Mutation"
+        );
+    }
+    private getFieldLabel(type: GraphQLType): string {
+        if (type instanceof GraphQLListClass) {
+            return `[${this.getFieldLabel((type as GraphQLList<GraphQLType>).ofType)}]`;
+        }
+        if (type instanceof GraphQLNonNullClass) {
+            return `${this.getFieldLabel((type as GraphQLNonNull<GraphQLType>).ofType)}!`;
+        }
+        return `${
+            (type as Exclude<
+                GraphQLType,
+                GraphQLList<GraphQLType> | GraphQLNonNull<GraphQLType>
+            >).name
+            }`;
+    }
+    private getNestedType(outputType: GraphQLOutputType): NestedType {
+        if (!Object.keys(outputType).includes("name")) {
+            return this.getNestedType(
+                (outputType as GraphQLList<any> | GraphQLNonNull<any>).ofType
+            );
+        }
+        return outputType as NestedType;
+    }
+    private isRelatedType(
+        source: GraphQLObjectType,
+        destination: GraphQLNamedType
+    ) {
+        const sourceFields = source.getFields();
+        const matchingField =
+            Object.keys(sourceFields).find(key => {
+                const fieldType = this.getNestedType(sourceFields[key].type);
+                return fieldType.name === destination.name;
+            }) || false;
+        return matchingField;
     }
 }
