@@ -1,16 +1,15 @@
-import SchemaBirdseye from './schemaConverter';
+import IntrospectionBirdseye from './introspectionConverter';
 import { Birdseye, Type } from '../dataStructure';
-import { buildClientSchema } from 'graphql';
 import dummySchema from './dummySchema';
 
-describe('SchemaConverter', () => {
-  const schema = buildClientSchema(dummySchema.data);
+describe('IntrospectionConverter', () => {
+  const schema = dummySchema.data.__schema as any;
   let birdseye;
   beforeEach(() => {
-    birdseye = new SchemaBirdseye(schema);
+    birdseye = new IntrospectionBirdseye(schema);
   })
   it('inherits from Birdseye datastructure', () => {
-    expect(SchemaBirdseye.prototype).toBeInstanceOf(Birdseye)
+    expect(IntrospectionBirdseye.prototype).toBeInstanceOf(Birdseye)
   })
   it('initializes properly', () => {
     expect(birdseye).toBeTruthy();
@@ -21,7 +20,7 @@ describe('SchemaConverter', () => {
   describe('Types', () => {
     let type;
     beforeEach(() => {
-      type = new SchemaBirdseye(schema).typeMap.Comic;
+      type = new IntrospectionBirdseye(schema).typeMap.Comic;
     })
     it('has fields', () => {
       expect(type.fieldMap).toBeTruthy();
@@ -29,7 +28,7 @@ describe('SchemaConverter', () => {
     describe("Fields", () => {
       let fields;
       beforeEach(() => {
-        fields = new SchemaBirdseye(schema).typeMap.Comic.fieldMap;
+        fields = new IntrospectionBirdseye(schema).typeMap.Comic.fieldMap;
       })
       it('is defined', () => {
         expect(fields.id).toBeTruthy();
