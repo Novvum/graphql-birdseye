@@ -1,21 +1,28 @@
 import {
     Birdseye,
     Type as BirdseyeType,
-    Connection as BirdseyeConnection,
     Field as BirdseyeField
 } from '../dataStructure';
-import { GraphQLSchema, GraphQLType, GraphQLList, GraphQLNonNull, GraphQLNamedType, GraphQLInputObjectType, GraphQLEnumType, GraphQLScalarType, GraphQLUnionType, GraphQLOutputType, GraphQLObjectType } from 'graphql';
+import {
+    GraphQLSchema,
+    GraphQLType,
+    GraphQLList,
+    GraphQLNonNull,
+    GraphQLNamedType,
+    GraphQLInputObjectType,
+    GraphQLEnumType,
+    GraphQLScalarType,
+    GraphQLUnionType,
+    GraphQLOutputType,
+    GraphQLObjectType
+} from './type/index.d';
 import {
     filteredTypes,
     baseEntities,
     instanceOf
 } from "./utils";
-import { TypeMap } from 'graphql/type/schema';
+import { TypeMap } from './type/schema';
 import { mapToArray } from '../utils';
-import {
-    GraphQLList as GraphQLListClass,
-    GraphQLNonNull as GraphQLNonNullClass
-} from 'graphql/type/wrappers'
 
 export type FilteredGraphqlOutputType = Exclude<
     GraphQLNamedType,
@@ -84,17 +91,17 @@ export default class DataStructure extends Birdseye {
         return (
             entity.name.startsWith("__") ||
             baseEntities.indexOf(entity.name) > -1 ||
-            instanceOf([GraphQLEnumType, GraphQLInputObjectType, GraphQLScalarType, GraphQLUnionType],
+            instanceOf(["GraphQLEnumType", "GraphQLInputObjectType", "GraphQLScalarType", "GraphQLUnionType"],
                 entity
             ) ||
             entity.name === "Mutation"
         );
     }
     private getFieldLabel(type: GraphQLType): string {
-        if (type instanceof GraphQLListClass) {
+        if (type.constructor.name === "GraphQLList") {
             return `[${this.getFieldLabel((type as GraphQLList<GraphQLType>).ofType)}]`;
         }
-        if (type instanceof GraphQLNonNullClass) {
+        if (type.constructor.name === "GraphQLNonNull") {
             return `${this.getFieldLabel((type as GraphQLNonNull<GraphQLType>).ofType)}!`;
         }
         return `${

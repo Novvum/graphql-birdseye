@@ -3,7 +3,7 @@ import * as ReactDOM from "react-dom";
 import defaultTheme, { Theme } from "./theme";
 import JointJS from "./jointjs/index";
 import { IntrospectionQuery } from "./graphql/utilities/introspectionQuery";
-import { GraphQLSchema } from "graphql/type/schema";
+import { GraphQLSchema } from "./graphql/type";
 import { withResizeDetector } from "react-resize-detector";
 import Loader from "./Loader";
 import SchemaBirdseye from "./graphql/schemaConverter";
