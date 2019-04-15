@@ -4,7 +4,17 @@ import {
     Connection as BirdseyeConnection,
     Field as BirdseyeField
 } from '../dataStructure';
-import { IntrospectionSchema, IntrospectionType, IntrospectionObjectType, IntrospectionInterfaceType, IntrospectionOutputTypeRef, IntrospectionOutputType, IntrospectionListTypeRef, IntrospectionNonNullTypeRef, IntrospectionNamedTypeRef } from 'graphql';
+import {
+    IntrospectionSchema,
+    IntrospectionType,
+    IntrospectionObjectType,
+    IntrospectionInterfaceType,
+    IntrospectionOutputTypeRef,
+    IntrospectionOutputType,
+    IntrospectionListTypeRef,
+    IntrospectionNonNullTypeRef,
+    IntrospectionNamedTypeRef
+} from './utilities/introspectionQuery';
 import { mapToArray, arrayToMap } from '../utils';
 
 type FilteredIntrospectionType = IntrospectionObjectType | IntrospectionInterfaceType;
