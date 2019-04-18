@@ -71,7 +71,7 @@ We have plans to keep improving Birdseye. Here's what is next.
 3. Smoother UI transitions and interactions
 
 ### Contributing
-This is an open source project. To learn how to contribute, please check out our contributor guidelines (coming soon).
+This is an open source project. To learn how to contribute, please check out our [contributing guide](./CONTRIBUTING.md#contributing-guide).
 
 ### License
 
