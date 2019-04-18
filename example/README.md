@@ -1,10 +1,10 @@
 <div align="center"><img src="https://i.imgur.com/JBBZ9Yn.png" width="400"></br></br>
-Birdseye is a dynamic and interactive tool that allows you to visualize any GraphQL schema. </br>
+View any GraphQL schema as a dynamic and interactive graph.</br>
 Try it out now: http://birdseye.novvum.io/</br></br>
 
-# Birdseye Example Site
+# Birdseye Demo Site
 
-You can find a demo of this example site here: http://birdseye.novvum.io. This project uses Gatsby and Typescript.
+This demo site is deployed here: http://birdseye.novvum.io. This project uses Gatsby and Typescript.
 
 </div>
 
@@ -20,8 +20,12 @@ _Don't forget to create a Github personal access token. See the .env.sample file
 
 ### Contributing
 
-This is an open source project. To learn how to contribute, please check out our contributor guidelines (coming soon).
+This is an open source project. To learn how to contribute, please check out our [contributing guide](../CONTRIBUTING.md#contributing-guide).
+
+### License
+
+MIT © [Novvum](https://github.com/novvum)
 
 ---
 
-<p align="center">Made by <a href="https://www.novvum.io">Novvum</a> ❤️</p>
+<p align="center">Made with ❤️ by <a href="https://www.novvum.io">Novvum</a></p>
