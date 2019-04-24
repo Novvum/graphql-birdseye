@@ -7,8 +7,8 @@
   "jsnext:main": "dist/index.es.js",
   "scripts": {
     "install:demo": "yarn --cwd ./example install",
-    "test": "cross-env CI=1 react-scripts-ts test --env=jsdom",
-    "test:watch": "react-scripts-ts test --env=jsdom",
+    "test": "echo 'no tests yet!'",
+    "test:watch": "yarn test",
     "build": "rollup -c && prettier --write 'dist/**/*.ts'",
     "build:demo": "bash ./.scripts/build-demo.sh",
     "lint": "tslint -p tsconfig.json",

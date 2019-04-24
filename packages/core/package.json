@@ -30,6 +30,7 @@
     "@types/lodash": "^4.14.118",
     "babel-core": "^6.26.3",
     "babel-runtime": "^6.26.0",
+    "react-scripts-ts": "^2.16.0",
     "rollup": "1.1.2",
     "rollup-plugin-babel": "4.3.2",
     "rollup-plugin-babel-minify": "^7.0.0",

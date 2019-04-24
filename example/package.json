@@ -3,6 +3,7 @@
   "description": "GraphQL birdseye example project",
   "version": "1.0.0",
   "author": "Novvum",
+  "private": true,
   "dependencies": {
     "@rebass/grid": "^6.0.0-7",
     "babel-plugin-styled-components": "^1.10.0",

@@ -22,15 +22,13 @@
     "npm": ">=5"
   },
   "scripts": {
-    "install:demo": "yarn --cwd ./example install",
-    "test": "cross-env CI=1 react-scripts-ts test --env=jsdom",
-    "test:watch": "react-scripts-ts test --env=jsdom",
-    "build": "wsrun --parallel build",
-    "build:demo": "bash ./.scripts/build-demo.sh",
+    "test": "wsrun --parallel test",
+    "test:watch": "wsrun --parallel test:watch",
+    "build:packages": "wsrun -p 'graphql-birdseye*' --parallel build",
+    "build:demo": "yarn workspace example build",
+    "build": "yarn build:packages && yarn build:demo",
     "lint": "tslint -p tsconfig.json",
-    "prepare": "yarn run build",
-    "predeploy": "yarn build:demo",
-    "deploy": "gh-pages -d example/build"
+    "prepare": "yarn build"
   },
   "devDependencies": {
     "cross-env": "^5.1.4",
