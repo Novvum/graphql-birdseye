@@ -1,0 +1,7 @@
+[build]
+  command = "yarn build:demo"
+  publish = "./example/public"
+
+[build.environment]
+  NODE_VERSION = "v11.14.0"
+  YARN_VERSION = "1.15.2"

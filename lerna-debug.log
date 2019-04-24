@@ -1,0 +1,22 @@
+0 silly input [ 'build' ]
+1 silly flags { _: [ 'run' ],
+1 silly flags   'reject-cycles': false,
+1 silly flags   rejectCycles: false,
+1 silly flags   scope: 'example',
+1 silly flags   script: 'build',
+1 silly flags   args: [] }
+2 verbose rootPath /Users/rohitravikoti/Documents/Personal projects/graphql-birdseye
+3 info version 2.11.0
+4 silly existsSync /Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/VERSION
+5 info scope example
+6 error EPACKAGES Errored while collecting packages and package graph
+7 error Error: No packages found that match scope 'example'
+7 error     at Function.filterPackages (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/lerna/lib/PackageUtilities.js:252:17)
+7 error     at RunCommand.runPreparations (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/lerna/lib/Command.js:333:60)
+7 error     at /Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/lerna/lib/Command.js:209:18
+7 error     at new Promise (<anonymous>)
+7 error     at RunCommand.run (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/lerna/lib/Command.js:193:14)
+7 error     at Object.handler (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/lerna/lib/commands/RunCommand.js:49:14)
+7 error     at Object.self.runCommand (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/lerna/node_modules/yargs/lib/command.js:233:22)
+7 error     at Object.Yargs.self._parseArgs (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/lerna/node_modules/yargs/yargs.js:990:30)
+7 error     at Object.Yargs.self.parse (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/lerna/node_modules/yargs/yargs.js:532:23)

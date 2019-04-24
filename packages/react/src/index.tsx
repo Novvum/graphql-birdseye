@@ -1,14 +1,19 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import defaultTheme, { Theme } from "./theme";
-import JointJS from "./jointjs/index";
-import { IntrospectionQuery } from "./graphql/utilities/introspectionQuery";
-import { GraphQLSchema } from "./graphql/type";
 import { withResizeDetector } from "react-resize-detector";
+
+import { IntrospectionQuery } from "graphql-birdseye-core/src/graphql/utilities/introspectionQuery";
+import { GraphQLSchema } from "graphql-birdseye-core/src/graphql/type";
+
+import {
+  defaultTheme,
+  Theme,
+  JointJS,
+  SchemaDataStructure as SchemaBirdseye,
+  IntrospectionDataStructure as IntrospectionBirdseye,
+} from "graphql-birdseye-core";
+import { Birdseye } from "graphql-birdseye-core/dist/dataStructure";
 import Loader from "./Loader";
-import SchemaBirdseye from "./graphql/schemaConverter";
-import IntrospectionBirdseye from "./graphql/introspectionConverter";
-import { Birdseye } from "./dataStructure";
 
 export interface GraphqlBirdseyeProps {
   dataStructure: Birdseye | null;

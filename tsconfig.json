@@ -23,9 +23,6 @@
     "noUnusedLocals": false, // true
     "noUnusedParameters": false // true
   },
-  "include": [
-    "src"
-  ],
   "exclude": [
     "node_modules",
     "build",
