@@ -1,4 +1,4 @@
-import { Theme, Rect, Row } from "graphql-birdseye/src/theme/types";
+import { Theme, Rect, Row } from "graphql-birdseye-core/src/theme/types";
 import { theme as styledTheme } from "../styled";
 
 const colors = {

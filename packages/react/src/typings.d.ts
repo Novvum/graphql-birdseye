@@ -7,9 +7,8 @@ declare module "*.css" {
   export default content;
 }
 
-declare module "react-svg-pan-zoom";
 interface SvgrComponent
-  extends React.StatelessComponent<React.SVGAttributes<SVGElement>> {}
+  extends React.StatelessComponent<React.SVGAttributes<SVGElement>> { }
 
 declare module "*.svg" {
   const svgUrl: string;

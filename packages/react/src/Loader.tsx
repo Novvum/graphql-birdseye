@@ -1,6 +1,6 @@
 import * as React from "react";
 import styles from "./Loader.css";
-import { Colors } from "./theme";
+import { Colors } from "graphql-birdseye-core/src/theme";
 
 export interface Props {
   colors: Colors;
