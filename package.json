@@ -22,9 +22,8 @@
   },
   "scripts": {
     "test": "lerna run --scope 'graphql-birdseye*' --parallel test",
-    "build:packages": "lerna run --scope 'graphql-birdseye*' build",
+    "build": "lerna run --scope 'graphql-birdseye*' build",
     "build:demo": "lerna run --scope birdseye-example build",
-    "build": "lerna run build",
     "lint": "tslint -p tsconfig.json",
     "prepare": "yarn build",
     "publish": "lerna publish"
