@@ -1,6 +1,5 @@
 {
   "name": "graphql-birdseye",
-  "version": "1.1.2",
   "description": "graphql visualizer",
   "author": "novvum",
   "license": "MIT",
@@ -28,7 +27,7 @@
     "build": "lerna run build",
     "lint": "tslint -p tsconfig.json",
     "prepare": "yarn build",
-    "publish": "yarn workspace graphql-birdseye-core publish && yarn workspace graphql-birdseye-react publish"
+    "publish": "lerna publish"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
