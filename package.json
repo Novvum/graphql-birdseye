@@ -22,10 +22,10 @@
     "npm": ">=5"
   },
   "scripts": {
-    "test": "wsrun -p 'graphql-birdseye*' --parallel test",
-    "build:packages": "wsrun -p 'graphql-birdseye*' --parallel build",
-    "build:demo": "yarn workspace example build",
-    "build": "yarn build:packages && yarn build:demo",
+    "test": "lerna run --scope 'graphql-birdseye*' --parallel test",
+    "build:packages": "lerna run --scope 'graphql-birdseye*' build",
+    "build:demo": "lerna run --scope birdseye-example build",
+    "build": "lerna run build",
     "lint": "tslint -p tsconfig.json",
     "prepare": "yarn build",
     "publish": "yarn workspace graphql-birdseye-core publish && yarn workspace graphql-birdseye-react publish"
@@ -35,10 +35,10 @@
     "babel-runtime": "^6.26.0",
     "cross-env": "^5.1.4",
     "husky": "^1.3.1",
+    "lerna": "^2.9.0",
     "prettier": "^1.16.4",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "2.9.2",
-    "wsrun": "^3.6.4",
     "yarn-run-all": "3.1.1"
   },
   "files": [
