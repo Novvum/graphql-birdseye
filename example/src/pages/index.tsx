@@ -17,7 +17,7 @@ import { PRESETS } from "../../presets";
 
 //async component for gatsby production build
 const GraphqlBirdseye = asyncComponent({
-  resolve: () => require("graphql-birdseye-react"),
+  resolve: () => require("graphql-birdseye"),
   LoadingComponent: () => <div />, // Optional
   ErrorComponent: () => <div>Uh oh..</div>, // Optional
 });

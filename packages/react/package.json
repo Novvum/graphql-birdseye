@@ -1,5 +1,5 @@
 {
-  "name": "graphql-birdseye-react",
+  "name": "graphql-birdseye",
   "version": "1.1.4-2",
   "description": "graphql visualizer",
   "main": "dist/index.js",
