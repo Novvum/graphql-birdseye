@@ -3,5 +3,5 @@
   publish = "./example/public"
 
 [build.environment]
-  NODE_VERSION = 11.14.0
-  YARN_VERSION = 1.15.2
+  NODE_VERSION = "v11.14.0"
+  YARN_VERSION = "1.15.2"
