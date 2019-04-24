@@ -27,7 +27,8 @@
     "build:demo": "yarn workspace example build",
     "build": "yarn build:packages && yarn build:demo",
     "lint": "tslint -p tsconfig.json",
-    "prepare": "yarn build"
+    "prepare": "yarn build",
+    "publish": "yarn workspace graphql-birdseye-core publish && yarn workspace graphql-birdseye-react publish"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
