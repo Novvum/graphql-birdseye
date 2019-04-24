@@ -22,8 +22,7 @@
     "npm": ">=5"
   },
   "scripts": {
-    "test": "wsrun --parallel test",
-    "test:watch": "wsrun --parallel test:watch",
+    "test": "wsrun -p 'graphql-birdseye*' --parallel test",
     "build:packages": "wsrun -p 'graphql-birdseye*' --parallel build",
     "build:demo": "yarn workspace example build",
     "build": "yarn build:packages && yarn build:demo",
