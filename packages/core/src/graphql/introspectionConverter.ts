@@ -1,5 +1,5 @@
 import {
-    Birdseye,
+    BirdseyeDataStructure,
     Type as BirdseyeType,
     Connection as BirdseyeConnection,
     Field as BirdseyeField
@@ -20,7 +20,7 @@ import { mapToArray, arrayToMap } from '../utils';
 type FilteredIntrospectionType = IntrospectionObjectType | IntrospectionInterfaceType;
 
 
-export default class DataStructure extends Birdseye {
+export default class DataStructure extends BirdseyeDataStructure {
     constructor(schema: IntrospectionSchema, config = {}) {
         super(config);
         this.typeMap = this.convert(schema.types);

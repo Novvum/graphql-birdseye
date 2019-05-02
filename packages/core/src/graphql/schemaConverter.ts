@@ -1,5 +1,5 @@
 import {
-    Birdseye,
+    BirdseyeDataStructure,
     Type as BirdseyeType,
     Field as BirdseyeField
 } from '../dataStructure';
@@ -35,7 +35,7 @@ export type NestedType = Exclude<
     GraphQLOutputType,
     GraphQLList<any> | GraphQLNonNull<any>
 >;
-export default class DataStructure extends Birdseye {
+export default class DataStructure extends BirdseyeDataStructure {
     constructor(schema: GraphQLSchema, config = {}) {
         super(config);
         this.typeMap = this.convert(schema.getTypeMap());

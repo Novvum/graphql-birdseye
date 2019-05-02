@@ -1,5 +1,5 @@
 import SchemaBirdseye from './schemaConverter';
-import { Birdseye, Type } from '../dataStructure';
+import { BirdseyeDataStructure, Type } from '../dataStructure';
 import { buildClientSchema } from 'graphql';
 import dummySchema from './dummySchema';
 
@@ -10,7 +10,7 @@ describe('SchemaConverter', () => {
     birdseye = new SchemaBirdseye(schema);
   })
   it('inherits from Birdseye datastructure', () => {
-    expect(SchemaBirdseye.prototype).toBeInstanceOf(Birdseye)
+    expect(SchemaBirdseye.prototype).toBeInstanceOf(BirdseyeDataStructure)
   })
   it('initializes properly', () => {
     expect(birdseye).toBeTruthy();

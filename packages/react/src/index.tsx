@@ -8,11 +8,11 @@ import { GraphQLSchema } from "graphql-birdseye-core/src/graphql/type";
 import {
   defaultTheme,
   Theme,
-  JointJS,
+  GraphqlBirdseye as JointJS,
   SchemaDataStructure as SchemaBirdseye,
   IntrospectionDataStructure as IntrospectionBirdseye,
+  BirdseyeDataStructure as Birdseye
 } from "graphql-birdseye-core";
-import { Birdseye } from "graphql-birdseye-core/dist/dataStructure";
 import Loader from "./Loader";
 
 export interface GraphqlBirdseyeProps {
@@ -103,7 +103,7 @@ class GraphqlBirdseye extends React.Component<
           display: "flex",
         }}
       >
-        <div id="playground" ref={this.setRef} style={{ flex: 1 }} />
+        <div ref={this.setRef} style={{ flex: 1 }} />
         {this.state.loading && <Loader colors={theme.colors} />}
       </div>
     );
