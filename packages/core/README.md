@@ -114,6 +114,7 @@ Update the size of the SVG container.
 |Name|Type|Description|
 |---|---|---|
 |`event`|String|One of:<br/>`"loading:start"`<br/>`"loading:stop"`|
+|`callback`|() => any)|The function that will be invoked when the event triggers.|
 
 #### BirdseyeDataStructure
 
