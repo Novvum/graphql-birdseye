@@ -63,15 +63,52 @@ birdseye.init(
 )
 ```
 
-You can also download and test the code for our [demo site](http://birdseye.novvum.io/) in the [example folder](https://github.com/Novvum/graphql-birdseye-core/tree/master/example) in the repository.
-
 ### API
+
+#### GraphqlBirdseye
+##### Constructor
+Instantiating the library.
+```
+const birdseye = new GraphqlBirdseye({ theme })
+```
 |Name|Type|Description|
 |---|---|---|
-|introspectionQuery|JSON object|Pass your schema as a JSON of an introspection query response. Use this [introspection query](https://github.com/Novvum/graphql-birdseye-core/blob/master/example/src/utils/introspectionQuery.tsx) to return your schema as a GraphQL schema object.|
-|schema|GraphQL schema object|Pass your schema as a GraphQL schema object. Return using [makeExecutableSchema](https://www.apollographql.com/docs/apollo-server/api/graphql-tools#makeExecutableSchema) from GraphQL tools.|
-|style|object|Pass in an object to style the container|
-|theme|object|An object defining the theme of the components. Theme objects should follow the type defined [here](https://github.com/Novvum/graphql-birdseye-core/blob/master/src/theme/types.ts). Here's a full [example](https://github.com/Novvum/graphql-birdseye-core/blob/master/example/src/styled/theme/birdseyeTheme.ts).|
+|theme (optional)|object|An object defining the theme of the components. Theme objects should follow the type defined [here](https://github.com/Novvum/graphql-birdseye-core/blob/master/src/theme/types.ts). Here's a full [example](https://github.com/Novvum/graphql-birdseye-core/blob/master/example/src/styled/theme/birdseyeTheme.ts).|
+
+##### `init(el, bounds, dataStructure)`
+Initializes the library and displays the data structure.
+|Name|Type|Description|
+|---|---|---|
+|`el`|[HTML DOM Element](https://www.w3schools.com/jsref/dom_obj_all.asp)|The HTML element on which to mount the canvas.|
+|`bounds`|object|`width`: Int<br/>`height`: Int|
+|`dataStructure`|BirdseyeDataStructure|Pass in the data structure to be used for generating the tables and relations in the diagram.|
+
+##### `setDataStructure(newDataStructure)`
+Updates the data structure and rerenders the diagram.
+|Name|Type|Description|
+|---|---|---|
+|`newDataStructure`|BirdseyeDataStructure|Pass in the data structure to be used for generating the tables and relations in the diagram.|
+
+##### `setActiveType(activeType)`
+Manually sets the selected table.
+|Name|Type|Description|
+|---|---|---|
+|`activeType`|String|The `name` value of the `Type` object from the BirdseyeDataStructure.|
+
+##### `setSize(width, height)`
+Update the size of the SVG container.
+
+##### `on(event, callback)`
+|Name|Type|Description|
+|---|---|---|
+|`event`|String|One of:<br/>`"loading:start"`<br/>`"loading:stop"`|
+
+#### BirdseyeDataStructure
+
+This is the abstracted data structure that is used for defining the GraphQL types and relations in a format that is consumable by the diagramming logic. We chose to specify our own data structure because the schema can be represented in various formats (i.e. introspection response, GraphQL Schema object, etc.). We have currently implemented two translators:
+
+- [`introspectionConverter`](./src/graphql/introspectionConverter.ts): Converts the [introspection](https://graphql.org/learn/introspection/) query response into the BirdseyeDataStructure.
+- [`schemaConverter`](./src/graphql/schemaConverter.ts): Converts the [GraphQLSchema](https://graphql.org/graphql-js/type/#graphqlschema) object into the BirdseyeDataStructure.
 
 ### Roadmap
 We have plans to keep improving Birdseye. Here's what is next:

@@ -39,7 +39,6 @@ export default class JointJS {
   }
   async init(el: any, bounds: any, dataStructure: BirdseyeDataStructure) {
     this.dataStructure = dataStructure;
-    console.log(dataStructure)
     this.graph = new joint.dia.Graph();
     this.paper = new joint.dia.FastPaper({
       el,

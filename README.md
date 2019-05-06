@@ -23,53 +23,13 @@ Birdseye is an interactive tool that dynamically displays GraphQL schemas. It he
 
 Birdseye was inspired by [GraphQL Voyager](https://github.com/APIs-guru/graphql-voyager) and the [Apis-guru](https://github.com/APIs-guru) team. We found that Voyager would add 1.2 MB to our projects, which was too big for us. This motivated us to create Birdseye, which has a bundle size of less than 200 KB. Birdseye is open source and free to use and explore.
 
-### Installation
+### Getting Started
 
-Install using NPM or yarn
-
-##### NPM
-
-```bash
-npm install --save graphql-birdseye
-```
-
-##### Yarn
-
-```bash
-yarn add graphql-birdseye
-```
-
-### Usage
-Here’s an example of how to use Birdseye in a React project. See the API Reference for how to pass your schema to the component.
-
-```tsx
-import * as React from 'react';
-
-import GraphqlBirdseye from 'graphql-birdseye';
-
-class Example extends React.Component {
-  render() {
-    return (
-      <GraphqlBirdseye
-        introspectionQuery={dummySchema.data}
-        style={{ height: "100vh" }}
-      />
-    );
-  }
-}
-```
-Try this example in code sandbox: <br /><br />
-[![Edit graphql-birdseye-demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/xp9mp9rzwo)
+You can get started by reading the docs for each package:
+* [`graphql-birdseye-core` (Pure JS)](./packages/core/README.md)
+* [`graphql-birdseye`(ReactJS)](./packages/react/README.md)
 
 You can also download and test the code for our [demo site](http://birdseye.novvum.io/) in the [example folder](https://github.com/Novvum/graphql-birdseye/tree/master/example) in the repository.
-
-### API
-|Name|Type|Description|
-|---|---|---|
-|introspectionQuery|JSON object|Pass your schema as a JSON of an introspection query response. Use this [introspection query](https://github.com/Novvum/graphql-birdseye/blob/master/example/src/utils/introspectionQuery.tsx) to return your schema as a GraphQL schema object.|
-|schema|GraphQL schema object|Pass your schema as a GraphQL schema object. Return using [makeExecutableSchema](https://www.apollographql.com/docs/apollo-server/api/graphql-tools#makeExecutableSchema) from GraphQL tools.|
-|style|object|Pass in an object to style the container|
-|theme|object|An object defining the theme of the components. Theme objects should follow the type defined [here](https://github.com/Novvum/graphql-birdseye/blob/master/src/theme/types.ts). Here's a full [example](https://github.com/Novvum/graphql-birdseye/blob/master/example/src/styled/theme/birdseyeTheme.ts).|
 
 ### Roadmap
 We have plans to keep improving Birdseye. Here's what is next:
