@@ -66,17 +66,23 @@ birdseye.init(
 ### API
 
 #### GraphqlBirdseye
+
 ##### Constructor
+
 Instantiating the library.
+
 ```
 const birdseye = new GraphqlBirdseye({ theme })
 ```
+
 |Name|Type|Description|
 |---|---|---|
 |theme (optional)|object|An object defining the theme of the components. Theme objects should follow the type defined [here](https://github.com/Novvum/graphql-birdseye-core/blob/master/src/theme/types.ts). Here's a full [example](https://github.com/Novvum/graphql-birdseye-core/blob/master/example/src/styled/theme/birdseyeTheme.ts).|
 
 ##### `init(el, bounds, dataStructure)`
+
 Initializes the library and displays the data structure.
+
 |Name|Type|Description|
 |---|---|---|
 |`el`|[HTML DOM Element](https://www.w3schools.com/jsref/dom_obj_all.asp)|The HTML element on which to mount the canvas.|
@@ -84,21 +90,27 @@ Initializes the library and displays the data structure.
 |`dataStructure`|BirdseyeDataStructure|Pass in the data structure to be used for generating the tables and relations in the diagram.|
 
 ##### `setDataStructure(newDataStructure)`
+
 Updates the data structure and rerenders the diagram.
+
 |Name|Type|Description|
 |---|---|---|
 |`newDataStructure`|BirdseyeDataStructure|Pass in the data structure to be used for generating the tables and relations in the diagram.|
 
 ##### `setActiveType(activeType)`
+
 Manually sets the selected table.
+
 |Name|Type|Description|
 |---|---|---|
 |`activeType`|String|The `name` value of the `Type` object from the BirdseyeDataStructure.|
 
 ##### `setSize(width, height)`
+
 Update the size of the SVG container.
 
 ##### `on(event, callback)`
+
 |Name|Type|Description|
 |---|---|---|
 |`event`|String|One of:<br/>`"loading:start"`<br/>`"loading:stop"`|
