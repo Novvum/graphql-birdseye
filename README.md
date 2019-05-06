@@ -26,7 +26,7 @@ Birdseye was inspired by [GraphQL Voyager](https://github.com/APIs-guru/graphql-
 ### Getting Started
 
 You can get started by reading the docs for each package:
-* [`graphql-birdseye-core` (Pure JS)](./packages/core/README.md)
+* [`graphql-birdseye-core` (web component)](./packages/core/README.md)
 * [`graphql-birdseye`(ReactJS)](./packages/react/README.md)
 
 You can also download and test the code for our [demo site](http://birdseye.novvum.io/) in the [example folder](https://github.com/Novvum/graphql-birdseye/tree/master/example) in the repository.
