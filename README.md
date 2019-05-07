@@ -11,6 +11,9 @@ Try it out now: http://birdseye.novvum.io/</br></br>
 ### Description
 Birdseye is an interactive tool that dynamically displays GraphQL schemas. It helps teams visualize and understand the nodes and connections within their schema. Birdseye was built using jointJS and makes for a lightweight addition to any React project.
 
+Try the React component on CodeSandbox: <br /><br />
+[![Edit graphql-birdseye-demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/xp9mp9rzwo)
+
 ### Features
 
 1. Graphical view of any GraphQL schema
