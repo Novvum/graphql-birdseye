@@ -7,9 +7,9 @@ Try it out now: http://birdseye.novvum.io/</br></br>
 
 [![NPM](https://img.shields.io/npm/v/graphql-birdseye.svg)](https://www.npmjs.com/package/graphql-birdseye) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
-
 ### Description
-Birdseye is an interactive tool that dynamically displays GraphQL schemas. It helps teams visualize and understand the nodes and connections within their schema. Birdseye was built using jointJS and makes for a lightweight addition to any React project.
+
+Birdseye is an interactive tool that dynamically displays GraphQL schemas. It helps teams visualize and understand the nodes and connections within their schema. Birdseye was built using jointJS and makes for a lightweight addition to any web project.
 
 Try the React component on CodeSandbox: <br /><br />
 [![Edit graphql-birdseye-demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/xp9mp9rzwo)
@@ -19,7 +19,7 @@ Try the React component on CodeSandbox: <br /><br />
 1. Graphical view of any GraphQL schema
 2. Ability to click on a field or type to view its connections
 3. Dynamic zooming to focus on small portions of the schema at a time
-4. Add to any React project
+4. Add to any web project
 5. Customizable styling and themeing
 
 ### Background
@@ -28,19 +28,21 @@ Birdseye was inspired by [GraphQL Voyager](https://github.com/APIs-guru/graphql-
 
 ### Getting Started
 
-You can get started by reading the docs for each package:
-* [`graphql-birdseye-core` (web component)](./packages/core/README.md)
-* [`graphql-birdseye`(ReactJS)](./packages/react/README.md)
+You can add birdseye to your project as either a Javascript library or as a React package. Get started by reading the docs for each method:
 
-You can also download and test the code for our [demo site](http://birdseye.novvum.io/) in the [example folder](https://github.com/Novvum/graphql-birdseye/tree/master/example) in the repository.
+- [`graphql-birdseye-core` (Javascript library)](./packages/core/README.md)
+- [`graphql-birdseye`(React Package)](./packages/react/README.md)
 
 ### Roadmap
+
 We have plans to keep improving Birdseye. Here's what is next:
+
 1. Improve performance for larger schemas
 2. Option to toggle zoom navigation style
 3. Smoother UI transitions and interactions
 
 ### Contributing
+
 This is an open source project. To learn how to contribute, please check out our [contributing guide](./CONTRIBUTING.md#contributing-guide).
 
 ### License
