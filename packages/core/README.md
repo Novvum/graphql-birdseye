@@ -21,7 +21,7 @@ Birdseye is an interactive tool that dynamically displays GraphQL schemas. It he
 
 ### Javascript Library Installation
 
-This is the documentation for installing Birdseye as a Javascript library. To learn how to intall it as a React package, please refer to the [React repository README](../../packages/react/README.md).
+This is the documentation to use Birdseye as a Javascript library. To learn how to use Birdseye as a React package, please refer to the React repository [README](../../packages/react/README.md).
 
 Install using NPM or yarn
 
@@ -71,15 +71,15 @@ Creates a Birdseye object.
 
 |Name|Type|Description|
 |---|---|---|
-|theme (optional)|object|An object defining the theme of the components. Theme objects should follow the type defined [here](https://github.com/Novvum/graphql-birdseye-core/blob/master/src/theme/types.ts). Here's a full [example](https://github.com/Novvum/graphql-birdseye-core/blob/master/example/src/styled/theme/birdseyeTheme.ts).|
+|theme (optional)|object|An object defining the theme of the components. Theme objects should follow the type defined (../../example/src/styled/theme/interface.ts). Here's a full [example](../../example/src/styled/theme/birdseyeTheme.ts).|
 
 ##### `init(el, bounds, dataStructure)`
-Initializes the Birdseye object with the GraphQL schema to display, the DOM element to attach it to, and its size.
+Initializes the Birdseye diagram with the GraphQL schema to display, the DOM element to attach it to, and its size.
 
 |Name|Type|Description|
 |---|---|---|
 |`el`|[HTML DOM Element](https://www.w3schools.com/jsref/dom_obj_all.asp)|The HTML element on which to mount the Birdseye diagram.|
-|`bounds`|object|The height and width of the diagram.`width`: Int<br/>`height`: Int|
+|`bounds`|object|The height and width of the diagram.<br/>`width`: Int<br/>`height`: Int|
 |`dataStructure`|[BirdseyeDataStructure](#birdseyedatastructure)|The GraphQL schema to display, expressed as a Birdseye Data Structure. Read more about Birdseye Data Structures below.|
 
 ##### `setDataStructure(newDataStructure)`
@@ -87,10 +87,10 @@ Updates the GraphQL schema displayed in the Birdseye diagram.
 
 |Name|Type|Description|
 |---|---|---|
-|`newDataStructure`|[BirdseyeDataStructure](#birdseyedatastructure)|The GraphQL schema to display, expressed as a Birdseye Data Structure. Read more about Birdseye Data Structure sbelow.|
+|`newDataStructure`|[BirdseyeDataStructure](#birdseyedatastructure)|The GraphQL schema to display, expressed as a Birdseye Data Structure. Read more about Birdseye Data Structure below.|
 
 ##### `setActiveType(activeType)`
-Changes the active type selected on the diagram. This function fires whenever a type is clicked, but you can use it change the active type manually.
+Changes the active type selected on the diagram. This function fires whenever a type is clicked, but it can also be used to change the active type manually.
 
 |Name|Type|Description|
 |---|---|---|
@@ -109,15 +109,15 @@ Invokes a function when a type is clicked and the diagram is loading. It can inv
 
 |Name|Type|Description|
 |---|---|---|
-|`event`|String|One of:<br/>`"loading:start"`<br/>`"loading:stop"`|
+|`event`|String|Use either  :<br/>`"loading:start"`<br/>`"loading:stop"`|
 |`callback`|() => any|The function that will be invoked when the event triggers.|
 
 #### BirdseyeDataStructure
 
-Birdseye uses this data structure to define GraphQL schemas. We chose to specify our own data structure because GraphQL schemas can be represented in various formats (i.e. introspection response, GraphQL Schema object, etc.). Birdseye ships with two translators to create Birdseye Data Structures.
+Birdseye uses this data structure to define GraphQL schemas. We chose to specify our own data structure because GraphQL schemas can be represented in various formats (i.e. introspection response, GraphQL Schema Object, etc.). Birdseye ships with two translators to create Birdseye Data Structures.
 
 - [`introspectionConverter`](./src/graphql/introspectionConverter.ts): Converts the response of an [introspection](https://graphql.org/learn/introspection/) query into a Birdseye Data Structure. Use the response from this [introspection query](../../example/src/utils/introspectionQuery.tsx) with this converter.
-- [`schemaConverter`](./src/graphql/schemaConverter.ts): Converts the [GraphQLSchema](https://graphql.org/graphql-js/type/#graphqlschema) object into a Birdseye Data Structure. You can use the [ExecutableSchema from GraphQL tools](https://www.apollographql.com/docs/apollo-server/api/graphql-tools/#makeExecutableSchema) to get create a GrapahQL Schema Object.
+- [`schemaConverter`](./src/graphql/schemaConverter.ts): Converts the [GraphQLSchema](https://graphql.org/graphql-js/type/#graphqlschema) object into a Birdseye Data Structure. You can use the [ExecutableSchema](https://www.apollographql.com/docs/apollo-server/api/graphql-tools/#makeExecutableSchema) from GraphQL tools to create a GrapahQL Schema Object.
 
 ### Roadmap
 We have plans to keep improving Birdseye. Here's what is next:
