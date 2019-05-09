@@ -67,7 +67,7 @@ You can also download and test the code on our [demo site](http://birdseye.novvu
 ### API
 |Name|Type|Description|
 |---|---|---|
-|introspectionQuery|JSON object|Pass your schema as a JSON of an introspection query response. Use this [introspection query](https://github.com/Novvum/graphql-birdseye/blob/master/example/src/utils/introspectionQuery.tsx) to return your schema as a GraphQL schema object.|
+|introspectionQuery|JSON object|Pass your schema as a JSON of an introspection query response. Use this [introspection query](../../example/src/utils/introspectionQuery.tsx) to return your schema as a GraphQL schema object.|
 |schema|GraphQL schema object|Pass your schema as a GraphQL schema object. Return using [makeExecutableSchema](https://www.apollographql.com/docs/apollo-server/api/graphql-tools#makeExecutableSchema) from GraphQL tools.|
 |style|object|Pass in an object to style the container|
 |theme|object|An object defining the theme of the components. Theme objects should follow the type defined [here](https://github.com/Novvum/graphql-birdseye/blob/master/src/theme/types.ts). Here's a full [example](https://github.com/Novvum/graphql-birdseye/blob/master/example/src/styled/theme/birdseyeTheme.ts).|
@@ -79,7 +79,7 @@ We have plans to keep improving Birdseye. Here's what is next:
 3. Smoother UI transitions and interactions
 
 ### Contributing
-This is an open source project. To learn how to contribute, please check out our [contributing guide](./CONTRIBUTING.md#contributing-guide).
+This is an open source project. To learn how to contribute, please check out our [contributing guide](../../CONTRIBUTING.md#contributing-guide).
 
 ### License
 

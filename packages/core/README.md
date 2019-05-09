@@ -21,7 +21,7 @@ Birdseye is an interactive tool that dynamically displays GraphQL schemas. It he
 
 ### Javascript Library Installation
 
-This is the documentation for installing Birdseye as a Javascript library. To learn how to intall it as a React package, please refer to the react repository [README](../../packages/react/README.md).
+This is the documentation for installing Birdseye as a Javascript library. To learn how to intall it as a React package, please refer to the [React repository README](../../packages/react/README.md).
 
 Install using NPM or yarn
 
@@ -39,7 +39,7 @@ yarn add graphql-birdseye-core
 
 ### Usage
 
-Here’s an example of how to use Birdseye Javascript library in a React project. See the API Reference for how to pass your schema to the component.
+Here’s an example of how to use the Birdseye Javascript library in a React project. See the API Reference for how to pass your schema to the component.
 
 ```javascript
 import {
@@ -67,52 +67,57 @@ birdseye.init(
 ### API
 
 ##### `const birdseye = new GraphqlBirdseye({ theme })`
-Creates a birdseye object to use in your project.
+Creates a Birdseye object.
 
 |Name|Type|Description|
 |---|---|---|
 |theme (optional)|object|An object defining the theme of the components. Theme objects should follow the type defined [here](https://github.com/Novvum/graphql-birdseye-core/blob/master/src/theme/types.ts). Here's a full [example](https://github.com/Novvum/graphql-birdseye-core/blob/master/example/src/styled/theme/birdseyeTheme.ts).|
 
 ##### `init(el, bounds, dataStructure)`
-Initializes the library and displays the data structure.
+Initializes the Birdseye object with the GraphQL schema to display, the DOM element to attach it to, and its size.
 
 |Name|Type|Description|
 |---|---|---|
-|`el`|[HTML DOM Element](https://www.w3schools.com/jsref/dom_obj_all.asp)|The HTML element on which to mount the canvas.|
-|`bounds`|object|Determines the size of the component.`width`: Int<br/>`height`: Int|
-|`dataStructure`|[BirdseyeDataStructure](#birdseyedatastructure)|Pass in the data structure to be used for generating the tables and relations in the diagram.|
+|`el`|[HTML DOM Element](https://www.w3schools.com/jsref/dom_obj_all.asp)|The HTML element on which to mount the Birdseye diagram.|
+|`bounds`|object|The height and width of the diagram.`width`: Int<br/>`height`: Int|
+|`dataStructure`|[BirdseyeDataStructure](#birdseyedatastructure)|The GraphQL schema to display, expressed as a Birdseye Data Structure. Read more about Birdseye Data Structures below.|
 
 ##### `setDataStructure(newDataStructure)`
-Updates the data structure and rerenders the diagram.
+Updates the GraphQL schema displayed in the Birdseye diagram.
 
 |Name|Type|Description|
 |---|---|---|
-|`newDataStructure`|[BirdseyeDataStructure](#birdseyedatastructure)|Pass in the data structure to be used for generating the tables and relations in the diagram.|
+|`newDataStructure`|[BirdseyeDataStructure](#birdseyedatastructure)|The GraphQL schema to display, expressed as a Birdseye Data Structure. Read more about Birdseye Data Structure sbelow.|
 
 ##### `setActiveType(activeType)`
-Manually sets the selected table.
+Changes the active type selected on the diagram. This function fires whenever a type is clicked, but you can use it change the active type manually.
 
 |Name|Type|Description|
 |---|---|---|
-|`activeType`|String|The `name` value of the `Type` object from the BirdseyeDataStructure.|
+|`activeType`|String|The `name` value of the `Type` object from the Birdseye Data Structure.|
 
 ##### `setSize(width, height)`
-Update the size of the SVG container.
+Updates the width and height of the Birdseye diagram.
+
+|Name|Type|Description|
+|---|---|---|
+|`width`|int|The width of the diagram.|
+|`height`|int|The height of the diagram.|
 
 ##### `on(event, callback)`
-Allows you to add fire a function on when.....
+Invokes a function when a type is clicked and the diagram is loading. It can invoke a function when the loading begins or when the loading ends.
 
 |Name|Type|Description|
 |---|---|---|
 |`event`|String|One of:<br/>`"loading:start"`<br/>`"loading:stop"`|
-|`callback`|() => any)|The function that will be invoked when the event triggers.|
+|`callback`|() => any|The function that will be invoked when the event triggers.|
 
 #### BirdseyeDataStructure
 
-This is the abstracted data structure that is used for defining the GraphQL types and relations in a format that is consumable by the diagramming logic. We chose to specify our own data structure because the schema can be represented in various formats (i.e. introspection response, GraphQL Schema object, etc.). We have currently implemented two translators:
+Birdseye uses this data structure to define GraphQL schemas. We chose to specify our own data structure because GraphQL schemas can be represented in various formats (i.e. introspection response, GraphQL Schema object, etc.). Birdseye ships with two translators to create Birdseye Data Structures.
 
-- [`introspectionConverter`](./src/graphql/introspectionConverter.ts): Converts the [introspection](https://graphql.org/learn/introspection/) query response into the BirdseyeDataStructure.
-- [`schemaConverter`](./src/graphql/schemaConverter.ts): Converts the [GraphQLSchema](https://graphql.org/graphql-js/type/#graphqlschema) object into the BirdseyeDataStructure.
+- [`introspectionConverter`](./src/graphql/introspectionConverter.ts): Converts the response of an [introspection](https://graphql.org/learn/introspection/) query into a Birdseye Data Structure. Use the response from this [introspection query](../../example/src/utils/introspectionQuery.tsx) with this converter.
+- [`schemaConverter`](./src/graphql/schemaConverter.ts): Converts the [GraphQLSchema](https://graphql.org/graphql-js/type/#graphqlschema) object into a Birdseye Data Structure. You can use the [ExecutableSchema from GraphQL tools](https://www.apollographql.com/docs/apollo-server/api/graphql-tools/#makeExecutableSchema) to get create a GrapahQL Schema Object.
 
 ### Roadmap
 We have plans to keep improving Birdseye. Here's what is next:
@@ -121,7 +126,7 @@ We have plans to keep improving Birdseye. Here's what is next:
 3. Smoother UI transitions and interactions
 
 ### Contributing
-This is an open source project. To learn how to contribute, please check out our [contributing guide](./CONTRIBUTING.md#contributing-guide).
+This is an open source project. To learn how to contribute, please check out our [contributing guide](../../CONTRIBUTING.md#contributing-guide).
 
 ### License
 
