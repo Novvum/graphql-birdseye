@@ -69,7 +69,7 @@ We used Birdseye as React package in our [demo site](http://birdseye.novvum.io/)
 |---|---|---|
 |introspectionQuery|JSON object|Pass your schema as a JSON of an introspection query response. Use this [introspection query](../../example/src/utils/introspectionQuery.tsx) to return your schema as a GraphQL schema object.|
 |schema|GraphQL schema object|Pass your schema as a GraphQL schema object. Return using [makeExecutableSchema](https://www.apollographql.com/docs/apollo-server/api/graphql-tools#makeExecutableSchema) from GraphQL tools.|
-|style|object|Pass in an object to style the container. Example `style={{ height: "100vh" }}`|
+|style|object|Pass in an object to style the container. <br />Example `style={{ height: "100vh" }}`|
 |theme|object|An object defining the theme of the components. Theme objects should follow the type defined [here](../../example/src/styled/theme/interface.ts). Here's a full [example](../../example/src/styled/theme/birdseyeTheme.ts).|
 
 ### Roadmap
