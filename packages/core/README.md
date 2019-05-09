@@ -17,11 +17,13 @@ Birdseye is an interactive tool that dynamically displays GraphQL schemas. It he
 2. Ability to click on a field or type to view its connections
 3. Dynamic zooming to focus on small portions of the schema at a time
 4. Add to any web project
-5. Customizable styling and themeing
+5. Customizable styling and theming
 
-### Javascript Library Installation
+### Javascript Library Documentation
 
 This is the documentation to use Birdseye as a Javascript library. To learn how to use Birdseye as a React package, please refer to the React repository [README](../../packages/react/README.md).
+
+### Installation
 
 Install using NPM or yarn
 

@@ -20,7 +20,7 @@ Try the React component on CodeSandbox: <br /><br />
 2. Ability to click on a field or type to view its connections
 3. Dynamic zooming to focus on small portions of the schema at a time
 4. Add to any web project
-5. Customizable styling and themeing
+5. Customizable styling and theming
 
 ### Background
 
