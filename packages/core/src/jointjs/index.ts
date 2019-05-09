@@ -1,7 +1,7 @@
 import injectCustomRouter from "./router";
 import injectCustomShapes from "./shapes";
 import defaultTheme, { Theme } from "../theme";
-import { Birdseye, Type as BirdseyeType } from "../dataStructure";
+import { BirdseyeDataStructure, Type as BirdseyeType } from "../dataStructure";
 import { mapToArray } from "../utils";
 var joint = require("jointjs");
 var svgPanZoom = require("svg-pan-zoom");
@@ -17,7 +17,7 @@ export default class JointJS {
   private theme: Theme;
   private activeType: string = "root";
   private animation: boolean = true;
-  private dataStructure: Birdseye;
+  private dataStructure: BirdseyeDataStructure;
   private maxZoom: number = 20;
 
   /**
@@ -31,15 +31,14 @@ export default class JointJS {
   private cachedLinks = {};
   private mounted: boolean = false;
 
-  constructor(opts: { theme?: Theme }) {
-    const { theme = defaultTheme } = opts;
+  constructor(opts?: { theme?: Theme }) {
+    const { theme = defaultTheme } = opts || {};
     injectCustomShapes(joint, theme);
     injectCustomRouter(joint);
     this.theme = theme;
   }
-  async init(el: any, bounds: any, dataStructure: Birdseye) {
+  async init(el: any, bounds: any, dataStructure: BirdseyeDataStructure) {
     this.dataStructure = dataStructure;
-    console.log(dataStructure)
     this.graph = new joint.dia.Graph();
     this.paper = new joint.dia.FastPaper({
       el,

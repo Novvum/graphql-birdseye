@@ -1,5 +1,5 @@
 import IntrospectionBirdseye from './introspectionConverter';
-import { Birdseye, Type } from '../dataStructure';
+import { BirdseyeDataStructure, Type } from '../dataStructure';
 import dummySchema from './dummySchema';
 
 describe('IntrospectionConverter', () => {
@@ -9,7 +9,7 @@ describe('IntrospectionConverter', () => {
     birdseye = new IntrospectionBirdseye(schema);
   })
   it('inherits from Birdseye datastructure', () => {
-    expect(IntrospectionBirdseye.prototype).toBeInstanceOf(Birdseye)
+    expect(IntrospectionBirdseye.prototype).toBeInstanceOf(BirdseyeDataStructure)
   })
   it('initializes properly', () => {
     expect(birdseye).toBeTruthy();

@@ -1,6 +1,6 @@
 import { mapToArray } from "./utils";
 
-export class Birdseye {
+export class BirdseyeDataStructure {
     typeMap: { [key: string]: Type } = {};
     // connections: Array<Connection> = [];
     config: Config = {};
