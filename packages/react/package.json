@@ -1,6 +1,6 @@
 {
   "name": "graphql-birdseye",
-  "version": "1.1.5",
+  "version": "1.2.1",
   "description": "graphql visualizer",
   "author": "novvum",
   "license": "MIT",
@@ -30,7 +30,7 @@
     "deploy": "gh-pages -d example/build"
   },
   "dependencies": {
-    "graphql-birdseye-core": "^1.1.4",
+    "graphql-birdseye-core": "^1.2.1",
     "react-resize-detector": "^3.4.0"
   },
   "peerDependencies": {
