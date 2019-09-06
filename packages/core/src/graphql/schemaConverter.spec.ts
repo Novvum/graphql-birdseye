@@ -1,54 +1,7 @@
-import SchemaBirdseye from './schemaConverter';
-import { BirdseyeDataStructure, Type } from '../dataStructure';
-import { buildClientSchema } from 'graphql';
-import dummySchema from './dummySchema';
+import SchemaBirdseye from "./schemaConverter";
+import { buildClientSchema } from "graphql";
+import dummySchema from "./dummySchema.new";
+import birdseyeDataStructureTests from "./birdseyeDataStructureTests";
 
-describe('SchemaConverter', () => {
-  const schema = buildClientSchema(dummySchema.data);
-  let birdseye;
-  beforeEach(() => {
-    birdseye = new SchemaBirdseye(schema);
-  })
-  it('inherits from Birdseye datastructure', () => {
-    expect(SchemaBirdseye.prototype).toBeInstanceOf(BirdseyeDataStructure)
-  })
-  it('initializes properly', () => {
-    expect(birdseye).toBeTruthy();
-  })
-  it('creates a typeMap', () => {
-    expect(birdseye.typeMap).toBeTruthy()
-  })
-  describe('Types', () => {
-    let type;
-    beforeEach(() => {
-      type = new SchemaBirdseye(schema).typeMap.Comic;
-    })
-    it('has fields', () => {
-      expect(type.fieldMap).toBeTruthy();
-    })
-    describe("Fields", () => {
-      let fields;
-      beforeEach(() => {
-        fields = new SchemaBirdseye(schema).typeMap.Comic.fieldMap;
-      })
-      it('is defined', () => {
-        expect(fields.id).toBeTruthy();
-      })
-      it('can be another type', () => {
-        expect(fields.variants.type).toBeInstanceOf(Type);
-      })
-      it('can be ID type', () => {
-        expect(fields.id.type).toBe("ID");
-      })
-      it('can be String type', () => {
-        expect(fields.title.type).toBe("String");
-      })
-      it('has a name and typeLabel', () => {
-        const variants = fields.variants;
-        expect(variants.name).toBe("variants");
-        expect(variants.typeLabel).toBe("[Summary!]");
-      })
-    })
-  })
-})
-
+const schema = buildClientSchema(dummySchema.data as any);
+birdseyeDataStructureTests("SchemaConverter", () => new SchemaBirdseye(schema));
