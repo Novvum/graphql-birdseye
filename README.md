@@ -37,9 +37,10 @@ Birdseye was inspired by [GraphQL Voyager](https://github.com/APIs-guru/graphql-
 
 We have plans to keep improving Birdseye. Here's what is next:
 
+1. Add Union and Interface type support
 1. Improve performance for larger schemas
-2. Option to toggle zoom navigation style
-3. Smoother UI transitions and interactions
+1. Option to toggle zoom navigation style
+1. Smoother UI transitions and interactions
 
 ### Contributing
 
