@@ -21,6 +21,7 @@
     "npm": ">=5"
   },
   "scripts": {
+    "core": "lerna run --scope 'graphql-birdseye-core' --parallel",
     "dev": "lerna run --scope 'birdseye-example' --parallel develop",
     "test": "lerna run --scope 'graphql-birdseye*' --parallel test",
     "build": "lerna run --scope 'graphql-birdseye*' build",
