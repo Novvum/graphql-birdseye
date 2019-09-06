@@ -84,6 +84,7 @@ export default class DataStructure extends BirdseyeDataStructure {
         implementations.map((implementation) => {
           const birdseyeImplementation = new BirdseyeImplementation();
           birdseyeImplementation.name = implementation.name;
+          birdseyeImplementation.label = implementation.name;
           birdseyeImplementation.type = birdseyeTypeMap[implementation.name];
           birdseyeType.addImplementation(birdseyeImplementation);
         });

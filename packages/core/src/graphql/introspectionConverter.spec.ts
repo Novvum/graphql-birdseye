@@ -1,5 +1,5 @@
 import IntrospectionBirdseye from "./introspectionConverter";
-import { BirdseyeDataStructure, Type } from "../dataStructure";
+import { BirdseyeDataStructure, Type, AbstractType } from "../dataStructure";
 import dummySchema from "./dummySchema.new";
 
 describe("IntrospectionConverter", () => {
@@ -17,7 +17,7 @@ describe("IntrospectionConverter", () => {
     expect(birdseye).toBeTruthy();
   });
   it("creates a typeMap", () => {
-    expect(birdseye.typeMap).toBeTruthy();
+    expect(Object.keys(birdseye.typeMap).length).toBeGreaterThan(0);
   });
   describe("Types", () => {
     let type;
@@ -25,7 +25,10 @@ describe("IntrospectionConverter", () => {
       type = new IntrospectionBirdseye(schema).typeMap.Post;
     });
     it("has fields", () => {
-      expect(type.fieldMap).toBeTruthy();
+      expect(Object.keys(type.fieldMap).length).toBeGreaterThan(0);
+    });
+    it("has no implementations", () => {
+      expect(type.implementations).toBeFalsy();
     });
     describe("Fields", () => {
       let fields;
@@ -61,8 +64,46 @@ describe("IntrospectionConverter", () => {
       type = new IntrospectionBirdseye(schema).typeMap.Publication;
     });
     it("has fields", () => {
-      expect(type.fieldMap).toBeTruthy();
+      expect(Object.keys(type.fieldMap).length).toBeGreaterThan(0);
+    });
+    it("has implementations", () => {
+      expect(type.implementations.length).toBeGreaterThan(0);
+    });
+    describe("Implementations", () => {
+      let implementation;
+      beforeEach(() => {
+        implementation = (new IntrospectionBirdseye(schema).typeMap
+          .Publication as AbstractType).implementations[0];
+      });
+      it("has a name, label, and type", () => {
+        expect(implementation.name).toBeTruthy();
+        expect(implementation.label).toBeTruthy();
+        expect(implementation.type).toBeTruthy();
+      });
     });
   });
-  describe("Unions", () => {});
+  describe("Unions", () => {
+    let type;
+    beforeEach(() => {
+      type = new IntrospectionBirdseye(schema).typeMap.TestUnion;
+    });
+    it("has no fields", () => {
+      expect(Object.keys(type.fieldMap).length).toEqual(0);
+    });
+    it("has implementations", () => {
+      expect(type.implementations.length).toBeGreaterThan(0);
+    });
+    describe("Implementations", () => {
+      let implementation;
+      beforeEach(() => {
+        implementation = (new IntrospectionBirdseye(schema).typeMap
+          .Publication as AbstractType).implementations[0];
+      });
+      it("has a name, label, and type", () => {
+        expect(implementation.name).toBeTruthy();
+        expect(implementation.label).toBeTruthy();
+        expect(implementation.type).toBeTruthy();
+      });
+    });
+  });
 });

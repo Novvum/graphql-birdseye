@@ -87,6 +87,7 @@ export class Field {
 
 export class Implementation {
   name: string;
+  label: string;
   type: Type;
 }
 export class Connection {
