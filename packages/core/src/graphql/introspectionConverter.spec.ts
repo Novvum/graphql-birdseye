@@ -1,5 +1,5 @@
 import IntrospectionBirdseye from "./introspectionConverter";
-import dummySchema from "./dummySchema.new";
+import dummySchema from "./referenceSchema.new";
 import birdseyeDataStructureTests from "./birdseyeDataStructureTests";
 
 const schema = dummySchema.data.__schema as any;

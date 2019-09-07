@@ -104,7 +104,7 @@ export default {
               args: [],
               type: {
                 kind: "INTERFACE",
-                name: "Publication",
+                name: "TestInterface",
                 ofType: null,
               },
               isDeprecated: false,
@@ -305,7 +305,7 @@ export default {
           interfaces: [
             {
               kind: "INTERFACE",
-              name: "Publication",
+              name: "TestInterface",
               ofType: null,
             },
           ],
@@ -314,7 +314,7 @@ export default {
         },
         {
           kind: "INTERFACE",
-          name: "Publication",
+          name: "TestInterface",
           description: "",
           fields: [
             {
@@ -1258,7 +1258,7 @@ export default {
           interfaces: [
             {
               kind: "INTERFACE",
-              name: "Publication",
+              name: "TestInterface",
               ofType: null,
             },
           ],
