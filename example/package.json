@@ -1,7 +1,7 @@
 {
   "name": "birdseye-example",
   "description": "GraphQL birdseye example project",
-  "version": "1.1.5",
+  "version": "1.2.1",
   "author": "Novvum",
   "private": true,
   "dependencies": {
@@ -19,7 +19,7 @@
     "gatsby-source-filesystem": "^2.0.8",
     "gatsby-source-graphql": "^2.0.15",
     "gatsby-transformer-sharp": "^2.1.17",
-    "graphql-birdseye": "^1.1.5",
+    "graphql-birdseye": "^1.2.1",
     "react": "^16.8.0",
     "react-async-component": "^2.0.0",
     "react-dom": "^16.8.0",
