@@ -1,7 +1,11 @@
 import injectCustomRouter from "./router";
 import injectCustomShapes from "./shapes";
 import defaultTheme, { Theme } from "../theme";
-import { BirdseyeDataStructure, Type as BirdseyeType } from "../dataStructure";
+import {
+  BirdseyeDataStructure,
+  Type as BirdseyeType,
+  AbstractType,
+} from "../dataStructure";
 import { mapToArray } from "../utils";
 var joint = require("jointjs");
 var svgPanZoom = require("svg-pan-zoom");
@@ -46,7 +50,7 @@ export default class JointJS {
       width: bounds.width,
       height: bounds.height,
       background: {
-        color: this.theme.colors.background
+        color: this.theme.colors.background,
       },
       gridSize: 1,
       async: true,
@@ -55,15 +59,15 @@ export default class JointJS {
         args: {
           endDirection: ["top", "bottom"],
           paddingBox: 200,
-          step: 100
-        }
+          step: 100,
+        },
       },
       defaultConnector: { name: "rounded", args: { radius: 200 } },
       interactive: {
         linkMove: false,
-        elementMove: false
+        elementMove: false,
       },
-      validateMagnet: () => false
+      validateMagnet: () => false,
     });
     await this.renderElements({ animate: false });
     this.bindInteractionEvents();
@@ -71,7 +75,7 @@ export default class JointJS {
       this.paper.options.async = false;
       this.resizeToFit({ animate: false });
       this.mounted = true;
-    })
+    });
   }
 
   destroy() {
@@ -88,42 +92,41 @@ export default class JointJS {
     // show link tools
     this.paper.on("link:mouseover", (linkView: any) => {
       const links = this.graph.getLinks();
-      links.map(link => {
+      links.map((link) => {
         if (link === linkView.model) {
           return;
         }
         link.transitionColor(this.theme.colors.line.inactive, {
-          duration: TRANSITION_DURATION / 2
-        })
-        link.toBack()
+          duration: TRANSITION_DURATION / 2,
+        });
+        link.toBack();
       });
       linkView.model.transitionColor(this.theme.colors.line.active, {
-        duration: TRANSITION_DURATION / 2
+        duration: TRANSITION_DURATION / 2,
       });
       linkView.model.toFront({
-        deep: true
+        deep: true,
       });
       linkView.showTools();
     });
-    this.paper.on("element:magnet:pointerclick", (cell: any, evt: any, port: any, x, y) => {
-      evt.stopPropagation()
-      console.log(cell, evt, port, x, y)
-    })
+    this.paper.on(
+      "element:magnet:pointerclick",
+      (cell: any, evt: any, port: any, x, y) => {
+        evt.stopPropagation();
+        console.log(cell, evt, port, x, y);
+      }
+    );
     this.paper.on("cell:mouseover", (cell: any, evt: any) => {
       if (!cell.model.isElement()) {
         return null;
       }
       cell.model.toFront({
-        deep: true
+        deep: true,
       });
       // return;
       let activePort = this.getHoveredPort(cell, evt);
-      cell.model.getPorts().map(port => {
-        cell.model.portProp(
-          port.id,
-          "attrs/.port-body/fill",
-          "transparent"
-        );
+      cell.model.getPorts().map((port) => {
+        cell.model.portProp(port.id, "attrs/.port-body/fill", "transparent");
       });
       if (!activePort) {
         return this.highlightLinks({ cell: cell.model });
@@ -134,7 +137,7 @@ export default class JointJS {
         return this.highlightLinks({ cell: cell.model });
       }
       return this.highlightLinks({
-        links: [activeLink]
+        links: [activeLink],
       });
     });
     this.paper.on("blank:mouseover cell:mouseover", () => {
@@ -196,7 +199,7 @@ export default class JointJS {
   }
   setSize(width: number, height: number) {
     this.paper.setDimensions(width, height);
-    this.panZoom && this.panZoom.resize()
+    this.panZoom && this.panZoom.resize();
   }
 
   /**
@@ -209,18 +212,18 @@ export default class JointJS {
     animate?: boolean;
   }) {
     await this.startLoading();
-    const newGraph = new joint.dia.Graph().fromJSON(this.graph.toJSON())
+    const newGraph = new joint.dia.Graph().fromJSON(this.graph.toJSON());
     const {
       dataStructure = this.dataStructure,
       activeType = this.activeType,
-      animate = this.animation
+      animate = this.animation,
     } = opts || {};
     const toRenderTypes: BirdseyeType[] = dataStructure.getAdjacentTypes(
       activeType
     );
     await Promise.all([
       this.removeUnusedElements(toRenderTypes, newGraph),
-      this.addNewElements(toRenderTypes, newGraph)
+      this.addNewElements(toRenderTypes, newGraph),
     ]);
     await this.layoutGraph({ animate, newGraph: newGraph });
     await this.stopLoading();
@@ -231,9 +234,11 @@ export default class JointJS {
     graph = this.graph
   ) {
     const currentElements = graph.getElements();
-    const toRemove = currentElements.filter(
-      (elem: any) => !toRenderTypes.find(type => type.name === elem.id)
-    ).map(elem => [elem, ...graph.getConnectedLinks(elem)]);
+    const toRemove = currentElements
+      .filter(
+        (elem: any) => !toRenderTypes.find((type) => type.name === elem.id)
+      )
+      .map((elem) => [elem, ...graph.getConnectedLinks(elem)]);
     graph.removeCells(...[].concat.apply([], toRemove));
   }
   private async addNewElements(
@@ -244,50 +249,59 @@ export default class JointJS {
       return `${t.name}_${f.name}_${ct.name}`;
     }
     const currentElements = graph.getElements();
-    const filtered = toRenderTypes.filter(type => {
+    const filtered = toRenderTypes.filter((type) => {
       return !currentElements.find((elem: any) => elem.id === type.name);
     });
-    const nodes = filtered.map(type => {
+    const nodes = filtered.map((type) => {
       const fields = type.getFields();
+      const inPorts = Object.keys(fields);
+      const outPorts = mapToArray(fields).map((field) => {
+        const connectedType = field.type;
+        const id = getPortId(type, field, connectedType);
+        let label = field.typeLabel;
+        return {
+          id,
+          label,
+        };
+      });
+      let typeLabel = type.name;
+      if (type instanceof AbstractType) {
+      }
       return this.createNode({
         id: type.name,
-        position: (
-          graph.getBBox() || this.paper.getContentBBox()
-        ).topLeft(),
+        position: (graph.getBBox() || this.paper.getContentBBox()).topLeft(),
         attrs: {
           ".label": {
-            text: type.name
-          }
+            text: typeLabel,
+          },
+          ".sub-label": type instanceof AbstractType && {
+            text: `<<${type.kind.toLowerCase()}>>`,
+          },
         },
-        inPorts: Object.keys(fields),
-        outPorts: mapToArray(fields).map(field => {
-          const connectedType = field.type;
-          const id = getPortId(type, field, connectedType);
-          let label = field.typeLabel;
-          return {
-            id,
-            label
-          };
-        })
+        inPorts,
+        outPorts,
       });
     });
-    const links = toRenderTypes.map(type => {
+    const links = toRenderTypes.map((type) => {
       const fields = type.getFields();
       const targetMap = mapToArray(fields).reduce((accumulator, field) => {
         const connectedType = field.type;
         if (
-          connectedType instanceof BirdseyeType && toRenderTypes.findIndex(type => type.name === connectedType.name) >
-          -1
+          connectedType instanceof BirdseyeType &&
+          toRenderTypes.findIndex((type) => type.name === connectedType.name) >
+            -1
         ) {
           accumulator[connectedType.name] = [
             ...(accumulator[connectedType.name] || []),
-            field
+            field,
           ];
         }
         return accumulator;
       }, {});
-      return (Object.keys(targetMap).map(targetId => this.createLink(type.name, targetId)));
-    })
+      return Object.keys(targetMap).map((targetId) =>
+        this.createLink(type.name, targetId)
+      );
+    });
     graph.addCells([...nodes, ...[].concat.apply([], links)]);
   }
 
@@ -302,29 +316,27 @@ export default class JointJS {
     joint.layout.DirectedGraph.layout(newGraph, {
       nodeSep: 200,
       rankSep: 500,
-      rankDir: "LR"
+      rankDir: "LR",
     });
     this.graph.fromJSON(newGraph.toJSON());
     await Promise.all([
       this.mounted && this.resizeToFit(),
-      ...this.graph
-        .getElements()
-        .map(async cell => {
-          if (!animate) {
-            return;
-          }
-          const originalPosition = originalPositions[cell.attributes.id];
-          const targetPosition = cell.position();
-          cell.position(originalPosition.x, originalPosition.y);
-          const links = this.graph.getConnectedLinks(cell);
-          this.graph.removeLinks(cell);
-          await cell.transitionPosition(targetPosition, {
-            duration: TRANSITION_DURATION
-          });
-          links.map(async link => {
-            link.addTo(this.graph);
-          })
-        })
+      ...this.graph.getElements().map(async (cell) => {
+        if (!animate) {
+          return;
+        }
+        const originalPosition = originalPositions[cell.attributes.id];
+        const targetPosition = cell.position();
+        cell.position(originalPosition.x, originalPosition.y);
+        const links = this.graph.getConnectedLinks(cell);
+        this.graph.removeLinks(cell);
+        await cell.transitionPosition(targetPosition, {
+          duration: TRANSITION_DURATION,
+        });
+        links.map(async (link) => {
+          link.addTo(this.graph);
+        });
+      }),
     ]);
     this.graph.resetCells(this.graph.getCells());
   }
@@ -336,7 +348,7 @@ export default class JointJS {
   private createNode(node: any) {
     const cachedCell = this.cachedCells[node.id];
     if (cachedCell) {
-      return cachedCell
+      return cachedCell;
     }
     var a1 = new joint.shapes.devs.Type(node);
     this.cachedCells[node.id] = a1;
@@ -344,7 +356,7 @@ export default class JointJS {
   }
   private createLink(sourceId: string, targetId: string) {
     const hash = `${sourceId}_${targetId}`;
-    const cachedLink = this.cachedLinks[hash]
+    const cachedLink = this.cachedLinks[hash];
     if (cachedLink) {
       return cachedLink;
     }
@@ -354,9 +366,9 @@ export default class JointJS {
       anchor: {
         name: `top`,
         args: {
-          dy: 5
-        }
-      }
+          dy: 5,
+        },
+      },
     });
     link.target({
       id: targetId,
@@ -364,16 +376,16 @@ export default class JointJS {
         name: `top`,
         args: {
           dy: this.theme.row.height - 5,
-          dx: 10
-        }
-      }
+          dx: 10,
+        },
+      },
     });
     this.cachedLinks[hash] = link;
     return link;
   }
   private addTools(link: any) {
     var toolsView = new joint.dia.ToolsView({
-      tools: [new joint.linkTools.TargetArrowhead()]
+      tools: [new joint.linkTools.TargetArrowhead()],
     });
     link.findView(this.paper).addTools(toolsView);
   }
@@ -381,15 +393,17 @@ export default class JointJS {
     if (!cell.model.isElement()) {
       return null;
     }
-    var port = cell.findAttribute('port', evt.target);
-    return port ? {
-      id: port,
-      link: this.graph
-        .getLinks(cell)
-        .find(
-          cell => cell.isLink() && cell.attributes.source.port === port
-        )
-    } : null
+    var port = cell.findAttribute("port", evt.target);
+    return port
+      ? {
+          id: port,
+          link: this.graph
+            .getLinks(cell)
+            .find(
+              (cell) => cell.isLink() && cell.attributes.source.port === port
+            ),
+        }
+      : null;
   }
   private highlightLinks(args: { cell?: any; links?: any }) {
     const { cell, links: lks } = args;
@@ -397,19 +411,19 @@ export default class JointJS {
     if (cell) {
       links = this.graph.getConnectedLinks(cell);
     }
-    this.graph.getLinks().map(link => {
+    this.graph.getLinks().map((link) => {
       link.transitionColor(this.theme.colors.line.inactive, {
-        duration: TRANSITION_DURATION
+        duration: TRANSITION_DURATION,
       });
-      link.toBack()
+      link.toBack();
     });
-    links.map(link => {
+    links.map((link) => {
       link.transitionColor(this.theme.colors.line.active, {
-        duration: TRANSITION_DURATION
-      })
+        duration: TRANSITION_DURATION,
+      });
       link.toFront({
-        deep: true
-      })
+        deep: true,
+      });
     });
   }
 
@@ -423,7 +437,7 @@ export default class JointJS {
         fit: true,
         controlIconsEnabled: true,
         maxZoom: this.maxZoom,
-        panEnabled: false
+        panEnabled: false,
       });
 
       this.paper.on("blank:pointerdown", () => {
@@ -464,11 +478,11 @@ export default class JointJS {
   animatePanAndZoom(x, y, zoomEnd) {
     let pan = this.panZoom.getPan();
     let panEnd = { x, y };
-    animate(pan, panEnd, props => {
+    animate(pan, panEnd, (props) => {
       this.panZoom.pan({ x: props.x, y: props.y });
       if (props === panEnd) {
         let zoom = this.panZoom.getZoom();
-        animate({ zoom }, { zoom: zoomEnd }, props => {
+        animate({ zoom }, { zoom: zoomEnd }, (props) => {
           this.panZoom.zoom(props.zoom);
         });
       }
