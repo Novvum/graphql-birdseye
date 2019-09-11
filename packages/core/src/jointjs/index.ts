@@ -1,5 +1,5 @@
 import injectCustomRouter from "./router";
-import injectCustomShapes from "./shapes";
+import injectCustomShapes, { PortKind } from "./shapes";
 import defaultTheme, { Theme } from "../theme";
 import {
   BirdseyeDataStructure,
@@ -262,10 +262,26 @@ export default class JointJS {
         return {
           id,
           label,
+          kind: PortKind.PORT,
         };
       });
       let typeLabel = type.name;
       if (type instanceof AbstractType) {
+        const label = type.kind;
+        inPorts.push(label);
+        outPorts.push({
+          id: `${label}_out`,
+          label: "",
+          kind: PortKind.LABEL,
+        });
+        type.implementations.map((impl) => {
+          inPorts.push(`${type.kind}_${impl.label}`);
+          outPorts.push({
+            id: getPortId(type, impl, impl.type),
+            label: impl.label,
+            kind: PortKind.PORT,
+          });
+        });
       }
       return this.createNode({
         id: type.name,
@@ -299,7 +315,7 @@ export default class JointJS {
         return accumulator;
       }, {});
       return Object.keys(targetMap).map((targetId) =>
-        this.createLink(type.name, targetId)
+        this.createSolidLink(type.name, targetId)
       );
     });
     graph.addCells([...nodes, ...[].concat.apply([], links)]);
@@ -354,13 +370,25 @@ export default class JointJS {
     this.cachedCells[node.id] = a1;
     return a1;
   }
-  private createLink(sourceId: string, targetId: string) {
+  private createSolidLink(sourceId: string, targetId: string) {
+    return this.createLink({
+      getLink: () => new joint.shapes.devs.Link(),
+      sourceId,
+      targetId,
+    });
+  }
+  private createLink(args: {
+    getLink: () => any;
+    sourceId: string;
+    targetId: string;
+  }) {
+    const { getLink, sourceId, targetId } = args;
     const hash = `${sourceId}_${targetId}`;
     const cachedLink = this.cachedLinks[hash];
     if (cachedLink) {
       return cachedLink;
     }
-    var link = new joint.shapes.devs.Link();
+    var link = getLink();
     link.source({
       id: sourceId,
       anchor: {

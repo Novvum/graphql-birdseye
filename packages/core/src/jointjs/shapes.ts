@@ -1,5 +1,10 @@
 import { Theme } from "../theme";
 
+export enum PortKind {
+  PORT,
+  LABEL,
+}
+
 export default (joint, theme: Theme) => {
   joint.dia.FastPaper = joint.dia.Paper.extend({
     sortViews: () => undefined,
@@ -39,7 +44,7 @@ export default (joint, theme: Theme) => {
           ...theme.divider,
         },
         ".joint-port": {
-          y: theme.row.height,
+          refY: theme.row.height,
         },
       },
       ports: {
@@ -161,20 +166,51 @@ export default (joint, theme: Theme) => {
       },
       createPortItem: function(group: any, port: any) {
         this._setSize();
+        const containerSize = this.get("size");
+        let p = port;
+        let portLabelStyle = {};
+        let portBodyStyle = {};
+        if (typeof port === "object") {
+          p = port;
+        } else {
+          p = {
+            id: port,
+            label: port,
+          };
+          if (["UNION", "INTERFACE"].includes(port)) {
+            p.label = port === "UNION" ? "possible types" : "implementations";
+            p.kind = PortKind.LABEL;
+            portLabelStyle = {
+              "font-weight": "normal",
+              x:
+                containerSize.width / 2 -
+                (p.label.length * theme.row.fieldNameLabel["font-size"]) / 3,
+            };
+            portBodyStyle = { x: "50%" };
+          } else if (
+            port.startsWith("UNION_") ||
+            port.startsWith("INTERFACE_")
+          ) {
+            p.label = "";
+            p.kind = PortKind.PORT;
+          }
+        }
         return {
-          id: typeof port === "object" ? port.id : port,
+          id: p.id,
           group: group,
           attrs: {
             ".port-label": {
-              text: typeof port === "object" ? port.label : port,
+              text: p.label,
+              ...portLabelStyle,
             },
             ".port-body": {
-              width: this.get("size").width,
-              x: group === "out" ? -this.get("size").width : 0,
+              width: containerSize.width,
+              x: group === "out" ? -containerSize.width : 0,
+              ...portBodyStyle,
             },
             ".port-body-highlighter": {
-              width: this.get("size").width - 20,
-              x: group === "out" ? -this.get("size").width + 10 : 10,
+              width: containerSize.width - 20,
+              x: group === "out" ? -containerSize.width + 10 : 10,
               height: theme.row.height,
               y: -theme.row.height / 2,
             },
