@@ -23,6 +23,11 @@ const nodeStyles = {
       "text-anchor": "middle",
       fill: "#ffffff",
     },
+    subLabel: {
+      "font-size": 15,
+      "text-anchor": "middle",
+      fill: "#ffffff",
+    },
     container: {
       fill: "transparent", // colors.primary,
       // stroke: colors.primary

@@ -7,9 +7,8 @@ import { asyncComponent } from "react-async-component";
 import birdseyeTheme from "../styled/theme/birdseyeTheme";
 import { styled } from "../styled";
 import Tooltip from "../components/Tooltip";
-import schema from "graphql-birdseye-core/src/graphql/dummySchema";
+import schema from "graphql-birdseye-core/src/graphql/referenceSchema.new";
 
-console.log(schema);
 //async component for gatsby production build
 const GraphqlBirdseye = asyncComponent({
   resolve: () => require("graphql-birdseye"),

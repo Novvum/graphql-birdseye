@@ -15,30 +15,27 @@
 9 silly runScriptInDir build [] core
 10 silly getExecOpts { cwd:
 10 silly getExecOpts    '/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/packages/core' }
-11 silly runScriptInDir build [] react
-12 silly getExecOpts { cwd:
-12 silly getExecOpts    '/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/packages/react' }
-13 error build Errored while running script in 'graphql-birdseye'
-14 error execute callback with error
-15 error Error: Command failed: yarn run build
-15 error
-15 error src/index.tsx → dist/index.js, dist/index.es.js...
-15 error [!] (rpt2 plugin) Error: /Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/packages/react/src/index.tsx(19,18): semantic error TS2304 [31mCannot find name 'Birdseye'.[39m
-15 error src/index.tsx
-15 error Error: /Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/packages/react/src/index.tsx(19,18): semantic error TS2304 [31mCannot find name 'Birdseye'.[39m
-15 error     at error (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup/dist/rollup.js:3597:30)
-15 error     at Object.error (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup/dist/rollup.js:16499:17)
-15 error     at Object.error (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup/dist/rollup.js:16908:31)
-15 error     at RollupContext.error (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup-plugin-typescript2/src/rollupcontext.ts:37:18)
-15 error     at lodash_2 (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup-plugin-typescript2/src/print-diagnostics.ts:41:11)
-15 error     at arrayEach (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup-plugin-typescript2/node_modules/lodash/lodash.js:516:11)
-15 error     at forEach (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup-plugin-typescript2/node_modules/lodash/lodash.js:9344:14)
-15 error     at _.each (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup-plugin-typescript2/src/print-diagnostics.ts:9:2)
-15 error     at cache.getCompiled (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup-plugin-typescript2/src/index.ts:220:6)
-15 error     at TsCache.getCompiled (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup-plugin-typescript2/src/tscache.ts:192:11)
-15 error
-15 error error Command failed with exit code 1.
-15 error $ rollup -c && prettier --write 'dist/**/*.ts'
-15 error info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
-15 error
-15 error     at Promise.all.then.arr (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/lerna/node_modules/execa/index.js:236:11)
+11 error build Errored while running script in 'graphql-birdseye-core'
+12 error execute callback with error
+13 error Error: Command failed: yarn run build
+13 error
+13 error src/index.ts → dist/index.js, dist/index.es.js...
+13 error [!] (rpt2 plugin) Error: /Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/packages/core/src/jointjs/index.ts(276,11): semantic error TS2304 [31mCannot find name 'lab'.[39m
+13 error src/jointjs/index.ts
+13 error Error: /Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/packages/core/src/jointjs/index.ts(276,11): semantic error TS2304 [31mCannot find name 'lab'.[39m
+13 error     at error (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup/dist/rollup.js:3597:30)
+13 error     at Object.error (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup/dist/rollup.js:16499:17)
+13 error     at Object.error (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup/dist/rollup.js:16908:31)
+13 error     at RollupContext.error (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup-plugin-typescript2/src/rollupcontext.ts:37:18)
+13 error     at lodash_2 (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup-plugin-typescript2/src/print-diagnostics.ts:41:11)
+13 error     at arrayEach (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup-plugin-typescript2/node_modules/lodash/lodash.js:516:11)
+13 error     at forEach (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup-plugin-typescript2/node_modules/lodash/lodash.js:9344:14)
+13 error     at _.each (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup-plugin-typescript2/src/print-diagnostics.ts:9:2)
+13 error     at Object.transform (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup-plugin-typescript2/src/index.ts:247:5)
+13 error     at /Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/rollup/dist/rollup.js:16611:25
+13 error
+13 error error Command failed with exit code 1.
+13 error $ rollup -c && prettier --write 'dist/**/*.ts'
+13 error info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
+13 error
+13 error     at Promise.all.then.arr (/Users/rohitravikoti/Documents/Personal projects/graphql-birdseye/node_modules/lerna/node_modules/execa/index.js:236:11)
